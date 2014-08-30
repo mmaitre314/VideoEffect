@@ -33,4 +33,4 @@ Visual Studio does not handle such an `<Extension>` element. The AppxManifest ne
 
 Filter processing is done in Bgra8 color space, which means that the video pipeline will typically do two conversions from and to a YUV colorspace (typically NV12 or YUY2).
 
-Video frames are received as IMF2DBuffer2 from the Media Foundation pipeline and successively wrapped inside [IBuffer](http://msdn.microsoft.com/en-us/library/windows/apps/windows.storage.streams.ibuffer.aspx), Bitmap, and BitmapImageSource/BitmapRenderer to be handed to the Nokia Imaging SDK.
+Video frames are received as [IMF2DBuffer2](http://msdn.microsoft.com/en-us/library/windows/desktop/hh447827) from the Media Foundation pipeline and successively wrapped inside [IBuffer](http://msdn.microsoft.com/en-us/library/windows/apps/windows.storage.streams.ibuffer.aspx), Bitmap, and BitmapImageSource/BitmapRenderer to be handed to the Nokia Imaging SDK.
