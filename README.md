@@ -1,16 +1,21 @@
+VideoEffects
+============
+
 This is a demo applying image effects from the [Nokia Imaging SDK](http://developer.nokia.com/resources/library/Imaging_API_Ref/index.html) to videos in [Universal Store Apps](http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx) for Windows Phone 8.1 and Windows 8.1.
 
-    var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+```c#
+var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+{
+    return new IFilter[]
     {
-        return new IFilter[]
-        {
-            new AntiqueFilter(),
-            new FlipFilter(FlipMode.Horizontal)
-        };
-    }));
+        new AntiqueFilter(),
+        new FlipFilter(FlipMode.Horizontal)
+    };
+}));
 
-    var transcoder = new MediaTranscoder();
-    transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
+var transcoder = new MediaTranscoder();
+transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
+```
 
 See the unit tests for more C# and C++/CX code samples. 
 
@@ -20,14 +25,16 @@ The meat of the code is under VideoEffects/VideoEffects/VideoEffects.Shared. It 
 
 The Runtime Class must be declared in the AppxManifest files of Store apps wanting to call it:
 
-    <Extensions>
-      <Extension Category="windows.activatableClass.inProcessServer">
-        <InProcessServer>
-          <Path>VideoEffects.WindowsPhone.dll</Path>
-          <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
-        </InProcessServer>
-      </Extension>
-    </Extensions>
+```xml
+<Extensions>
+  <Extension Category="windows.activatableClass.inProcessServer">
+    <InProcessServer>
+      <Path>VideoEffects.WindowsPhone.dll</Path>
+      <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
+    </InProcessServer>
+  </Extension>
+</Extensions>
+```
 
 Visual Studio does not handle such an `<Extension>` element. The AppxManifest needs to be opened as raw XML and the XML code snippet above copy/pasted. For Windows Store apps the `<path>` is VideoEffects.Windows.dll.
 
