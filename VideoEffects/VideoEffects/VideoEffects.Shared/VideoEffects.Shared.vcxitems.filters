@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Video1in1outEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferOnMF2DBuffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FilterChainFactory.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.cpp" />
+  </ItemGroup>
+</Project>
