@@ -8,14 +8,14 @@ Original|Antique + HorizontalFlip
 ![Original](http://mmaitre314.github.io/VideoEffect/car_original.jpg)|![Processed](http://mmaitre314.github.io/VideoEffect/car_processed.jpg)
 
 ```c#
-var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+var definition = new LumiaEffectDefinition(() =>
 {
     return new IFilter[]
     {
         new AntiqueFilter(),
         new FlipFilter(FlipMode.Horizontal)
     };
-}));
+});
 
 var transcoder = new MediaTranscoder();
 transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
