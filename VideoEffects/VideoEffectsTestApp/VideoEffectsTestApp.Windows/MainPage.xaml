@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="VideoEffectsTestApp.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VideoEffectsTestApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Orientation="Vertical">
+            <MediaElement Name="MediaElementPreview" Height="300" Width="400" AreTransportControlsEnabled="True" AutoPlay="True" IsLooping="True" Stretch="Uniform" />
+            <CaptureElement Name="CapturePreview" Height="300" Width="400" Stretch="Uniform"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Right" Click="StartMediaElementPreview_Click"/>
+            <Button Name="StartCaptureElementPreview" Content="MediaCapture Preview" HorizontalAlignment="Right" Click="StartMediaCapturePreview_Click"/>
+            <Button Name="StartCaptureElementRecord" Content="MediaCapture Record" HorizontalAlignment="Center" Click="StartMediaCaptureRecord_Click"/>
+            <Button Name="Transcode" Content="MediaTranscoder" HorizontalAlignment="Right" Click="Transcode_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

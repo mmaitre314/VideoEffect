@@ -45,25 +45,16 @@ void LumiaEffect::StartStreaming(_In_ unsigned long format, _In_ unsigned int wi
     _format = format;
     _width = width;
     _height = height;
-
-    // Create the sample allocator
-    ComPtr<IMFAttributes> attr;
-    CHK(MFCreateAttributes(&attr, 3));
-    CHK(attr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&_allocator)));
-    CHK(_allocator->InitializeSampleAllocatorEx(1, 50, attr.Get(), _outputType.Get()));
-
-    _effect = ref new FilterEffect();
-    _effect->Filters = _filters;
 }
 
-ComPtr<IMFSample> LumiaEffect::ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample)
+bool LumiaEffect::ProcessSample(
+    _In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample,
+    _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample
+    )
 {
     // Get the input/output buffers
-    ComPtr<IMFSample> outputSample;
     ComPtr<IMFMediaBuffer> outputBuffer;
     ComPtr<IMFMediaBuffer> inputBuffer;
-    CHK(_allocator->AllocateSample(&outputSample));
     CHK(inputSample->GetBufferByIndex(0, &inputBuffer));
     CHK(outputSample->GetBufferByIndex(0, &outputBuffer));
 
@@ -78,31 +69,35 @@ ComPtr<IMFSample> LumiaEffect::ProcessSample(_In_ const Microsoft::WRL::ComPtr<I
 
     // Copy buffer length (work around SinkWriter bug)
     unsigned long length = 0;
-    CHK(inputBuffer->GetCurrentLength(&length));
+    CHK(inputBuffer->GetCurrentLength(&length)); // TODO: use outputbuffer's contiguous length instead
     CHK(outputBuffer->SetCurrentLength(length));
 
     // Create input/output IBuffer wrappers
     ComPtr<WinRTBufferOnMF2DBuffer> outputWinRTBuffer;
     ComPtr<WinRTBufferOnMF2DBuffer> inputWinRTBuffer;
-    CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&outputWinRTBuffer, outputBuffer, MF2DBuffer_LockFlags_Write));
-    CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&inputWinRTBuffer, inputBuffer, MF2DBuffer_LockFlags_Read));
+    CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&outputWinRTBuffer, outputBuffer, MF2DBuffer_LockFlags_Write, _defaultStride));
+    CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&inputWinRTBuffer, inputBuffer, MF2DBuffer_LockFlags_Read, _defaultStride));
 
     // Create input/Ouput bitmap wrappers
     Size size = { (float)_width, (float)_height };
     auto outputBitmap = ref new Bitmap(size, ColorMode::Bgra8888, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());
     auto inputBitmap = ref new Bitmap(size, ColorMode::Bgra8888, inputWinRTBuffer->GetStride(), inputWinRTBuffer->GetIBuffer());
- 
+
     // Process the bitmap
-    _effect->Source = ref new BitmapImageSource(inputBitmap);
-    auto renderer = ref new BitmapRenderer(_effect, outputBitmap);
+    FilterEffect^ effect = ref new FilterEffect();
+    effect->Filters = _filters;
+    effect->Source = ref new BitmapImageSource(inputBitmap);
+    auto renderer = ref new BitmapRenderer(effect, outputBitmap);
     create_task(renderer->RenderAsync()).get(); // Blocks for the duration of processing (must be called in MTA)
 
-    return outputSample;
+    // Force MF buffer unlocking (race-condition refcount leak in effects? xVP cannot always lock the buffer afterward)
+    outputWinRTBuffer->Unlock();
+    inputWinRTBuffer->Unlock();
+
+    return true; // Always produces data
 }
 
 void LumiaEffect::EndStreaming()
 {
-    _effect = nullptr; // Release to avoid keeping the last input Bitmap alive
-    _allocator = nullptr;
 }
 

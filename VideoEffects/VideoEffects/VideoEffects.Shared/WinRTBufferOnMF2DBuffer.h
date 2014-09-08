@@ -17,23 +17,38 @@ public:
     {
     }
 
-    HRESULT RuntimeClassInitialize(_In_ const Microsoft::WRL::ComPtr<IMFMediaBuffer> buffer, _In_ MF2DBuffer_LockFlags lockFlags)
+    HRESULT RuntimeClassInitialize(_In_ const Microsoft::WRL::ComPtr<IMFMediaBuffer> buffer, _In_ MF2DBuffer_LockFlags lockFlags, _In_ unsigned int defaultStride)
     {
         return ExceptionBoundary([=]()
         {
-            _buffer2D = As<IMF2DBuffer2>(buffer);
-
-            unsigned char *pScanline0 = nullptr;
-            long pitch;
-            CHK(_buffer2D->Lock2DSize(lockFlags, &pScanline0, &pitch, &_pBuffer, &_capacity));
-
-            if (pitch <= 0)
+            if (SUCCEEDED(buffer.As(&_buffer2D)))
             {
-                CHK(OriginateError(E_INVALIDARG, L"Negative stride"));
-            }
+                unsigned char *pScanline0 = nullptr;
+                long pitch;
+                CHK(_buffer2D->Lock2DSize(lockFlags, &pScanline0, &pitch, &_pBuffer, &_capacity));
 
-            _length = _capacity;
-            _stride = static_cast<unsigned int>(pitch);
+                if (pitch <= 0)
+                {
+                    CHK(OriginateError(E_INVALIDARG, L"Negative stride"));
+                }
+
+                _length = _capacity;
+                _stride = static_cast<unsigned int>(pitch);
+            }
+            else
+            {
+                // When inserted in MediaElement the effect may get 1D buffers (maybe in other cases too)
+                // so support fallback to 1D buffers here
+
+                unsigned long capacity;
+                unsigned long length;
+                CHK(buffer->Lock(&_pBuffer, &capacity, &length));
+
+                _buffer1D = buffer;
+                _capacity = capacity;
+                _length = length;
+                _stride = defaultStride;
+            }
         });
     }
 
@@ -47,6 +62,21 @@ public:
         return reinterpret_cast<Windows::Storage::Streams::IBuffer^>(
             static_cast<ABI::Windows::Storage::Streams::IBuffer*>(this)
             );
+    }
+
+    void Unlock()
+    {
+        if (_pBuffer != nullptr)
+        {
+            if (_buffer2D != nullptr)
+            {
+                (void)_buffer2D->Unlock2D();
+            }
+            if (_buffer1D != nullptr)
+            {
+                (void)_buffer1D->Unlock();
+            }
+        }
     }
 
     //
@@ -105,10 +135,7 @@ private:
 
     virtual ~WinRTBufferOnMF2DBuffer()
     {
-        if (_pBuffer != nullptr)
-        {
-            (void)_buffer2D->Unlock2D();
-        }
+        Unlock();
     }
 
     unsigned char *_pBuffer;
@@ -117,4 +144,5 @@ private:
     unsigned int _stride;
 
     Microsoft::WRL::ComPtr<IMF2DBuffer2> _buffer2D;
+    Microsoft::WRL::ComPtr<IMFMediaBuffer> _buffer1D;
 };

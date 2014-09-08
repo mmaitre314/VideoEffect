@@ -22,7 +22,7 @@
 //
 //        // Data processing
 //        void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
-//        Microsoft::WRL::ComPtr<IMFSample> ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& sample); // May return nullptr if no output yet
+//        bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample); // Returns true if produced data
 //        void EndStreaming();
 //
 //        PluginEffect();
@@ -48,6 +48,30 @@
 #pragma warning(push)
 #pragma warning(disable:4127) // Warning: C4127 "conditional expression is constant".
 
+// Bring definitions from d3d11.h when app does not use D3D
+#ifndef __d3d11_h__
+typedef enum D3D11_USAGE
+{
+    D3D11_USAGE_DEFAULT = 0,
+    D3D11_USAGE_IMMUTABLE = 1,
+    D3D11_USAGE_DYNAMIC = 2,
+    D3D11_USAGE_STAGING = 3
+} D3D11_USAGE;
+typedef enum D3D11_BIND_FLAG
+{
+    D3D11_BIND_VERTEX_BUFFER = 0x1L,
+    D3D11_BIND_INDEX_BUFFER = 0x2L,
+    D3D11_BIND_CONSTANT_BUFFER = 0x4L,
+    D3D11_BIND_SHADER_RESOURCE = 0x8L,
+    D3D11_BIND_STREAM_OUTPUT = 0x10L,
+    D3D11_BIND_RENDER_TARGET = 0x20L,
+    D3D11_BIND_DEPTH_STENCIL = 0x40L,
+    D3D11_BIND_UNORDERED_ACCESS = 0x80L,
+    D3D11_BIND_DECODER = 0x200L,
+    D3D11_BIND_VIDEO_ENCODER = 0x400L
+} D3D11_BIND_FLAG; 
+#endif
+
 template<class Plugin, bool D3DAware = false>
 class Video1in1outEffect : public Microsoft::WRL::RuntimeClass<
     Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::RuntimeClassType::WinRtClassicComMix>,
@@ -61,6 +85,8 @@ public:
 
     Video1in1outEffect()
         : _streaming(false)
+        , _defaultStride(0)
+        , _defaultSize(0)
     {
     }
 
@@ -149,7 +175,7 @@ public:
             MFT_INPUT_STREAM_WHOLE_SAMPLES | 
             MFT_INPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER | 
             MFT_INPUT_STREAM_FIXED_SAMPLE_SIZE;
-        streamInfo->cbSize = 0;
+        streamInfo->cbSize = _defaultSize;
         streamInfo->cbMaxLookahead = 0;
         streamInfo->cbAlignment = 0;
 
@@ -169,12 +195,17 @@ public:
             return OriginateError(MF_E_INVALIDSTREAMNUMBER);
         }
 
-        streamInfo->dwFlags = 
-            MFT_OUTPUT_STREAM_WHOLE_SAMPLES | 
-            MFT_OUTPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER | 
-            MFT_OUTPUT_STREAM_FIXED_SAMPLE_SIZE |
-            MFT_OUTPUT_STREAM_PROVIDES_SAMPLES;
-        streamInfo->cbSize = 0;
+        streamInfo->dwFlags =
+            MFT_OUTPUT_STREAM_WHOLE_SAMPLES |
+            MFT_OUTPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER |
+            MFT_OUTPUT_STREAM_FIXED_SAMPLE_SIZE;
+
+        if (D3DAware)
+        {
+            streamInfo->dwFlags |= MFT_OUTPUT_STREAM_PROVIDES_SAMPLES;
+        }
+
+        streamInfo->cbSize = _defaultSize;
         streamInfo->cbAlignment = 0;
 
         return S_OK;
@@ -324,6 +355,7 @@ public:
             else if (!(flags & MFT_SET_TYPE_TEST_ONLY))
             {
                 _outputType = type;
+                _UpdateFormatInfo();
                 _SetStreamingState(false);
             }
         });
@@ -490,7 +522,7 @@ public:
                 notAccepting = true;
             }
 
-            _sample = sample;
+            _sample = _NormalizeSample(sample);
         });
         return FAILED(hr) ? hr : notAccepting ? MF_E_NOTACCEPTING : S_OK;
     }
@@ -504,13 +536,28 @@ public:
 
             if ((outputSamples == nullptr) || (status == nullptr))
             {
-                CHK(E_POINTER);
+                CHK(OriginateError(E_POINTER));
             }
             *status = 0;
 
-            if ((flags != 0) || (outputBufferCount != 1) || (outputSamples[0].pSample != nullptr))
+            if ((flags != 0) || (outputBufferCount != 1))
             {
-                CHK(E_INVALIDARG);
+                CHK(OriginateError(E_INVALIDARG));
+            }
+
+            if (D3DAware)
+            {
+                if ((outputSamples[0].pSample != nullptr))
+                {
+                    CHK(OriginateError(E_INVALIDARG));
+                }
+            }
+            else
+            {
+                if ((outputSamples[0].pSample == nullptr))
+                {
+                    CHK(OriginateError(E_INVALIDARG));
+                }
             }
 
             _SetStreamingState(true);
@@ -521,16 +568,31 @@ public:
                 return;
             }
 
-            ::Microsoft::WRL::ComPtr<IMFSample> sample = static_cast<Plugin*>(this)->ProcessSample(_sample);
+            ::Microsoft::WRL::ComPtr<IMFSample> outputSample;
+            if (D3DAware)
+            {
+                // TODO: handle sample allocation for D3DAware MFTs
+                CHK(OriginateError(E_NOTIMPL, L"TODO: sample allocator"));
+            }
+            else
+            {
+                outputSample = outputSamples[0].pSample;
+            }
+
+            bool producedData = static_cast<Plugin*>(this)->ProcessSample(_sample, outputSample);
+
             _sample = nullptr;
 
-            if (sample == nullptr)
+            if (!producedData)
             {
                 needMoreInput = true;
             }
             else
             {
-                outputSamples[0].pSample = sample.Detach();
+                if (D3DAware)
+                {
+                    outputSamples[0].pSample = outputSample.Detach();
+                }
             }
         });
         return FAILED(hr) ? hr : needMoreInput ? MF_E_TRANSFORM_NEED_MORE_INPUT : S_OK;
@@ -541,7 +603,9 @@ protected:
     ::Microsoft::WRL::ComPtr<IMFMediaType> _inputType;
     ::Microsoft::WRL::ComPtr<IMFMediaType> _outputType;
     ::Microsoft::WRL::ComPtr<IMFDXGIDeviceManager> _deviceManager;
+    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _allocator;
     ::std::vector<unsigned long> _supportedFormats;
+    unsigned int _defaultStride; // Buffer stride when receiving 1D buffers (happens sometimes in MediaElement)
 
     ~Video1in1outEffect()
     {
@@ -643,20 +707,186 @@ private:
         return static_cast<Plugin*>(this)->IsFormatSupported(subtype.Data1, width, height);
     }
 
+    void _UpdateFormatInfo()
+    {
+        if (_outputType == nullptr)
+        {
+            _defaultStride = 0;
+            _defaultSize = 0;
+        }
+        else
+        {
+            unsigned int stride;
+            if (FAILED(_outputType->GetUINT32(MF_MT_DEFAULT_STRIDE, &stride)))
+            {
+                stride = 0;
+            }
+
+            if ((int)stride < 0)
+            {
+                CHK(OriginateError(E_INVALIDARG, L"Negative stride not supported"));
+            }
+
+            GUID subtype;
+            unsigned int width;
+            unsigned int height;
+            CHK(_outputType->GetGUID(MF_MT_SUBTYPE, &subtype));
+            CHK(MFGetAttributeSize(_outputType.Get(), MF_MT_FRAME_SIZE, &width, &height));
+
+            unsigned int size = 0;
+            if (subtype == MFVideoFormat_NV12)
+            {
+                stride = stride != 0 ? stride : width;
+                size = (3 * stride * height) / 2;
+            }
+            else if ((subtype == MFVideoFormat_YUY2) || (subtype == MFVideoFormat_UYVY))
+            {
+                stride = stride != 0 ? stride : ((2 * width) + 3) & ~3; // DWORD aligned
+                size = stride * height;
+            }
+            else if ((subtype == MFVideoFormat_ARGB32) || (subtype == MFVideoFormat_RGB32))
+            {
+                stride = stride != 0 ? stride : 4 * width;
+                size = stride * height;
+            }
+            else
+            {
+                CHK(OriginateError(E_INVALIDARG, L"Unknown format"));
+            }
+
+            _defaultStride = stride;
+            _defaultSize = size;
+        }
+    }
+
+    // Enforce the input sample contains a single 2D buffer, making copies as necessary
+    ::Microsoft::WRL::ComPtr<IMFSample> _NormalizeSample(_In_ const ::Microsoft::WRL::ComPtr<IMFSample>& sample)
+    {
+        ::Microsoft::WRL::ComPtr<IMFSample> normalizedSample;
+
+        ::Microsoft::WRL::ComPtr<IMFMediaBuffer> buffer1D;
+        unsigned long bufferCount;
+        CHK(sample->GetBufferCount(&bufferCount));
+        if (bufferCount == 1)
+        {
+            CHK(sample->GetBufferByIndex(0, &buffer1D));
+        }
+        else
+        {
+            CHK(sample->ConvertToContiguousBuffer(&buffer1D)); // merge multiple buffers
+        }
+
+        ::Microsoft::WRL::ComPtr<IMF2DBuffer2> buffer2D;
+        if (FAILED(buffer1D.As(&buffer2D)))
+        {
+            CHK(_allocator->AllocateSample(&normalizedSample));
+
+            ::Microsoft::WRL::ComPtr<IMFMediaBuffer> normalizedBuffer1D;
+            ::Microsoft::WRL::ComPtr<IMF2DBuffer2> normalizedBuffer2D;
+            CHK(normalizedSample->GetBufferByIndex(0, &normalizedBuffer1D));
+            CHK(normalizedBuffer1D.As(&normalizedBuffer2D));
+
+            GUID subtype;
+            unsigned int width;
+            unsigned int height;
+            CHK(_outputType->GetGUID(MF_MT_SUBTYPE, &subtype));
+            CHK(MFGetAttributeSize(_outputType.Get(), MF_MT_FRAME_SIZE, &width, &height));
+
+            // Copy the buffer
+            unsigned long capacity;
+            unsigned long length;
+            unsigned char* pBuffer = nullptr;
+            CHK(buffer1D->Lock(&pBuffer, &capacity, &length));
+            Buffer1DUnlocker buffer1DUnlocker(buffer1D);
+            if ((subtype == MFVideoFormat_ARGB32) || (subtype == MFVideoFormat_RGB32))
+            {
+                // RGB in system memory in bottom-up and ContiguousCopyFrom() does not handle the vertial flipping needed
+                // so do a custom copy here
+
+                unsigned long normalizedCapacity;
+                long normalizedStride;
+                unsigned char *pNormalizedScanline0 = nullptr;
+                unsigned char *pNormalizedBuffer = nullptr;
+                CHK(normalizedBuffer2D->Lock2DSize(
+                    MF2DBuffer_LockFlags_Write, 
+                    &pNormalizedScanline0, 
+                    &normalizedStride, 
+                    &pNormalizedBuffer, 
+                    &normalizedCapacity
+                    ));
+                Buffer2DUnlocker normalizedBuffer2DUnlocker(normalizedBuffer2D);
+
+                if (length < _defaultStride * height)
+                {
+                    CHK(OriginateError(MF_E_BUFFERTOOSMALL));
+                }
+
+                CHK(MFCopyImage(
+                    pNormalizedScanline0,
+                    normalizedStride,
+                    pBuffer + _defaultStride * (height - 1),
+                    -(int)_defaultStride,
+                    4 * width,
+                    height
+                    ));
+            }
+            else
+            {
+                CHK(normalizedBuffer2D->ContiguousCopyFrom(pBuffer, length));
+            }
+
+            // Update 1D length
+            unsigned long normalizedLength;
+            CHK(normalizedBuffer2D->GetContiguousLength(&normalizedLength));
+            CHK(normalizedBuffer1D->SetCurrentLength(normalizedLength));
+
+            // Copy time
+            long long time;
+            if (SUCCEEDED(sample->GetSampleTime(&time)))
+            {
+                CHK(normalizedSample->SetSampleTime(time));
+            }
+
+            // Copy duration
+            long long duration;
+            if (SUCCEEDED(sample->GetSampleDuration(&duration)))
+            {
+                CHK(normalizedSample->SetSampleDuration(duration));
+            }
+
+            // Copy attributes (shallow copy)
+            CHK(sample->CopyAllItems(normalizedSample.Get()));
+        }
+
+        return normalizedSample != nullptr ? normalizedSample : sample;
+    }
+
     void _SetStreamingState(bool streaming)
     {
         if (streaming && !_streaming)
         {
             if (_inputType == nullptr)
             {
-                CHK(MF_E_INVALIDREQUEST);
+                CHK(OriginateError(MF_E_INVALIDREQUEST, L"Streaming started without an input media type"));
             }
 
-            GUID subtype;
-            CHK(_inputType->GetGUID(MF_MT_SUBTYPE, &subtype));
+            // Create the sample allocator
+            ::Microsoft::WRL::ComPtr<IMFAttributes> attr;
+            CHK(MFCreateAttributes(&attr, 3));
+            CHK(attr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+            CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&_allocator)));
+            if (_deviceManager != nullptr)
+            {
+                CHK(attr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                CHK(attr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET));
+                CHK(_allocator->SetDirectXManager(_deviceManager.Get()));
+            }
+            CHK(_allocator->InitializeSampleAllocatorEx(0, 50, attr.Get(), _outputType.Get()));
 
+            GUID subtype;
             unsigned int width;
             unsigned int height;
+            CHK(_inputType->GetGUID(MF_MT_SUBTYPE, &subtype));
             CHK(MFGetAttributeSize(_inputType.Get(), MF_MT_FRAME_SIZE, &width, &height));
 
             static_cast<Plugin*>(this)->StartStreaming(subtype.Data1, width, height);
@@ -664,14 +894,49 @@ private:
         else if (!streaming && _streaming)
         {
             static_cast<Plugin*>(this)->EndStreaming();
+
+            _allocator = nullptr;
         }
         _streaming = streaming;
     }
+
+    class Buffer1DUnlocker
+    {
+    public:
+        Buffer1DUnlocker(_In_ const ::Microsoft::WRL::ComPtr<IMFMediaBuffer>& buffer)
+            : _buffer(buffer)
+        {
+        }
+        ~Buffer1DUnlocker()
+        {
+            (void)_buffer->Unlock();
+        }
+
+    private:
+        ::Microsoft::WRL::ComPtr<IMFMediaBuffer> _buffer;
+    };
+
+    class Buffer2DUnlocker
+    {
+    public:
+        Buffer2DUnlocker(_In_ const ::Microsoft::WRL::ComPtr<IMF2DBuffer2>& buffer)
+            : _buffer(buffer)
+        {
+        }
+        ~Buffer2DUnlocker()
+        {
+            (void)_buffer->Unlock2D();
+        }
+
+    private:
+        ::Microsoft::WRL::ComPtr<IMF2DBuffer2> _buffer;
+    };
 
     ::Microsoft::WRL::ComPtr<IMFAttributes> _attributes;
     ::Microsoft::WRL::ComPtr<IMFSample> _sample;
 
     bool _streaming; // use _SetStreamingState() to update
+    unsigned int _defaultSize;
 
     ::Microsoft::WRL::Wrappers::SRWLock _lock;
 };

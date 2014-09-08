@@ -36,7 +36,7 @@ public:
 
     // Data processing
     void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
-    Microsoft::WRL::ComPtr<IMFSample> ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& sample);
+    bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample);
     void EndStreaming();
 
 private:
@@ -44,10 +44,7 @@ private:
     unsigned long _format;
     unsigned int _width;
     unsigned int _height;
-
-    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _allocator;
-
-    Nokia::Graphics::Imaging::FilterEffect^ _effect;
+    
     Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ _filters;
 };
 
