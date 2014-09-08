@@ -22,14 +22,14 @@ namespace UnitTests
             StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Input/Car.mp4"));
             StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MC_Basic.mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+            var definition = new LumiaEffectDefinition(() =>
             {
                 return new IFilter[]
                 {
                     new AntiqueFilter(),
                     new FlipFilter(FlipMode.Horizontal)
                 };
-            }));
+            });
 
             var clip = await MediaClip.CreateFromFileAsync(source);
             clip.VideoEffectDefinitions.Add(definition);

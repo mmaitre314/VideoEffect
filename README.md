@@ -3,15 +3,19 @@ VideoEffects
 
 This is a demo applying image effects from the [Nokia Imaging SDK](http://developer.nokia.com/resources/library/Imaging_API_Ref/index.html) to videos in [Universal Store Apps](http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx) for Windows Phone 8.1 and Windows 8.1.
 
+Original|Antique + HorizontalFlip
+----|----
+![Original](http://mmaitre314.github.io/VideoEffect/car_original.jpg)|![Processed](http://mmaitre314.github.io/VideoEffect/car_processed.jpg)
+
 ```c#
-var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+var definition = new LumiaEffectDefinition(() =>
 {
     return new IFilter[]
     {
         new AntiqueFilter(),
         new FlipFilter(FlipMode.Horizontal)
     };
-}));
+});
 
 var transcoder = new MediaTranscoder();
 transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);

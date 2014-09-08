@@ -38,14 +38,14 @@ namespace UnitTests
             // Note: this does not work - ExampleFilterChain must be in a separate WinRT DLL
             // var definition = new LumiaEffectDefinition(typeof(ExampleFilterChain).FullName);
 
-            var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+            var definition = new LumiaEffectDefinition(() =>
             {
                 return new IFilter[]
                 {
                     new AntiqueFilter(),
                     new FlipFilter(FlipMode.Horizontal)
                 };
-            }));
+            });
 
             var transcoder = new MediaTranscoder();
             transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
