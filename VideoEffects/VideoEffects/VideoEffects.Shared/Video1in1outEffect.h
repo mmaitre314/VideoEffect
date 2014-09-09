@@ -504,15 +504,15 @@ public:
 
             if (sample == nullptr)
             {
-                CHK(E_POINTER);
+                CHK(OriginateError(E_POINTER));
             }
             if (flags != 0)
             {
-                CHK(E_INVALIDARG);
+                CHK(OriginateError(E_INVALIDARG));
             }
             if (streamID != 0)
             {
-                CHK(MF_E_INVALIDSTREAMNUMBER);
+                CHK(OriginateError(MF_E_INVALIDSTREAMNUMBER));
             }
 
             _SetStreamingState(true);
@@ -520,6 +520,12 @@ public:
             if ((_inputType == nullptr) || (_outputType == nullptr) || (_sample != nullptr))
             {
                 notAccepting = true;
+                return;
+            }
+
+            if (MFGetAttributeUINT32(sample, MFSampleExtension_Interlaced, false))
+            {
+                CHK(OriginateError(E_INVALIDARG, L"Interlaced content not supported"));
             }
 
             _sample = _NormalizeSample(sample);
@@ -687,8 +693,14 @@ private:
             return false;
         }
 
-        if (MFGetAttributeUINT32(type, MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive) != MFVideoInterlace_Progressive)
+        unsigned int interlacing = MFGetAttributeUINT32(type, MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive);
+        if ((interlacing == MFVideoInterlace_FieldInterleavedUpperFirst) ||
+            (interlacing == MFVideoInterlace_FieldInterleavedLowerFirst) ||
+            (interlacing == MFVideoInterlace_FieldSingleUpper) ||
+            (interlacing == MFVideoInterlace_FieldSingleLower))
         {
+            // Note: MFVideoInterlace_MixedInterlaceOrProgressive is allowed here and interlacing checked via MFSampleExtension_Interlaced 
+            // on samples themselves
             return false;
         }
 
