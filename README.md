@@ -1,7 +1,7 @@
 VideoEffects
 ============
 
-This is a demo applying image effects from the [Nokia Imaging SDK](http://developer.nokia.com/resources/library/Imaging_API_Ref/index.html) to videos in [Universal Store Apps](http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx) for Windows Phone 8.1 and Windows 8.1.
+Enables image effects from the [Nokia Imaging SDK](http://developer.nokia.com/resources/library/Imaging_API_Ref/index.html) to be applied to videos in [Universal Store Apps](http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx) for Windows Phone 8.1 and Windows 8.1.
 
 Original|Antique + HorizontalFlip
 ----|----
@@ -21,9 +21,9 @@ var transcoder = new MediaTranscoder();
 transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
 ```
 
-See the unit tests for more C# and C++/CX code samples. 
+See the unit tests for more C# and C++/CX code samples. Binaries are available via [NuGet](https://www.nuget.org/packages/MMaitre.VideoEffects/).
 
-Effects can be applied via [MediaTranscoder](http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.transcoding.mediatranscoder.aspx), [MediaComposition](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.editing.mediacomposition.aspx), [MediaCapture](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.capture.mediacapture.aspx), or [MediaElement](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.ui.xaml.controls.mediaelement.aspx), although only the first one has really been tested (and quite lightly for that matter).
+Effects can be applied via [MediaTranscoder](http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.transcoding.mediatranscoder.aspx), [MediaComposition](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.editing.mediacomposition.aspx), [MediaCapture](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.capture.mediacapture.aspx), or [MediaElement](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.ui.xaml.controls.mediaelement.aspx).
 
 The meat of the code is under VideoEffects/VideoEffects/VideoEffects.Shared. It consists in a Windows Runtime Class “VideoEffects.LumiaEffect” wrapping chains of Imaging SDK’s IFilter inside [IMFTransform](http://msdn.microsoft.com/en-us/library/windows/desktop/ms696260)/[IMediaExtension](http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.imediaextension.aspx). The rest is mostly support code and unit tests. 
 
