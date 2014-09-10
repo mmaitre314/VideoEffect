@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="clean.cmd" />
+    <None Include="MMaitre.VideoEffects.native.targets" />
+    <None Include="MMaitre.VideoEffects.nuspec" />
+    <None Include="MMaitre.VideoEffects.Symbols.nuspec" />
+    <None Include="MMaitre.VideoEffects.win81.targets" />
+    <None Include="MMaitre.VideoEffects.wpa81.targets" />
+    <None Include="pack.cmd" />
+    <None Include="Pack.sln" />
+    <None Include="Package.appxmanifest.win81.transform" />
+    <None Include="Package.appxmanifest.wpa81.transform" />
+  </ItemGroup>
+</Project>

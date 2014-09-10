@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>MMaitre.VideoEffects.Symbols</id>
+    <title>Video Effects symbols</title>
+    <version>$NuGetVersion$</version>
+    <authors>Matthieu Maitre</authors>
+    <owners>Matthieu Maitre</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/mmaitre314/VideoEffect</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Applies effects from the Nokia Imaging SDK to videos.</summary>
+    <description>Provides a Media Extension applying image effects from the Nokia Imaging SDK to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1.</description>
+    <copyright>Copyright © 2014, Matthieu Maitre. All rights reserved.</copyright>
+    <tags>Native WinRT</tags>
+  </metadata>
+  <files>
+    <!-- symbols -->
+    <file src="Release\VideoEffects.Windows\VideoEffects.Windows.pdb" target="build\native\Windows\x86\" />
+    <file src="x64\Release\VideoEffects.Windows\VideoEffects.Windows.pdb" target="build\native\Windows\x64\" />
+    <file src="ARM\Release\VideoEffects.Windows\VideoEffects.Windows.pdb" target="build\native\Windows\Arm\" />
+    <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.pdb" target="build\native\WindowsPhone\x86\" />
+    <file src="ARM\Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.pdb" target="build\native\WindowsPhone\Arm\" />
+    
+    <!-- source -->
+    <file src="..\VideoEffects\**\*.cpp" target="src\" />
+    <file src="..\VideoEffects\**\*.h"   target="src\" />
+  </files>
+</package>
+

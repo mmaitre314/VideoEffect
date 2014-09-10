@@ -19,8 +19,13 @@ namespace VideoEffects
 #endif
     {
     public:
+
+        ///<summary>Creates an effect definition from a class implementing IFilterChainFactory.</summary>
+        ///<param name='filterChainFactory'>ActivatableClassId of the filter factory.</param>
         LumiaEffectDefinition(_In_ Platform::String^ filterChainFactory);
 
+        ///<summary>Creates an effect definition from a FilterChainFactory delegate.
+        ///</summary>
         [Windows::Foundation::Metadata::DefaultOverload]
         LumiaEffectDefinition(_In_ VideoEffects::FilterChainFactory^ filterChainFactory);
 

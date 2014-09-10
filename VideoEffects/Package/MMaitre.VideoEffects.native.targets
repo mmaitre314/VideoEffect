@@ -1,0 +1,15 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CheckNonStoreApp" Condition="'$(WindowsAppContainer)' != 'true'" BeforeTargets="PrepareForBuild">
+    <Error Text="Only Store Apps are supported." />
+  </Target>
+  <ItemGroup>
+    <Reference Include="VideoEffects.Windows" Condition="'$(ApplicationType)' == 'Windows Store'">
+      <HintPath>$(MSBuildThisFileDirectory)\Windows\$(PlatformTarget)\VideoEffects.winmd</HintPath>
+      <Implementation>VideoEffects.Windows.dll</Implementation>
+    </Reference>
+    <Reference Include="VideoEffects.WindowsPhone" Condition="'$(ApplicationType)' == 'Windows Phone'">
+      <HintPath>$(MSBuildThisFileDirectory)\WindowsPhone\$(PlatformTarget)\VideoEffects.winmd</HintPath>
+      <Implementation>VideoEffects.WindowsPhone.dll</Implementation>
+    </Reference>
+  </ItemGroup>
+</Project>

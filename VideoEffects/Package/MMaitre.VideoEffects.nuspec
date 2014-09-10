@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>MMaitre.VideoEffects</id>
+    <title>Video Effects</title>
+    <version>$NuGetVersion$</version>
+    <authors>Matthieu Maitre</authors>
+    <owners>Matthieu Maitre</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/mmaitre314/VideoEffect</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Applies effects from the Nokia Imaging SDK to videos.</summary>
+    <description>Provides a Media Extension applying image effects from the Nokia Imaging SDK to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1.</description>
+    <copyright>Copyright © 2014, Matthieu Maitre. All rights reserved.</copyright>
+    <tags>Native WinRT</tags>
+    <dependencies>
+      <dependency id="NokiaImagingSDK" version="1.2.151" />
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- implementation -->
+    <file src="Release\VideoEffects.Windows\VideoEffects.Windows.dll" target="build\native\Windows\x86\" />
+    <file src="x64\Release\VideoEffects.Windows\VideoEffects.Windows.dll" target="build\native\Windows\x64\" />
+    <file src="ARM\Release\VideoEffects.Windows\VideoEffects.Windows.dll" target="build\native\Windows\Arm\" />
+    <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.dll" target="build\native\WindowsPhone\x86\" />
+    <file src="ARM\Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.dll" target="build\native\WindowsPhone\Arm\" />
+
+    <!-- metadata -->
+    <file src="Release\VideoEffects.Windows\VideoEffects.winmd" target="build\native\Windows\x86\" />
+    <file src="Release\VideoEffects.Windows\VideoEffects.winmd" target="build\native\Windows\x64\" />
+    <file src="Release\VideoEffects.Windows\VideoEffects.winmd" target="build\native\Windows\Arm\" />
+    <file src="Release\VideoEffects.WindowsPhone\VideoEffects.winmd" target="build\native\WindowsPhone\x86\" />
+    <file src="Release\VideoEffects.WindowsPhone\VideoEffects.winmd" target="build\native\WindowsPhone\Arm\" />
+
+    <!-- Intellisense -->
+    <file src="Release\VideoEffects.Windows\VideoEffects.Windows.xml" target="build\native\Windows\x86\VideoEffects.xml" />
+    <file src="Release\VideoEffects.Windows\VideoEffects.Windows.xml" target="build\native\Windows\x64\VideoEffects.xml" />
+    <file src="Release\VideoEffects.Windows\VideoEffects.Windows.xml" target="build\native\Windows\Arm\VideoEffects.xml" />
+    <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.xml" target="build\native\WindowsPhone\x86\VideoEffects.xml" />
+    <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.xml" target="build\native\WindowsPhone\Arm\VideoEffects.xml" />
+
+    <!-- build -->
+    <file src="MMaitre.VideoEffects.native.targets" target="build\native\MMaitre.VideoEffects.targets" />
+    <file src="MMaitre.VideoEffects.win81.targets" target="build\win81\MMaitre.VideoEffects.targets" />
+    <file src="MMaitre.VideoEffects.wpa81.targets" target="build\wpa81\MMaitre.VideoEffects.targets" />
+    
+    <!-- Component registration (Note: native apps need to add that manually) -->
+    <file src="Package.appxmanifest.win81.transform" target="content\win81\Package.appxmanifest.transform" />
+    <file src="Package.appxmanifest.wpa81.transform" target="content\wpa81\Package.appxmanifest.transform" />
+    
+  </files>
+</package>
