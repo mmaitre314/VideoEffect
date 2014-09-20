@@ -11,11 +11,15 @@ namespace VideoEffects
     {
     public:
 
-        ///<summary>Creates an effect definition from a FilterChainFactory delegate.
-        ///</summary>
+        ///<summary>Creates an effect definition a Bgrx8 CSO shader (32bpp no alpha).</summary>
+        ShaderEffectDefinition(
+            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderBgrx8
+            );
+
+        ///<summary>Creates an effect definition an Nv12 CSO shader.</summary>
         ShaderEffectDefinition(
             _In_ Windows::Storage::Streams::IBuffer^ compiledShaderY,
-            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderUV
+            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderCbCr
             );
 
         virtual property Platform::String^ ActivatableClassId 

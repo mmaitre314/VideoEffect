@@ -22,4 +22,8 @@
     <Content Include="$(MSBuildThisFileDirectory)Invert_100_NV12_UV.cso" />
     <Content Include="$(MSBuildThisFileDirectory)Invert_100_NV12_Y.cso" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Invert_093_RGB32.cso" />
+    <Content Include="$(MSBuildThisFileDirectory)Invert_100_RGB32.cso" />
+  </ItemGroup>
 </Project>

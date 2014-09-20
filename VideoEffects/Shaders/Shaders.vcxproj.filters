@@ -18,5 +18,7 @@
     <FxCompile Include="Invert_093_NV12_Y.hlsl" />
     <FxCompile Include="Invert_100_NV12_UV.hlsl" />
     <FxCompile Include="Invert_100_NV12_Y.hlsl" />
+    <FxCompile Include="Invert_093_RGB32.hlsl" />
+    <FxCompile Include="Invert_100_RGB32.hlsl" />
   </ItemGroup>
 </Project>

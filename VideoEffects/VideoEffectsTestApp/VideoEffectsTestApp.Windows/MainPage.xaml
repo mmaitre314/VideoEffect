@@ -19,7 +19,8 @@
             <Button Name="Transcode" Content="MediaTranscoder" HorizontalAlignment="Right" Click="Transcode_Click"/>
             <ComboBox Name="EffectType">
                 <ComboBoxItem IsSelected="True">Lumia effect</ComboBoxItem>
-                <ComboBoxItem>Shader effect</ComboBoxItem>
+                <ComboBoxItem>Shader effect (Nv12)</ComboBoxItem>
+                <ComboBoxItem>Shader effect (Bgrx8)</ComboBoxItem>
             </ComboBox>
         </StackPanel>
     </Grid>

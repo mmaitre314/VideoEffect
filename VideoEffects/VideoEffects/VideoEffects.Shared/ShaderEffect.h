@@ -45,7 +45,17 @@ public:
 
 private:
 
-    Microsoft::WRL::ComPtr<IMFSample> _ProcessSampleNv12(_In_ const Microsoft::WRL::ComPtr<IMFSample>& sample);
+    void ShaderEffect::_DrawNV12(
+        long long time,
+        const Microsoft::WRL::ComPtr<IMFDXGIBuffer>& inputBufferDxgi,
+        const Microsoft::WRL::ComPtr<IMFDXGIBuffer>& outputBufferDxgi
+        );
+
+    void ShaderEffect::_DrawRGB32(
+        long long time,
+        const Microsoft::WRL::ComPtr<IMFDXGIBuffer>& inputBufferDxgi,
+        const Microsoft::WRL::ComPtr<IMFDXGIBuffer>& outputBufferDxgi
+        );
 
     static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> _CreateShaderResourceView(
         _In_ const Microsoft::WRL::ComPtr<ID3D11Device>& device,
@@ -67,6 +77,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> _vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> _pixelShader_NV12_Y;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> _pixelShader_NV12_UV;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> _pixelShader_RGB32;
     Microsoft::WRL::ComPtr<ID3D11SamplerState> _sampleStateLinear;
     Microsoft::WRL::ComPtr<ID3D11InputLayout> _quadLayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer> _frameInfo;
@@ -74,6 +85,7 @@ private:
 
     Windows::Storage::Streams::IBuffer^ _bufferShader_NV12_Y;
     Windows::Storage::Streams::IBuffer^ _bufferShader_NV12_UV;
+    Windows::Storage::Streams::IBuffer^ _bufferShader_RGB32;
 };
 
 ActivatableClass(ShaderEffect);

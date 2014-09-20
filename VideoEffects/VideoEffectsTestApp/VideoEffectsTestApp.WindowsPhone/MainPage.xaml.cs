@@ -194,6 +194,10 @@ namespace VideoEffectsTestApp
                     IBuffer shaderUV = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_UV.cso");
                     return new VideoEffects.ShaderEffectDefinition(shaderY, shaderUV);
 
+                case 2:
+                    IBuffer shader = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_RGB32.cso");
+                    return new VideoEffects.ShaderEffectDefinition(shader);
+
                 default:
                     throw new ArgumentException("Invalid effect type");
             }
