@@ -201,7 +201,7 @@ bool ShaderEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_
     device->GetImmediateContext(&immediateContext);
 
     // Get the resource views
-    ComPtr<ID3D11ShaderResourceView> srvY = _CreateShaderResourceView(device.Get(), inputBufferDxgi, DXGI_FORMAT_R8G8_UNORM);
+    ComPtr<ID3D11ShaderResourceView> srvY = _CreateShaderResourceView(device.Get(), inputBufferDxgi, DXGI_FORMAT_R8_UNORM);
     ComPtr<ID3D11ShaderResourceView> srvUV = _CreateShaderResourceView(device.Get(), inputBufferDxgi, DXGI_FORMAT_R8G8_UNORM);
     ComPtr<ID3D11RenderTargetView> rtvY = _CreateRenderTargetView(device.Get(), outputBufferDxgi, DXGI_FORMAT_R8_UNORM);
     ComPtr<ID3D11RenderTargetView> rtvUV = _CreateRenderTargetView(device.Get(), outputBufferDxgi, DXGI_FORMAT_R8G8_UNORM);
