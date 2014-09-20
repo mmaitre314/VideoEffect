@@ -7,6 +7,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferOnMF2DBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FilterChainFactory.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)D3D11DeviceLock.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -14,5 +17,10 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl" />
   </ItemGroup>
 </Project>

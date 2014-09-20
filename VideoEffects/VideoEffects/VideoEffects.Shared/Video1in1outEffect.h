@@ -462,6 +462,10 @@ public:
             case MFT_MESSAGE_SET_D3D_MANAGER:
                 if (D3DAware)
                 {
+                    if (_streaming)
+                    {
+                        CHK(OriginateError(E_ILLEGAL_METHOD_CALL, L"Cannot update D3D manager while streaming"));
+                    }
                     if (param == 0)
                     {
                         _deviceManager = nullptr;
@@ -577,8 +581,7 @@ public:
             ::Microsoft::WRL::ComPtr<IMFSample> outputSample;
             if (D3DAware)
             {
-                // TODO: handle sample allocation for D3DAware MFTs
-                CHK(OriginateError(E_NOTIMPL, L"TODO: sample allocator"));
+                CHK(_outputAllocator->AllocateSample(&outputSample));
             }
             else
             {
@@ -609,7 +612,8 @@ protected:
     ::Microsoft::WRL::ComPtr<IMFMediaType> _inputType;
     ::Microsoft::WRL::ComPtr<IMFMediaType> _outputType;
     ::Microsoft::WRL::ComPtr<IMFDXGIDeviceManager> _deviceManager;
-    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _allocator;
+    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _inputAllocator;
+    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _outputAllocator;
     ::std::vector<unsigned long> _supportedFormats;
     unsigned int _defaultStride; // Buffer stride when receiving 1D buffers (happens sometimes in MediaElement)
 
@@ -776,6 +780,7 @@ private:
     {
         ::Microsoft::WRL::ComPtr<IMFSample> normalizedSample;
 
+        // Merge multiple buffers to get a single one
         ::Microsoft::WRL::ComPtr<IMFMediaBuffer> buffer1D;
         unsigned long bufferCount;
         CHK(sample->GetBufferCount(&bufferCount));
@@ -785,13 +790,14 @@ private:
         }
         else
         {
-            CHK(sample->ConvertToContiguousBuffer(&buffer1D)); // merge multiple buffers
+            CHK(sample->ConvertToContiguousBuffer(&buffer1D));
         }
 
+        // Convert 1D CPU buffers to 2D CPU buffers
         ::Microsoft::WRL::ComPtr<IMF2DBuffer2> buffer2D;
         if (FAILED(buffer1D.As(&buffer2D)))
         {
-            CHK(_allocator->AllocateSample(&normalizedSample));
+            CHK(_inputAllocator->AllocateSample(&normalizedSample));
 
             ::Microsoft::WRL::ComPtr<IMFMediaBuffer> normalizedBuffer1D;
             ::Microsoft::WRL::ComPtr<IMF2DBuffer2> normalizedBuffer2D;
@@ -847,27 +853,58 @@ private:
                 CHK(normalizedBuffer2D->ContiguousCopyFrom(pBuffer, length));
             }
 
-            // Update 1D length
-            unsigned long normalizedLength;
-            CHK(normalizedBuffer2D->GetContiguousLength(&normalizedLength));
-            CHK(normalizedBuffer1D->SetCurrentLength(normalizedLength));
+            _CopySampleProperties(sample, normalizedSample);
+        }
 
-            // Copy time
-            long long time;
-            if (SUCCEEDED(sample->GetSampleTime(&time)))
+        // Ensure DXGI buffers have D3D11_BIND_SHADER_RESOURCE
+        // On Phone 8.1, input textures may only have D3D11_BIND_DECODER
+        ::Microsoft::WRL::ComPtr<IMFDXGIBuffer> bufferDXGI;
+        if (D3DAware && (_deviceManager != nullptr) && SUCCEEDED(buffer1D.As(&bufferDXGI)))
+        {
+            ::Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+            unsigned int subresource;
+            CHK(bufferDXGI->GetResource(IID_PPV_ARGS(&texture)));
+            CHK(bufferDXGI->GetSubresourceIndex(&subresource));
+
+            D3D11_TEXTURE2D_DESC texDesc;
+            texture->GetDesc(&texDesc);
+
+            if (!(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
             {
-                CHK(normalizedSample->SetSampleTime(time));
-            }
+                CHK(_inputAllocator->AllocateSample(&normalizedSample));
 
-            // Copy duration
-            long long duration;
-            if (SUCCEEDED(sample->GetSampleDuration(&duration)))
-            {
-                CHK(normalizedSample->SetSampleDuration(duration));
-            }
+                ::Microsoft::WRL::ComPtr<IMFMediaBuffer> normalizedBuffer1D;
+                ::Microsoft::WRL::ComPtr<IMFDXGIBuffer> normalizedBufferDXGI;
+                ::Microsoft::WRL::ComPtr<ID3D11Texture2D> normalizedTexture;
+                unsigned int normalizedSubresource;
+                CHK(normalizedSample->GetBufferByIndex(0, &normalizedBuffer1D));
+                CHK(normalizedBuffer1D.As(&normalizedBufferDXGI));
+                CHK(normalizedBufferDXGI->GetResource(IID_PPV_ARGS(&normalizedTexture)));
+                CHK(normalizedBufferDXGI->GetSubresourceIndex(&normalizedSubresource));
 
-            // Copy attributes (shallow copy)
-            CHK(sample->CopyAllItems(normalizedSample.Get()));
+                ::Microsoft::WRL::ComPtr<ID3D11Device> device;
+                HANDLE handle;
+                CHK(_deviceManager->OpenDeviceHandle(&handle));
+                HRESULT hr = _deviceManager->GetVideoService(handle, IID_PPV_ARGS(&device));
+                CHK(_deviceManager->CloseDeviceHandle(handle));
+                CHK(hr);
+
+                ::Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
+                device->GetImmediateContext(&context);
+
+                context->CopySubresourceRegion(
+                    normalizedTexture.Get(),
+                    normalizedSubresource,
+                    0,
+                    0,
+                    0,
+                    texture.Get(),
+                    subresource,
+                    nullptr
+                    );
+
+                _CopySampleProperties(sample, normalizedSample);
+            }
         }
 
         return normalizedSample != nullptr ? normalizedSample : sample;
@@ -883,17 +920,55 @@ private:
             }
 
             // Create the sample allocator
-            ::Microsoft::WRL::ComPtr<IMFAttributes> attr;
-            CHK(MFCreateAttributes(&attr, 3));
-            CHK(attr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-            CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&_allocator)));
-            if (_deviceManager != nullptr)
+            ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> allocator;
+            CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&allocator)));
+            if (_deviceManager == nullptr)
             {
+                CHK(allocator->InitializeSampleAllocatorEx(1, 50, nullptr, _outputType.Get()));
+                _inputAllocator = allocator;
+                _outputAllocator = allocator;
+            }
+            else
+            {
+                CHK(allocator->SetDirectXManager(_deviceManager.Get()));
+
+                ::Microsoft::WRL::ComPtr<IMFAttributes> attr;
+                CHK(MFCreateAttributes(&attr, 3));
+                CHK(attr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
                 CHK(attr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
                 CHK(attr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET));
-                CHK(_allocator->SetDirectXManager(_deviceManager.Get()));
+
+                if (SUCCEEDED(allocator->InitializeSampleAllocatorEx(1, 50, attr.Get(), _outputType.Get())))
+                {
+                    _inputAllocator = allocator;
+                    _outputAllocator = allocator;
+                }
+                else // Try again only enabling only one bind flag on each allocator (Phone 8.1 DX drivers do not support both flags)
+                {
+                    ::Microsoft::WRL::ComPtr<IMFAttributes> inputAttr;
+                    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
+                    CHK(MFCreateAttributes(&inputAttr, 3));
+                    CHK(inputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+                    CHK(inputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                    CHK(inputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE));
+                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
+                    CHK(inputAllocator->SetDirectXManager(_deviceManager.Get()));
+                    CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, inputAttr.Get(), _inputType.Get()));
+
+                    ::Microsoft::WRL::ComPtr<IMFAttributes> outputAttr;
+                    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
+                    CHK(MFCreateAttributes(&outputAttr, 3));
+                    CHK(outputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+                    CHK(outputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                    CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET));
+                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
+                    CHK(outputAllocator->SetDirectXManager(_deviceManager.Get()));
+                    CHK(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get()));
+
+                    _inputAllocator = inputAllocator;
+                    _outputAllocator = outputAllocator;
+                }
             }
-            CHK(_allocator->InitializeSampleAllocatorEx(0, 50, attr.Get(), _outputType.Get()));
 
             GUID subtype;
             unsigned int width;
@@ -907,9 +982,40 @@ private:
         {
             static_cast<Plugin*>(this)->EndStreaming();
 
-            _allocator = nullptr;
+            _inputAllocator = nullptr;
+            _outputAllocator = nullptr;
         }
         _streaming = streaming;
+    }
+
+    void _CopySampleProperties(
+        const ::Microsoft::WRL::ComPtr<IMFSample>& inputSample,
+        const ::Microsoft::WRL::ComPtr<IMFSample>& outputSample
+        )
+    {
+        // Update 1D length
+        unsigned long length;
+        ComPtr<IMFMediaBuffer> outputBuffer;
+        CHK(outputSample->GetBufferByIndex(0, &outputBuffer));
+        CHK(outputBuffer->GetMaxLength(&length));
+        CHK(outputBuffer->SetCurrentLength(length));
+
+        // Copy time
+        long long time;
+        if (SUCCEEDED(inputSample->GetSampleTime(&time)))
+        {
+            CHK(outputSample->SetSampleTime(time));
+        }
+
+        // Copy duration
+        long long duration;
+        if (SUCCEEDED(inputSample->GetSampleDuration(&duration)))
+        {
+            CHK(outputSample->SetSampleDuration(duration));
+        }
+
+        // Copy attributes (shallow copy)
+        CHK(inputSample->CopyAllItems(outputSample.Get()));
     }
 
     class Buffer1DUnlocker

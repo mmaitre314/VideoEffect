@@ -7,6 +7,8 @@
 
 #include <robuffer.h>
 
+#include <d3d11_2.h>
+
 #include <mfapi.h>
 #include <mfidl.h>
 #include <Mferror.h>
@@ -123,4 +125,20 @@ inline unsigned char* GetData(Windows::Storage::Streams::IBuffer^ buffer)
     CHK(((IUnknown*)buffer)->QueryInterface(IID_PPV_ARGS(&bufferAccess)));
     CHK(bufferAccess->Buffer(&bytes));
     return bytes;
+}
+
+//
+// Add a local IVideoEffectDefinition on Winows 8.1 
+// (interface was added in Windows Phone 8.1)
+//
+
+namespace VideoEffects
+{
+#if WINAPI_FAMILY!=WINAPI_FAMILY_PHONE_APP
+    public interface class IVideoEffectDefinition
+    {
+        property Platform::String^ ActivatableClassId { Platform::String^ get(); }
+        property Windows::Foundation::Collections::IPropertySet^ Properties { Windows::Foundation::Collections::IPropertySet^ get(); }
+    };
+#endif
 }

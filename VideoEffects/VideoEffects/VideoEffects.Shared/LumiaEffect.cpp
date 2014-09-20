@@ -4,17 +4,18 @@
 #include "Video1in1outEffect.h"
 #include "LumiaEffect.h"
 
-using namespace VideoEffects;
+using namespace concurrency;
 using namespace Microsoft::WRL;
 using namespace Nokia::Graphics::Imaging;
 using namespace Platform;
+using namespace std;
+using namespace VideoEffects;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
 using namespace Windows::Storage;
 using namespace Windows::Storage::Streams;
-using namespace concurrency;
 
-void LumiaEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props)
+void LumiaEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
 {
     CHKNULL(props);
 
@@ -35,7 +36,7 @@ void LumiaEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfor
 
 std::vector<unsigned long> LumiaEffect::GetSupportedFormats()
 {
-    std::vector<unsigned long> formats;
+    vector<unsigned long> formats;
     formats.push_back(MFVideoFormat_ARGB32.Data1);
     return formats;
 }
@@ -47,10 +48,7 @@ void LumiaEffect::StartStreaming(_In_ unsigned long format, _In_ unsigned int wi
     _height = height;
 }
 
-bool LumiaEffect::ProcessSample(
-    _In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample,
-    _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample
-    )
+bool LumiaEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_ const ComPtr<IMFSample>& outputSample)
 {
     // Get the input/output buffers
     ComPtr<IMFMediaBuffer> outputBuffer;
@@ -69,7 +67,7 @@ bool LumiaEffect::ProcessSample(
 
     // Copy buffer length (work around SinkWriter bug)
     unsigned long length = 0;
-    CHK(inputBuffer->GetCurrentLength(&length)); // TODO: use outputbuffer's contiguous length instead
+    CHK(outputBuffer->GetMaxLength(&length));
     CHK(outputBuffer->SetCurrentLength(length));
 
     // Create input/output IBuffer wrappers
@@ -100,4 +98,3 @@ bool LumiaEffect::ProcessSample(
 void LumiaEffect::EndStreaming()
 {
 }
-

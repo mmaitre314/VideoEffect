@@ -25,12 +25,17 @@
                 <MediaElement Name="MediaCompositionPreview" Height="150" Width="400" AreTransportControlsEnabled="True" AutoPlay="True" IsLooping="True" Stretch="Uniform" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
             </Grid>
 
-            <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Center" Click="StartMediaElementPreview_Click"/>
-            <Button Name="StartCaptureElementPreview" Content="MediaCapture Preview" HorizontalAlignment="Center" Click="StartMediaCapturePreview_Click"/>
-            <Button Name="StartCaptureElementRecord" Content="MediaCapture Record" HorizontalAlignment="Center" Click="StartMediaCaptureRecord_Click"/>
-            <Button Name="StartMediaCompositionPreview" Content="MediaComposition Preview" HorizontalAlignment="Center" Click="StartMediaCompositionPreview_Click"/>
-            <Button Name="StartMediaCompositionRender" Content="MediaComposition Render" HorizontalAlignment="Center" Click="StartMediaCompositionRender_Click"/>
-            <Button Name="StartMediaTranscoder" Content="MediaTranscoder" HorizontalAlignment="Center" Click="Transcode_Click"/>
+            <ComboBox Name="EffectType">
+                <ComboBoxItem IsSelected="True">Lumia effect</ComboBoxItem>
+                <ComboBoxItem>Shader effect</ComboBoxItem>
+            </ComboBox>
+
+            <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Center" Click="StartMediaElementPreview_Click" MinHeight="0"/>
+            <Button Name="StartCaptureElementPreview" Content="MediaCapture Preview" HorizontalAlignment="Center" Click="StartMediaCapturePreview_Click" MinHeight="0"/>
+            <Button Name="StartCaptureElementRecord" Content="MediaCapture Record" HorizontalAlignment="Center" Click="StartMediaCaptureRecord_Click" MinHeight="0" />
+            <Button Name="StartMediaCompositionPreview" Content="MediaComposition Preview" HorizontalAlignment="Center" Click="StartMediaCompositionPreview_Click" MinHeight="0"/>
+            <Button Name="StartMediaCompositionRender" Content="MediaComposition Render" HorizontalAlignment="Center" Click="StartMediaCompositionRender_Click" MinHeight="0"/>
+            <Button Name="StartMediaTranscoder" Content="MediaTranscoder" HorizontalAlignment="Center" Click="Transcode_Click" MinHeight="0"/>
         </StackPanel>
 
     </Grid>

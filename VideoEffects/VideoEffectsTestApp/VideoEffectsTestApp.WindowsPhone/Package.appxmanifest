@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="e5f65e97-27ec-4445-bf3f-a28c3ab6f3de" Publisher="CN=mmaitre" Version="1.0.0.1" />
+  <Identity Name="e5f65e97-27ec-4445-bf3f-a28c3ab6f3de" Publisher="CN=mmaitre" Version="1.0.0.2" />
   <mp:PhoneIdentity PhoneProductId="e5f65e97-27ec-4445-bf3f-a28c3ab6f3de" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>VideoEffectsTestApp.WindowsPhone</DisplayName>
@@ -33,6 +33,7 @@
       <InProcessServer>
         <Path>VideoEffects.WindowsPhone.dll</Path>
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffect" ThreadingModel="both" />
       </InProcessServer>
     </Extension>
   </Extensions>

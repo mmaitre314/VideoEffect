@@ -14,10 +14,13 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)D3D11DeviceLock.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FilterChainFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Video1in1outEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferOnMF2DBuffer.h" />
   </ItemGroup>
@@ -27,8 +30,19 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <VariableName>g_vertexShader</VariableName>
+      <HeaderFileOutput>$(IntDir)%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput>
+      </ObjectFileOutput>
+    </FxCompile>
   </ItemGroup>
 </Project>
