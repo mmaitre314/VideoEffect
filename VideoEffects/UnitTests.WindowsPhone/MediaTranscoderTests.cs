@@ -10,42 +10,27 @@ using Windows.Media.Transcoding;
 using Windows.Media.MediaProperties;
 using Windows.Storage;
 using Windows.Foundation.Collections;
+using Windows.Media.Effects;
 
 namespace UnitTests
 {
-    // Note: this does not work - ExampleFilterChain must be in a separate WinRT DLL
-    //class ExampleFilterChain : IFilterChainFactory
-    //{
-    //    public IEnumerable<IFilter> Create()
-    //    {
-    //        return new IFilter[]
-    //            {
-    //                new AntiqueFilter(),
-    //                new FlipFilter(FlipMode.Horizontal)
-    //            };
-    //    }
-    //}
-
     [TestClass]
     public class MediaTranscoderTests
     {
+        // DataTestMethod/DataRow do not seem to work in Phone tests yet, so fake it
         [TestMethod]
-        public async Task CS_WP_MT_Basic()
+        public async Task CS_WP_MT_Basic_Lumia() { await CS_WP_MT_Basic(EffectType.Lumia); }
+        [TestMethod]
+        public void CS_WP_MT_Basic_ShaderNv12() { Assert.Inconclusive("Does not work in Phone Emulator (no DXGI device manager)"); }
+        [TestMethod]
+        public void CS_WP_MT_Basic_ShaderBgrx8() { Assert.Inconclusive("Does not work in Phone Emulator (no DXGI device manager)"); }
+
+        async Task CS_WP_MT_Basic(EffectType effectType)
         {
             StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Input/Car.mp4"));
-            StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MT_Basic.mp4", CreationCollisionOption.ReplaceExisting);
+            StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MT_Basic" + effectType + ".mp4", CreationCollisionOption.ReplaceExisting);
 
-            // Note: this does not work - ExampleFilterChain must be in a separate WinRT DLL
-            // var definition = new LumiaEffectDefinition(typeof(ExampleFilterChain).FullName);
-
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new AntiqueFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await Utils.CreateEffectDefinitionAsync(effectType);
 
             var transcoder = new MediaTranscoder();
             transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);

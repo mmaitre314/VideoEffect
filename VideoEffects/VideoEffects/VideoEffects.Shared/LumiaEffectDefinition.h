@@ -2,15 +2,6 @@
 
 namespace VideoEffects
 {
-    // Add a local IVideoEffectDefinition on Winows 8.1 (interface was added in Windows Phone 8.1)
-#if WINAPI_FAMILY!=WINAPI_FAMILY_PHONE_APP
-    public interface class IVideoEffectDefinition
-    {
-        property Platform::String^ ActivatableClassId { Platform::String^ get(); }
-        property Windows::Foundation::Collections::IPropertySet^ Properties { Windows::Foundation::Collections::IPropertySet^ get(); }
-    };
-#endif
-
     public ref class LumiaEffectDefinition sealed
 #if WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP
         : public Windows::Media::Effects::IVideoEffectDefinition

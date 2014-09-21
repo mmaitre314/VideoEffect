@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -15,5 +15,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Invert_093_NV12_UV.cso" />
+    <Content Include="$(MSBuildThisFileDirectory)Invert_093_NV12_Y.cso" />
+    <Content Include="$(MSBuildThisFileDirectory)Invert_100_NV12_UV.cso" />
+    <Content Include="$(MSBuildThisFileDirectory)Invert_100_NV12_Y.cso" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Invert_093_RGB32.cso" />
+    <Content Include="$(MSBuildThisFileDirectory)Invert_100_RGB32.cso" />
   </ItemGroup>
 </Project>

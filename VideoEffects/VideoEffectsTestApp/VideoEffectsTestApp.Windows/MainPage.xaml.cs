@@ -13,6 +13,7 @@ using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Media.Transcoding;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -42,14 +43,7 @@ namespace VideoEffectsTestApp
             StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Car.mp4"));
             StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("VideoEffectsTestApp.MediaTranscoder.mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new AntiqueFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await CreateEffectDefinitionAsync();
 
             var transcoder = new MediaTranscoder();
             transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
@@ -71,14 +65,7 @@ namespace VideoEffectsTestApp
                 return;
             }
 
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new AntiqueFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await CreateEffectDefinitionAsync();
 
             var capture = new MediaCapture();
             await capture.InitializeAsync(new MediaCaptureInitializationSettings
@@ -106,14 +93,7 @@ namespace VideoEffectsTestApp
 
             StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("VideoEffectsTestApp.MediaCapture.mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new GrayscaleFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await CreateEffectDefinitionAsync();
 
             var capture = new MediaCapture();
             await capture.InitializeAsync(new MediaCaptureInitializationSettings
@@ -131,23 +111,44 @@ namespace VideoEffectsTestApp
             StartCaptureElementRecord.IsEnabled = true;
         }
 
-        private void StartMediaElementPreview_Click(object sender, RoutedEventArgs e)
+        private async void StartMediaElementPreview_Click(object sender, RoutedEventArgs e)
         {
             StartMediaElementPreview.IsEnabled = false;
 
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new AntiqueFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await CreateEffectDefinitionAsync();
 
             MediaElementPreview.Source = new Uri("ms-appx:///Assets/Car.mp4");
             MediaElementPreview.AddVideoEffect(definition.ActivatableClassId, false, definition.Properties);
 
             StartMediaElementPreview.IsEnabled = true;
+        }
+
+        private async Task<IVideoEffectDefinition> CreateEffectDefinitionAsync()
+        {
+            switch (EffectType.SelectedIndex)
+            {
+                case 0: 
+                    return new LumiaEffectDefinition(() =>
+                {
+                    return new IFilter[]
+                    {
+                        new AntiqueFilter(),
+                        new FlipFilter(FlipMode.Horizontal)
+                    };
+                });
+
+                case 1:
+                    IBuffer shaderY = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_Y.cso");
+                    IBuffer shaderUV = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_UV.cso");
+                    return new VideoEffects.ShaderEffectDefinition(shaderY, shaderUV);
+
+                case 2:
+                    IBuffer shader = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_RGB32.cso");
+                    return new VideoEffects.ShaderEffectDefinition(shader);
+
+                default:
+                    throw new ArgumentException("Invalid effect type");
+            }
         }
     }
 }

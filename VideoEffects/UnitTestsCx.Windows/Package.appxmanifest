@@ -35,6 +35,7 @@
       <InProcessServer>
         <Path>VideoEffects.Windows.dll</Path>
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffect" ThreadingModel="both" />
       </InProcessServer>
     </Extension>
   </Extensions>

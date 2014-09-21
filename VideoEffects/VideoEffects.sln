@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.NuGet.Windows", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.NuGet.WindowsPhone", "UnitTests.NuGet.WindowsPhone\UnitTests.NuGet.WindowsPhone.csproj", "{0C6838FD-9956-48D1-9BE2-C0FC516028E7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shaders", "Shaders\Shaders.vcxproj", "{FFC1BB14-7629-463F-9328-757C775F549B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		VideoEffects\VideoEffects.Shared\VideoEffects.Shared.vcxitems*{90ce9278-d95d-480d-a961-a552fbb24d9c}*SharedItemsImports = 4
@@ -312,7 +314,6 @@ Global
 		{79958B79-9332-45A8-A4D8-1151DB3AB52E}.Release|Win32.ActiveCfg = Release|Win32
 		{79958B79-9332-45A8-A4D8-1151DB3AB52E}.Release|x64.ActiveCfg = Release|Win32
 		{79958B79-9332-45A8-A4D8-1151DB3AB52E}.Release|x86.ActiveCfg = Release|Win32
-		{79958B79-9332-45A8-A4D8-1151DB3AB52E}.Release|x86.Build.0 = Release|Win32
 		{18B2FB9B-0C01-41C1-AFD9-922D0428441D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18B2FB9B-0C01-41C1-AFD9-922D0428441D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18B2FB9B-0C01-41C1-AFD9-922D0428441D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -377,6 +378,24 @@ Global
 		{0C6838FD-9956-48D1-9BE2-C0FC516028E7}.Release|x86.ActiveCfg = Release|x86
 		{0C6838FD-9956-48D1-9BE2-C0FC516028E7}.Release|x86.Build.0 = Release|x86
 		{0C6838FD-9956-48D1-9BE2-C0FC516028E7}.Release|x86.Deploy.0 = Release|x86
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|ARM.ActiveCfg = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|Win32.Build.0 = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|x64.ActiveCfg = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|x86.ActiveCfg = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Debug|x86.Build.0 = Debug|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|ARM.ActiveCfg = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|Win32.ActiveCfg = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|Win32.Build.0 = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|x64.ActiveCfg = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|x86.ActiveCfg = Release|Win32
+		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
