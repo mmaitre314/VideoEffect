@@ -19,20 +19,20 @@ namespace UnitTests
     [TestClass]
     public class MediaCompositionTests
     {
+        // DataTestMethod/DataRow do not seem to work in Phone tests yet, so fake it
         [TestMethod]
-        public async Task CS_WP_MC_Basic()
+        public async Task CS_WP_MC_Basic_Lumia() { await CS_WP_MC_Basic(EffectType.Lumia); }
+        [TestMethod]
+        public void CS_WP_MC_Basic_ShaderNv12() { Assert.Inconclusive("Does not work in Phone Emulator (no DXGI device manager)"); }
+        [TestMethod]
+        public void CS_WP_MC_Basic_ShaderBgrx8() { Assert.Inconclusive("Does not work in Phone Emulator (no DXGI device manager)"); }
+
+        async Task CS_WP_MC_Basic(EffectType effectType)
         {
             StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Input/Car.mp4"));
-            StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MC_Basic.mp4", CreationCollisionOption.ReplaceExisting);
+            StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MC_Basic_" + effectType + ".mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new AntiqueFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await Utils.CreateEffectDefinitionAsync(effectType);
 
             var clip = await MediaClip.CreateFromFileAsync(source);
             clip.VideoEffectDefinitions.Add(definition);
@@ -43,20 +43,16 @@ namespace UnitTests
             await composition.RenderToFileAsync(destination);
         }
 
-        [TestMethod]
-        public async Task CS_WP_MC_PreviewTranscode()
+        [DataTestMethod]
+        [DataRow(EffectType.Lumia, DisplayName = "Lumia")]
+        [DataRow(EffectType.ShaderNv12, DisplayName = "ShaderNv12")]
+        [DataRow(EffectType.ShaderBgrx8, DisplayName = "ShaderBgrx8")]
+        public async Task CS_WP_MC_PreviewTranscode(EffectType effectType)
         {
             StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Input/Car.mp4"));
-            StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MC_PreviewTranscode.mp4", CreationCollisionOption.ReplaceExisting);
+            StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("CS_WP_MC_PreviewTranscode_" + effectType + ".mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = new LumiaEffectDefinition(() =>
-            {
-                return new IFilter[]
-                {
-                    new AntiqueFilter(),
-                    new FlipFilter(FlipMode.Horizontal)
-                };
-            });
+            var definition = await Utils.CreateEffectDefinitionAsync(effectType);
 
             var clip = await MediaClip.CreateFromFileAsync(source);
             clip.VideoEffectDefinitions.Add(definition);

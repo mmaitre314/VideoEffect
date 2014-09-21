@@ -128,6 +128,24 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Invert_093_NV12_UV.cso">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Invert_093_NV12_Y.cso">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Invert_093_RGB32.cso">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Invert_100_NV12_UV.cso">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Invert_100_NV12_Y.cso">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Invert_100_RGB32.cso">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="packages.config" />
     <None Include="UnitTestsCx.WindowsPhone_TemporaryKey.pfx" />
   </ItemGroup>

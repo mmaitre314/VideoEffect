@@ -2,9 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="MediaCompositionTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="..\UnitTestsCx.Windows\Await.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Logo.scale-240.png" />
@@ -21,6 +23,12 @@
     <None Include="packages.config" />
     <None Include="UnitTestsCx.WindowsPhone_TemporaryKey.pfx" />
     <None Include="$(MSBuildThisFileDirectory)\..\..\content\$(MappedPlatformToolset)\Help\Nokia Imaging SDK.chm" />
+    <None Include="Invert_093_NV12_UV.cso" />
+    <None Include="Invert_093_NV12_Y.cso" />
+    <None Include="Invert_093_RGB32.cso" />
+    <None Include="Invert_100_NV12_UV.cso" />
+    <None Include="Invert_100_NV12_Y.cso" />
+    <None Include="Invert_100_RGB32.cso" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Input">
