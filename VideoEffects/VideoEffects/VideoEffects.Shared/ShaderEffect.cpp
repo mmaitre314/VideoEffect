@@ -7,6 +7,7 @@
 using namespace concurrency;
 using namespace Microsoft::WRL;
 using namespace Platform;
+using namespace std;
 using namespace Windows::Storage;
 using namespace Windows::Storage::Streams;
 
@@ -41,7 +42,37 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
     }
     else
     {
-        throw ref new InvalidArgumentException(L"No shader found");
+        CHK(OriginateError(E_INVALIDARG, L"No shader found"));
+    }
+}
+
+void ShaderEffect::ValidateDeviceManager(_In_ const ComPtr<IMFDXGIDeviceManager>& deviceManager)
+{
+    // Currently only needs to check device caps for NV12
+    if (find(_supportedFormats.begin(), _supportedFormats.end(), MFVideoFormat_NV12.Data1) == _supportedFormats.end())
+    {
+        return;
+    }
+
+    // Get the DX device
+    ComPtr<ID3D11Device> device;
+    HANDLE handle;
+    CHK(deviceManager->OpenDeviceHandle(&handle));
+    HRESULT hr = deviceManager->GetVideoService(handle, IID_PPV_ARGS(&device));
+    CHK(deviceManager->CloseDeviceHandle(handle));
+    CHK(hr);
+
+    // Verify the DX device supports NV12 pixel shaders
+    D3D_FEATURE_LEVEL level = device->GetFeatureLevel();
+    if (level < D3D_FEATURE_LEVEL_10_0)
+    {
+        // Windows Phone 8.1 added NV12 texture shader support on Feature Level 9.3
+        unsigned int result;
+        CHK(device->CheckFormatSupport(DXGI_FORMAT_NV12, &result));
+        if (!(result & D3D11_FORMAT_SUPPORT_TEXTURE2D) || !(result & D3D11_FORMAT_SUPPORT_RENDER_TARGET))
+        {
+            CHK(OriginateError(E_INVALIDARG, L"DXGI device does not support NV12 textures"));
+        }
     }
 }
 
@@ -49,7 +80,7 @@ void ShaderEffect::StartStreaming(_In_ unsigned long format, _In_ unsigned int w
 {
     if (_deviceManager == nullptr)
     {
-        throw ref new InvalidArgumentException(L"No DXGI device manager");
+        CHK(OriginateError(E_INVALIDARG, L"No DXGI device manager"));
     }
 
     _format = format;
@@ -68,22 +99,6 @@ void ShaderEffect::StartStreaming(_In_ unsigned long format, _In_ unsigned int w
     HRESULT hr = _deviceManager->GetVideoService(handle, IID_PPV_ARGS(&device));
     CHK(_deviceManager->CloseDeviceHandle(handle));
     CHK(hr);
-
-    //
-    // Verify the DX device supports NV12 pixel shaders
-    //
-
-    D3D_FEATURE_LEVEL level = device->GetFeatureLevel();
-    if (level < D3D_FEATURE_LEVEL_10_0)
-    {
-        // Windows Phone 8.1 added NV12 texture shader support on Feature Level 9.3
-        unsigned int result;
-        CHK(device->CheckFormatSupport(DXGI_FORMAT_NV12, &result));
-        if (!(result & D3D11_FORMAT_SUPPORT_TEXTURE2D) || !(result & D3D11_FORMAT_SUPPORT_RENDER_TARGET))
-        {
-            throw ref new InvalidArgumentException(L"DXGI device does not support NV12 textures");
-        }
-    }
 
     //
     // Create vertices

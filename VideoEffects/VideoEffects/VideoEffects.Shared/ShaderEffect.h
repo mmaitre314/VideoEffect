@@ -12,7 +12,7 @@
 //</Extensions>
 //
 
-class ShaderEffect : public Video1in1outEffect<ShaderEffect, /*D3DAware*/true>
+class ShaderEffect WrlSealed : public Video1in1outEffect<ShaderEffect, /*D3DAware*/true>
 {
     InspectableClass(L"VideoEffects.ShaderEffect", TrustLevel::BaseTrust);
 
@@ -37,6 +37,7 @@ public:
     {
         return true; // no constraint beyond set of supported formats 
     }
+    void ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& deviceManager);
 
     // Data processing
     void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);

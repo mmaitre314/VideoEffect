@@ -10,6 +10,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)D3D11DeviceLock.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)DebuggerLogger.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -19,6 +21,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)DebuggerLogger.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl" />

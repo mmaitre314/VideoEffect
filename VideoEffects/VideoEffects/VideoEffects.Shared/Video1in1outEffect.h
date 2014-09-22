@@ -19,6 +19,7 @@
 //        // Format management
 //        std::vector<unsigned long> GetSupportedFormats() const; // After initialization, _supportedFormats can be updated directly
 //        bool IsFormatSupported(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height) const;
+//        bool ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& deviceManager); // Optional, for D3DAware effects to check DX device caps
 //
 //        // Data processing
 //        void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
@@ -47,6 +48,8 @@
 
 #pragma warning(push)
 #pragma warning(disable:4127) // Warning: C4127 "conditional expression is constant".
+
+#include "MediaTypeFormatter.h"
 
 // Bring definitions from d3d11.h when app does not use D3D
 #ifndef __d3d11_h__
@@ -85,6 +88,7 @@ public:
 
     Video1in1outEffect()
         : _streaming(false)
+        , _progressive(false)
         , _defaultStride(0)
         , _defaultSize(0)
     {
@@ -321,11 +325,22 @@ public:
             }
             else if (!(flags & MFT_SET_TYPE_TEST_ONLY))
             {
-                _inputType = type;
                 _SetStreamingState(false);
+                _inputType = type;
             }
         });
-        return FAILED(hr) ? hr : invalidType ? MF_E_INVALIDMEDIATYPE : S_OK;
+        hr = FAILED(hr) ? hr : invalidType ? MF_E_INVALIDMEDIATYPE : S_OK;
+
+        if (SUCCEEDED(hr))
+        {
+            Trace("Media type %s succeeded: %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", MediaTypeFormatter::FormatMediaType(type).c_str());
+        }
+        else
+        {
+            Trace("Media type %s failed (hr=%08X): %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", hr, MediaTypeFormatter::FormatMediaType(type).c_str());
+        }
+
+        return hr;
     }
 
     IFACEMETHODIMP SetOutputType(_In_ DWORD streamId, _In_opt_ IMFMediaType *type, _In_ DWORD flags)
@@ -354,12 +369,23 @@ public:
             }
             else if (!(flags & MFT_SET_TYPE_TEST_ONLY))
             {
+                _SetStreamingState(false);
                 _outputType = type;
                 _UpdateFormatInfo();
-                _SetStreamingState(false);
             }
         });
-        return FAILED(hr) ? hr : invalidType ? MF_E_INVALIDMEDIATYPE : S_OK;
+        hr = FAILED(hr) ? hr : invalidType ? MF_E_INVALIDMEDIATYPE : S_OK;
+
+        if (SUCCEEDED(hr))
+        {
+            Trace("Media type %s succeeded: %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", MediaTypeFormatter::FormatMediaType(type).c_str());
+        }
+        else
+        {
+            Trace("Media type %s failed (hr=%08X): %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", hr, MediaTypeFormatter::FormatMediaType(type).c_str());
+        }
+
+        return hr;
     }
 
     IFACEMETHODIMP GetInputCurrentType(_In_ DWORD streamId, _COM_Outptr_ IMFMediaType **type)
@@ -446,6 +472,8 @@ public:
 
     IFACEMETHODIMP ProcessMessage(_In_ MFT_MESSAGE_TYPE message, _In_ ULONG_PTR param)
     {
+        Trace("Message: %08X", message);
+
         return ExceptionBoundary([this, message, param]()
         {
             auto lock = _lock.LockExclusive();
@@ -462,18 +490,28 @@ public:
             case MFT_MESSAGE_SET_D3D_MANAGER:
                 if (D3DAware)
                 {
-                    if (_streaming)
+                    ComPtr<IMFDXGIDeviceManager> deviceManager;
+                    if (param != 0)
                     {
-                        CHK(OriginateError(E_ILLEGAL_METHOD_CALL, L"Cannot update D3D manager while streaming"));
+                        CHK(reinterpret_cast<IUnknown*>(param)->QueryInterface(IID_PPV_ARGS(&deviceManager)));
                     }
-                    if (param == 0)
+
+                    Trace("Device manager @%p", deviceManager.Get());
+
+                    // MediaElement sends the same device manager multiple times, so ignore duplicate calls
+                    if (deviceManager != _deviceManager)
                     {
-                        _deviceManager = nullptr;
-                        return;
-                    }
-                    else
-                    {
-                        CHK(reinterpret_cast<IUnknown*>(param)->QueryInterface(IID_PPV_ARGS(&_deviceManager)));
+                        if (_streaming)
+                        {
+                            CHK(OriginateError(E_ILLEGAL_METHOD_CALL, L"Cannot update D3D manager while streaming"));
+                        }
+
+                        if (deviceManager != nullptr)
+                        {
+                            ValidateDeviceManager(deviceManager);
+                        }
+
+                        _deviceManager = deviceManager;
                     }
                 }
                 else
@@ -527,7 +565,7 @@ public:
                 return;
             }
 
-            if (MFGetAttributeUINT32(sample, MFSampleExtension_Interlaced, false))
+            if (!_progressive && MFGetAttributeUINT32(sample, MFSampleExtension_Interlaced, false))
             {
                 CHK(OriginateError(E_INVALIDARG, L"Interlaced content not supported"));
             }
@@ -608,6 +646,10 @@ public:
     }
 
 protected:
+
+    virtual void ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& /*deviceManager*/)
+    {
+    }
 
     ::Microsoft::WRL::ComPtr<IMFMediaType> _inputType;
     ::Microsoft::WRL::ComPtr<IMFMediaType> _outputType;
@@ -729,6 +771,7 @@ private:
         {
             _defaultStride = 0;
             _defaultSize = 0;
+            _progressive = false;
         }
         else
         {
@@ -770,6 +813,10 @@ private:
                 CHK(OriginateError(E_INVALIDARG, L"Unknown format"));
             }
 
+            unsigned int interlacedMode;
+            _progressive = SUCCEEDED(_outputType->GetUINT32(MF_MT_INTERLACE_MODE, &interlacedMode)) &&
+                (interlacedMode == MFVideoInterlace_Progressive);
+
             _defaultStride = stride;
             _defaultSize = size;
         }
@@ -790,6 +837,7 @@ private:
         }
         else
         {
+            Trace("%i buffers, calling ConvertToContiguousBuffer() to normalize", bufferCount);
             CHK(sample->ConvertToContiguousBuffer(&buffer1D));
         }
 
@@ -797,6 +845,8 @@ private:
         ::Microsoft::WRL::ComPtr<IMF2DBuffer2> buffer2D;
         if (FAILED(buffer1D.As(&buffer2D)))
         {
+            Trace("Converting 1D buffer to 2D CPU buffer");
+
             CHK(_inputAllocator->AllocateSample(&normalizedSample));
 
             ::Microsoft::WRL::ComPtr<IMFMediaBuffer> normalizedBuffer1D;
@@ -861,6 +911,8 @@ private:
         ::Microsoft::WRL::ComPtr<IMFDXGIBuffer> bufferDXGI;
         if (D3DAware && (_deviceManager != nullptr) && SUCCEEDED(buffer1D.As(&bufferDXGI)))
         {
+            Trace("Copying DX texture to enable D3D11_BIND_SHADER_RESOURCE");
+
             ::Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
             unsigned int subresource;
             CHK(bufferDXGI->GetResource(IID_PPV_ARGS(&texture)));
@@ -914,6 +966,8 @@ private:
     {
         if (streaming && !_streaming)
         {
+            Trace("Starting streaming");
+
             if (_inputType == nullptr)
             {
                 CHK(OriginateError(MF_E_INVALIDREQUEST, L"Streaming started without an input media type"));
@@ -980,6 +1034,8 @@ private:
         }
         else if (!streaming && _streaming)
         {
+            Trace("Ending streaming");
+
             static_cast<Plugin*>(this)->EndStreaming();
 
             _inputAllocator = nullptr;
@@ -1054,6 +1110,7 @@ private:
     ::Microsoft::WRL::ComPtr<IMFSample> _sample;
 
     bool _streaming; // use _SetStreamingState() to update
+    bool _progressive;
     unsigned int _defaultSize;
 
     ::Microsoft::WRL::Wrappers::SRWLock _lock;

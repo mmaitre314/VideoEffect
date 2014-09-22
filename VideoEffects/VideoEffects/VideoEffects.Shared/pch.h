@@ -1,7 +1,12 @@
 ﻿#pragma once
 
+#include <algorithm>
+#include <sstream>
+
 #include <collection.h>
 #include <ppltasks.h>
+
+#include <strsafe.h>
 
 #include <wrl.h>
 
@@ -15,6 +20,8 @@
 
 #include <windows.media.h>
 
+#include "DebuggerLogger.h"
+
 //
 // Error handling
 //
@@ -26,65 +33,121 @@
 // Exception-free error handling
 #define CHK_RETURN(statement) {hr = (statement); if (FAILED(hr)) { return hr; };}
 
-// A class to track error origin
-template <size_t N>
-HRESULT OriginateError(__in HRESULT hr, __in wchar_t const (&str)[N])
+//
+// Error origin
+//
+
+namespace Details
 {
-    if (FAILED(hr))
+    class ErrorOrigin
     {
-        ::RoOriginateErrorW(hr, N - 1, str);
-    }
-    return hr;
+    public:
+
+        template <size_t N, size_t L>
+        static HRESULT TracedOriginateError(_In_ char const (&function)[L], _In_ HRESULT hr, _In_ wchar_t const (&str)[N])
+        {
+            if (FAILED(hr))
+            {
+                s_logger.Log(function, LogLevel::Error, "failed hr=%08X: %S", hr, str);
+                ::RoOriginateErrorW(hr, N - 1, str);
+            }
+            return hr;
+        }
+
+        // A method to track error origin
+        template <size_t L>
+        static HRESULT TracedOriginateError(_In_ char const (&function)[L], __in HRESULT hr)
+        {
+            if (FAILED(hr))
+            {
+                s_logger.Log(function, LogLevel::Error, "failed hr=%08X", hr);
+                ::RoOriginateErrorW(hr, 0, nullptr);
+            }
+            return hr;
+        }
+
+        ErrorOrigin() = delete;
+    };
 }
 
-// A class to track error origin
-inline HRESULT OriginateError(__in HRESULT hr)
-{
-    if (FAILED(hr))
-    {
-        ::RoOriginateErrorW(hr, 0, nullptr);
-    }
-    return hr;
-}
+#define OriginateError(_hr, ...) ::Details::ErrorOrigin::TracedOriginateError(__FUNCTION__, _hr, __VA_ARGS__)
 
-// Converts exceptions into HRESULTs
-template <typename Lambda>
-HRESULT ExceptionBoundary(Lambda&& lambda)
+//
+// Exception boundary (converts exceptions into HRESULTs)
+//
+
+namespace Details
 {
-    try
+    template<size_t L /*= sizeof(__FUNCTION__)*/>
+    class TracedExceptionBoundary
     {
-        lambda();
-        return S_OK;
-    }
+    public:
+        TracedExceptionBoundary(_In_ const char *function /*= __FUNCTION__*/)
+            : _function(function)
+        {
+        }
+
+        TracedExceptionBoundary(const TracedExceptionBoundary&) = delete;
+        TracedExceptionBoundary& operator=(const TracedExceptionBoundary&) = delete;
+
+        HRESULT operator()(std::function<void()>&& lambda)
+        {
+            s_logger.Log(_function, L, LogLevel::Verbose, "boundary enter");
+
+            HRESULT hr = S_OK;
+            try
+            {
+                lambda();
+            }
 #ifdef _INC_COMDEF // include comdef.h to enable
-    catch (const _com_error& e)
-    {
-        return e.Error();
-    }
+            catch (const _com_error& e)
+            {
+                hr = e.Error();
+            }
 #endif
 #ifdef __cplusplus_winrt // enable C++/CX to use (/ZW)
-    catch (Platform::Exception^ e)
-    {
-        return e->HResult;
-    }
+            catch (Platform::Exception^ e)
+            {
+                hr = e->HResult;
+            }
 #endif
-    catch (const std::bad_alloc&)
-    {
-        return E_OUTOFMEMORY;
-    }
-    catch (const std::out_of_range&)
-    {
-        return E_BOUNDS;
-    }
-    catch (const std::exception&)
-    {
-        return E_FAIL;
-    }
-    catch (...)
-    {
-        return E_FAIL;
-    }
+            catch (const std::bad_alloc&)
+            {
+                hr = E_OUTOFMEMORY;
+            }
+            catch (const std::out_of_range&)
+            {
+                hr = E_BOUNDS;
+            }
+            catch (const std::exception& e)
+            {
+                s_logger.Log(_function, L, LogLevel::Error, "caught unknown STL exception: %s", e.what());
+                hr = E_FAIL;
+            }
+            catch (...)
+            {
+                s_logger.Log(_function, L, LogLevel::Error, "caught unknown exception");
+                hr = E_FAIL;
+            }
+
+            if (FAILED(hr))
+            {
+                s_logger.Log(_function, L, LogLevel::Error, "boundary exit - failed hr=%08X", hr);
+            }
+            else
+            {
+                s_logger.Log(_function, L, LogLevel::Verbose, "boundary exit");
+            }
+
+            return hr;
+        }
+
+    private:
+        const char* _function;
+    };
 }
+
+#define ExceptionBoundary ::Details::TracedExceptionBoundary<sizeof(__FUNCTION__)>(__FUNCTION__)
 
 //
 // Casting
@@ -142,3 +205,23 @@ namespace VideoEffects
     };
 #endif
 }
+
+//
+// Exception-safe PROPVARIANT
+//
+
+class PropVariant : public PROPVARIANT
+{
+public:
+    PropVariant()
+    {
+        PropVariantInit(this);
+    }
+    ~PropVariant()
+    {
+        (void)PropVariantClear(this);
+    }
+
+    PropVariant(const PropVariant&) = delete;
+    PropVariant& operator&(const PropVariant&) = delete;
+};
