@@ -9,7 +9,7 @@
 using namespace std;
 using namespace Microsoft::WRL;
 
-string MediaTypeFormatter::FormatMediaType(_In_opt_ const ComPtr<IMFMediaType>& mt)
+string MediaTypeFormatter::Format(_In_opt_ const ComPtr<IMFMediaType>& mt)
 {
     if (mt == nullptr)
     {
@@ -34,30 +34,35 @@ string MediaTypeFormatter::FormatMediaType(_In_opt_ const ComPtr<IMFMediaType>& 
         }
         firstAttribute = false;
 
-        PropVariant var;
-        GUID guid;
-        CHK(mt->GetItemByIndex(i, &guid, &var));
-
-        _AddGuid(guid, stream);
-        stream << '=';
-
-        switch (var.vt)
-        {
-        case VT_UI4: stream << var.ulVal; break;
-        case VT_UI8: stream << var.uhVal.QuadPart << '(' << var.uhVal.HighPart << ' ' << var.uhVal.LowPart << ')'; break;
-        case VT_R8: stream << var.dblVal; break;
-        case VT_CLSID: _AddGuid(*var.puuid, stream); break;
-        case VT_LPWSTR: stream << var.pwszVal; break;
-        case VT_VECTOR | VT_UI1: stream << "<byte array>"; break;
-        case VT_UNKNOWN: stream << "<IUnknown>"; break;
-        default: stream << "<unknown type>";
-        }
+        AddAttribute(mt, i, stream);
     }
 
     return stream.str();
 }
 
-void MediaTypeFormatter::_AddGuid(_In_ const GUID& guid, _Inout_ ostringstream& stream)
+void MediaTypeFormatter::AddAttribute(_In_ const ComPtr<IMFAttributes>& attr, _In_ unsigned int i, _Inout_ ostringstream& stream)
+{
+    PropVariant var;
+    GUID guid;
+    CHK(attr->GetItemByIndex(i, &guid, &var));
+
+    AddGuid(guid, stream);
+    stream << '=';
+
+    switch (var.vt)
+    {
+    case VT_UI4: stream << var.ulVal; break;
+    case VT_UI8: stream << var.uhVal.QuadPart << '(' << var.uhVal.HighPart << ' ' << var.uhVal.LowPart << ')'; break;
+    case VT_R8: stream << var.dblVal; break;
+    case VT_CLSID: AddGuid(*var.puuid, stream); break;
+    case VT_LPWSTR: stream << var.pwszVal; break;
+    case VT_VECTOR | VT_UI1: stream << "<byte array>"; break;
+    case VT_UNKNOWN: stream << "<IUnknown>"; break;
+    default: stream << "<unknown type>";
+    }
+}
+
+void MediaTypeFormatter::AddGuid(_In_ const GUID& guid, _Inout_ ostringstream& stream)
 {
     LPCSTR name = _GetGuidFriendlyName(guid);
     if (name != nullptr)
@@ -81,6 +86,18 @@ void MediaTypeFormatter::_AddGuid(_In_ const GUID& guid, _Inout_ ostringstream& 
 
 LPCSTR MediaTypeFormatter::_GetGuidFriendlyName(const GUID& guid)
 {
+    // Sample extensions
+
+    IF_EQUAL_RETURN(guid, MFSampleExtension_DecodeTimestamp);
+    IF_EQUAL_RETURN(guid, MFSampleExtension_CleanPoint);
+    IF_EQUAL_RETURN(guid, MFSampleExtension_Token);
+    IF_EQUAL_RETURN(guid, MFSampleExtension_Discontinuity);
+    IF_EQUAL_RETURN(guid, MFSampleExtension_Interlaced);
+    IF_EQUAL_RETURN(guid, MFSampleExtension_FrameCorruption);
+    IF_EQUAL_RETURN(guid, MF_NALU_LENGTH_INFORMATION);
+
+    // Media type attributes
+
     IF_EQUAL_RETURN(guid, MF_MT_MAJOR_TYPE);
     IF_EQUAL_RETURN(guid, MF_MT_MAJOR_TYPE);
     IF_EQUAL_RETURN(guid, MF_MT_SUBTYPE);
@@ -127,6 +144,9 @@ LPCSTR MediaTypeFormatter::_GetGuidFriendlyName(const GUID& guid)
     IF_EQUAL_RETURN(guid, MF_MT_IMAGE_LOSS_TOLERANT);
     IF_EQUAL_RETURN(guid, MF_MT_MPEG4_SAMPLE_DESCRIPTION);
     IF_EQUAL_RETURN(guid, MF_MT_MPEG4_CURRENT_SAMPLE_ENTRY);
+    IF_EQUAL_RETURN(guid, MF_PROGRESSIVE_CODING_CONTENT);
+    IF_EQUAL_RETURN(guid, MF_NALU_LENGTH_SET);
+    IF_EQUAL_RETURN(guid, MF_MT_VIDEO_ROTATION);
 
     // Media types
 

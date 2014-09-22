@@ -22,6 +22,7 @@
                 <ComboBoxItem>Shader effect (Nv12)</ComboBoxItem>
                 <ComboBoxItem>Shader effect (Bgrx8)</ComboBoxItem>
             </ComboBox>
+            <Button Name="ClearPreview" Content="Clear preview" HorizontalAlignment="Right" Click="ClearPreview_Click"/>
         </StackPanel>
     </Grid>
 </Page>

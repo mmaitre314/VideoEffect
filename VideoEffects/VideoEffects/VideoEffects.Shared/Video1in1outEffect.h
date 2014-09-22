@@ -50,6 +50,7 @@
 #pragma warning(disable:4127) // Warning: C4127 "conditional expression is constant".
 
 #include "MediaTypeFormatter.h"
+#include "SampleFormatter.h"
 
 // Bring definitions from d3d11.h when app does not use D3D
 #ifndef __d3d11_h__
@@ -100,11 +101,13 @@ public:
         {
             _supportedFormats = static_cast<Plugin*>(this)->GetSupportedFormats();
 
-            CHK(MFCreateAttributes(&_attributes, 10));
+            CHK(MFCreateAttributes(&_attributes, 3));
+            CHK(MFCreateAttributes(&_inputAttributes, 3));
 
             if (D3DAware)
             {
                 CHK(_attributes->SetUINT32(MF_SA_D3D11_AWARE, true));
+                CHK(_inputAttributes->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE)); // Hint for the sample allocator in the up-stream component
             }
         });
     }
@@ -227,9 +230,22 @@ public:
         return _attributes.CopyTo(attributes);
     }
 
-    IFACEMETHODIMP GetInputStreamAttributes(_In_ DWORD, __deref_out IMFAttributes **)
+    IFACEMETHODIMP GetInputStreamAttributes(_In_ DWORD streamId, __deref_out IMFAttributes ** attributes)
     {
-        return E_NOTIMPL;
+        auto lock = _lock.LockExclusive();
+
+        if (attributes == nullptr)
+        {
+            return OriginateError(E_POINTER);
+        }
+        *attributes = nullptr;
+
+        if (streamId != 0)
+        {
+            return OriginateError(MF_E_INVALIDSTREAMNUMBER);
+        }
+
+        return _inputAttributes.CopyTo(attributes);
     }
 
     IFACEMETHODIMP GetOutputStreamAttributes(_In_ DWORD, __deref_out IMFAttributes **)
@@ -333,11 +349,11 @@ public:
 
         if (SUCCEEDED(hr))
         {
-            Trace("Media type %s succeeded: %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", MediaTypeFormatter::FormatMediaType(type).c_str());
+            Trace("Media type %s succeeded: %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", MediaTypeFormatter::Format(type).c_str());
         }
         else
         {
-            Trace("Media type %s failed (hr=%08X): %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", hr, MediaTypeFormatter::FormatMediaType(type).c_str());
+            Trace("Media type %s failed (hr=%08X): %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", hr, MediaTypeFormatter::Format(type).c_str());
         }
 
         return hr;
@@ -378,11 +394,11 @@ public:
 
         if (SUCCEEDED(hr))
         {
-            Trace("Media type %s succeeded: %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", MediaTypeFormatter::FormatMediaType(type).c_str());
+            Trace("Media type %s succeeded: %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", MediaTypeFormatter::Format(type).c_str());
         }
         else
         {
-            Trace("Media type %s failed (hr=%08X): %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", hr, MediaTypeFormatter::FormatMediaType(type).c_str());
+            Trace("Media type %s failed (hr=%08X): %s", flags & MFT_SET_TYPE_TEST_ONLY ? "test" : "set", hr, MediaTypeFormatter::Format(type).c_str());
         }
 
         return hr;
@@ -539,6 +555,8 @@ public:
 
     IFACEMETHODIMP ProcessInput(_In_ DWORD streamID, _In_ IMFSample *sample, _In_ DWORD flags)
     {
+        Trace("Input sample: %s", SampleFormatter::Format(sample).c_str());
+
         bool notAccepting = false;
         HRESULT hr = ExceptionBoundary([this, streamID, sample, flags, &notAccepting]()
         {
@@ -572,7 +590,15 @@ public:
 
             _sample = _NormalizeSample(sample);
         });
-        return FAILED(hr) ? hr : notAccepting ? MF_E_NOTACCEPTING : S_OK;
+
+        hr = FAILED(hr) ? hr : notAccepting ? MF_E_NOTACCEPTING : S_OK;
+
+        if (FAILED(hr))
+        {
+            Trace("Failed hr=%08X", hr);
+        }
+
+        return hr;
     }
 
     IFACEMETHODIMP ProcessOutput(_In_ DWORD flags, _In_ DWORD outputBufferCount, _Inout_ MFT_OUTPUT_DATA_BUFFER  *outputSamples, _Out_ DWORD *status)
@@ -642,7 +668,19 @@ public:
                 }
             }
         });
-        return FAILED(hr) ? hr : needMoreInput ? MF_E_TRANSFORM_NEED_MORE_INPUT : S_OK;
+
+        hr = FAILED(hr) ? hr : needMoreInput ? MF_E_TRANSFORM_NEED_MORE_INPUT : S_OK;
+
+        if (SUCCEEDED(hr))
+        {
+            Trace("Output sample: %s", SampleFormatter::Format(outputSamples[0].pSample).c_str());
+        }
+        else
+        {
+            Trace("Failed hr=%08X", hr);
+        }
+
+        return hr;
     }
 
 protected:
@@ -911,8 +949,6 @@ private:
         ::Microsoft::WRL::ComPtr<IMFDXGIBuffer> bufferDXGI;
         if (D3DAware && (_deviceManager != nullptr) && SUCCEEDED(buffer1D.As(&bufferDXGI)))
         {
-            Trace("Copying DX texture to enable D3D11_BIND_SHADER_RESOURCE");
-
             ::Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
             unsigned int subresource;
             CHK(bufferDXGI->GetResource(IID_PPV_ARGS(&texture)));
@@ -923,6 +959,8 @@ private:
 
             if (!(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE))
             {
+                Trace("Copying DX texture to enable D3D11_BIND_SHADER_RESOURCE");
+
                 CHK(_inputAllocator->AllocateSample(&normalizedSample));
 
                 ::Microsoft::WRL::ComPtr<IMFMediaBuffer> normalizedBuffer1D;
@@ -1107,6 +1145,7 @@ private:
     };
 
     ::Microsoft::WRL::ComPtr<IMFAttributes> _attributes;
+    ::Microsoft::WRL::ComPtr<IMFAttributes> _inputAttributes;
     ::Microsoft::WRL::ComPtr<IMFSample> _sample;
 
     bool _streaming; // use _SetStreamingState() to update

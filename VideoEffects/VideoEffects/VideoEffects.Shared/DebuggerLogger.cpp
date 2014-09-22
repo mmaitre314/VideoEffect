@@ -2,7 +2,7 @@
 #include "DebuggerLogger.h"
 
 DebuggerLogger::DebuggerLogger()
-    : _level(LogLevel::Information)
+    : _level(LogLevel::Error)
 {
     OutputDebugStringA("Starting tracing\n");
 }

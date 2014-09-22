@@ -21,6 +21,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SampleFormatter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Video1in1outEffect.h" />
@@ -34,6 +35,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)SampleFormatter.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinition.cpp" />
   </ItemGroup>

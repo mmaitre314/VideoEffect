@@ -150,5 +150,18 @@ namespace VideoEffectsTestApp
                     throw new ArgumentException("Invalid effect type");
             }
         }
+
+        private void ClearPreview_Click(object sender, RoutedEventArgs e)
+        {
+            if (CapturePreview.Source != null)
+            {
+                CapturePreview.Source.Dispose();
+                CapturePreview.Source = null;
+            }
+
+            MediaElementPreview.Stop();
+            MediaElementPreview.RemoveAllEffects();
+            MediaElementPreview.Source = null;
+        }
     }
 }
