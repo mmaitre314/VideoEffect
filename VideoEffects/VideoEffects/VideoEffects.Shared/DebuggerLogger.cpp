@@ -10,7 +10,7 @@ DebuggerLogger::DebuggerLogger()
 void DebuggerLogger::_Log(_In_reads_(L) const char *function, _In_ size_t L, _In_ PCSTR format, va_list args)
 {
     char message[2048];
-    int pos = 0;
+    size_t pos = 0;
     size_t size = sizeof(message);
 
     // Trace header: function name
