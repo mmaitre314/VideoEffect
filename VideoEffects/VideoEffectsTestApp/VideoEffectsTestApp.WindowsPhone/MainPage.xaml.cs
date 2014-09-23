@@ -16,6 +16,7 @@ using Windows.Media.MediaProperties;
 using Windows.Media.Transcoding;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -40,13 +41,13 @@ namespace VideoEffectsTestApp
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
 
-        /// <summary>
-        /// Invoked when this page is about to be displayed in a Frame.
-        /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.
-        /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (!ShaderEffectDefinition.TestNv12Support())
+            {
+                EffectTypeShaderNv12.Foreground = new SolidColorBrush(Colors.Gray);
+                EffectTypeShaderNv12.IsEnabled = false;
+            }
         }
 
         private async void Transcode_Click(object sender, RoutedEventArgs e)

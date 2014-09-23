@@ -11,6 +11,9 @@ namespace VideoEffects
     {
     public:
 
+        ///<summary>Returns true if the graphics device supports Nv12 pixel shaders.</summary>
+        static bool TestNv12Support();
+
         ///<summary>Creates an effect definition a Bgrx8 CSO shader (32bpp no alpha).</summary>
         ShaderEffectDefinition(
             _In_ Windows::Storage::Streams::IBuffer^ compiledShaderBgrx8
