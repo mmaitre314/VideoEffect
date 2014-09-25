@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "ShaderEffectDefinition.h"
+#include "ShaderEffectDefinitionNv12.h"
 
 using namespace Platform;
 using namespace Microsoft::WRL;
@@ -7,27 +7,18 @@ using namespace VideoEffects;
 using namespace Windows::Foundation::Collections;
 using namespace Windows::Storage::Streams;
 
-ShaderEffectDefinition::ShaderEffectDefinition(
+ShaderEffectDefinitionNv12::ShaderEffectDefinitionNv12(
     _In_ IBuffer^ compiledShaderY,
     _In_ IBuffer^ compiledShaderCbCr
     )
-    : _activatableClassId(L"VideoEffects.ShaderEffect")
+    : _activatableClassId(L"VideoEffects.ShaderEffectNv12")
     , _properties(ref new PropertySet())
 {
-    _properties->Insert(L"Shader_NV12_Y", compiledShaderY);
-    _properties->Insert(L"Shader_NV12_UV", compiledShaderCbCr);
+    _properties->Insert(L"Shader0", compiledShaderY);
+    _properties->Insert(L"Shader1", compiledShaderCbCr);
 }
 
-ShaderEffectDefinition::ShaderEffectDefinition(
-    _In_ IBuffer^ compiledShaderBgrx8
-    )
-    : _activatableClassId(L"VideoEffects.ShaderEffect")
-    , _properties(ref new PropertySet())
-{
-    _properties->Insert(L"Shader_RGB32", compiledShaderBgrx8);
-}
-
-bool ShaderEffectDefinition::TestNv12Support()
+bool ShaderEffectDefinitionNv12::TestGraphicsDeviceSupport()
 {
     D3D_FEATURE_LEVEL featureLevels[] =
     {

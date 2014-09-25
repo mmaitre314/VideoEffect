@@ -43,11 +43,19 @@ namespace VideoEffectsTestApp
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (!ShaderEffectDefinition.TestNv12Support())
+            if (!ShaderEffectDefinitionNv12.TestGraphicsDeviceSupport())
             {
                 EffectTypeShaderNv12.Foreground = new SolidColorBrush(Colors.Gray);
                 EffectTypeShaderNv12.IsEnabled = false;
             }
+
+            EffectType.SelectionChanged += EffectType_SelectionChanged;
+        }
+
+        void EffectType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            StartMediaCompositionPreview.IsEnabled = (EffectType.SelectedIndex != 0);
+            StartMediaCompositionRender.IsEnabled = (EffectType.SelectedIndex != 0);
         }
 
         private async void Transcode_Click(object sender, RoutedEventArgs e)
@@ -198,11 +206,11 @@ namespace VideoEffectsTestApp
                 case 1:
                     IBuffer shaderY = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_Y.cso");
                     IBuffer shaderUV = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_UV.cso");
-                    return new VideoEffects.ShaderEffectDefinition(shaderY, shaderUV);
+                    return new ShaderEffectDefinitionNv12(shaderY, shaderUV);
 
                 case 2:
                     IBuffer shader = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_RGB32.cso");
-                    return new VideoEffects.ShaderEffectDefinition(shader);
+                    return new ShaderEffectDefinitionBgrx8(shader);
 
                 default:
                     throw new ArgumentException("Invalid effect type");

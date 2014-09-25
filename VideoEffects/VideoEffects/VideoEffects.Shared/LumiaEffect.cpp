@@ -34,7 +34,7 @@ void LumiaEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
     }
 }
 
-std::vector<unsigned long> LumiaEffect::GetSupportedFormats()
+vector<unsigned long> LumiaEffect::GetSupportedFormats()
 {
     vector<unsigned long> formats;
     formats.push_back(MFVideoFormat_ARGB32.Data1);

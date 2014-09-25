@@ -11,38 +11,15 @@ using namespace std;
 using namespace Windows::Storage;
 using namespace Windows::Storage::Streams;
 
-struct ScreenVertex
-{
-    float Pos[4];
-    float Tex[2];
-};
-
-struct ShaderParameters // struct length must be a multiple of 16 -- maps to register(b0) in HLSL
-{
-    float Width;
-    float Height;
-    float Time;
-    float Value;
-};
-
 void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props)
 {
     CHKNULL(props);
 
-    if (props->HasKey(L"Shader_NV12_Y") && props->HasKey(L"Shader_NV12_UV"))
+    _bufferShader0 = safe_cast<IBuffer^>(props->Lookup(L"Shader0"));
+
+    if (props->HasKey(L"Shader1"))
     {
-        _bufferShader_NV12_Y = safe_cast<IBuffer^>(props->Lookup(L"Shader_NV12_Y"));
-        _bufferShader_NV12_UV = safe_cast<IBuffer^>(props->Lookup(L"Shader_NV12_UV"));
-        _supportedFormats.push_back(MFVideoFormat_NV12.Data1);
-    }
-    else if (props->HasKey(L"Shader_RGB32"))
-    {
-        _bufferShader_RGB32 = safe_cast<IBuffer^>(props->Lookup(L"Shader_RGB32"));
-        _supportedFormats.push_back(MFVideoFormat_RGB32.Data1);
-    }
-    else
-    {
-        CHK(OriginateError(E_INVALIDARG, L"No shader found"));
+        _bufferShader1 = safe_cast<IBuffer^>(props->Lookup(L"Shader1"));
     }
 }
 
@@ -158,14 +135,10 @@ void ShaderEffect::StartStreaming(_In_ unsigned long format, _In_ unsigned int w
     // Create the pixel shaders
     //
 
-    if (_bufferShader_RGB32 != nullptr)
+    CHK(device->CreatePixelShader(GetData(_bufferShader0), _bufferShader0->Length, nullptr, &_pixelShader0));
+    if (_bufferShader1 != nullptr)
     {
-        CHK(device->CreatePixelShader(GetData(_bufferShader_RGB32), _bufferShader_RGB32->Length, nullptr, &_pixelShader_RGB32));
-    }
-    else
-    {
-        CHK(device->CreatePixelShader(GetData(_bufferShader_NV12_Y), _bufferShader_NV12_Y->Length, nullptr, &_pixelShader_NV12_Y));
-        CHK(device->CreatePixelShader(GetData(_bufferShader_NV12_UV), _bufferShader_NV12_UV->Length, nullptr, &_pixelShader_NV12_UV));
+        CHK(device->CreatePixelShader(GetData(_bufferShader1), _bufferShader1->Length, nullptr, &_pixelShader1));
     }
 
     //
@@ -211,157 +184,17 @@ bool ShaderEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_
     CHK(outputBuffer->GetMaxLength(&length));
     CHK(outputBuffer->SetCurrentLength(length));
 
-    if (_pixelShader_RGB32 != nullptr)
-    {
-        _DrawRGB32(time, inputBufferDxgi, outputBufferDxgi);
-    }
-    else
-    {
-        _DrawNV12(time, inputBufferDxgi, outputBufferDxgi);
-    }
+    _Draw(time, inputBufferDxgi, outputBufferDxgi);
 
     return true; // Always produces data
-}
-
-void ShaderEffect::_DrawRGB32(
-    long long time,
-    const ComPtr<IMFDXGIBuffer>& inputBufferDxgi,
-    const ComPtr<IMFDXGIBuffer>& outputBufferDxgi
-    )
-{
-    // Setup the viewport to match the back-buffer
-    D3D11_VIEWPORT vp;
-    vp.Width = (float)_width;
-    vp.Height = (float)_height;
-    vp.MinDepth = 0.0f;
-    vp.MaxDepth = 1.0f;
-    vp.TopLeftX = 0.0f;
-    vp.TopLeftY = 0.0f;
-
-    // Get the device immediate context
-    // Lock it: the code below modifies the shader state of the device in a non-atomic way
-    D3D11DeviceLock device(_deviceManager);
-    ComPtr<ID3D11DeviceContext> immediateContext;
-    device->GetImmediateContext(&immediateContext);
-
-    // Get the resource views
-    ComPtr<ID3D11ShaderResourceView> srv = _CreateShaderResourceView(device.Get(), inputBufferDxgi, DXGI_FORMAT_B8G8R8X8_UNORM);
-    ComPtr<ID3D11RenderTargetView> rtv = _CreateRenderTargetView(device.Get(), outputBufferDxgi, DXGI_FORMAT_B8G8R8X8_UNORM);
-
-    // Cache current context state to be able to restore
-    D3D11_VIEWPORT origViewPorts[D3D11_VIEWPORT_AND_SCISSORRECT_MAX_INDEX];
-    UINT origViewPortCount = 1;
-    ComPtr<ID3D11ShaderResourceView> origSrv;
-    ComPtr<ID3D11RenderTargetView> origRtv;
-    ComPtr<ID3D11DepthStencilView> origDsv;
-    immediateContext->RSGetViewports(&origViewPortCount, origViewPorts);
-    immediateContext->PSGetShaderResources(0, 1, &origSrv);
-    immediateContext->OMGetRenderTargets(1, &origRtv, &origDsv);
-
-    // Draw
-    UINT vbStrides = sizeof(ScreenVertex);
-    UINT vbOffsets = 0;
-    ShaderParameters parameters = { (float)_width, (float)_height, (float)time / 10000000.f, 0.f };
-    immediateContext->UpdateSubresource(_frameInfo.Get(), 0, nullptr, &parameters, 0, 0);
-    immediateContext->IASetInputLayout(_quadLayout.Get());
-    immediateContext->IASetVertexBuffers(0, 1, _screenQuad.GetAddressOf(), &vbStrides, &vbOffsets);
-    immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    immediateContext->OMSetRenderTargets(1, rtv.GetAddressOf(), nullptr);
-    immediateContext->RSSetViewports(1, &vp);
-    immediateContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
-    immediateContext->PSSetConstantBuffers(0, 1, _frameInfo.GetAddressOf());
-    immediateContext->PSSetSamplers(0, 1, _sampleStateLinear.GetAddressOf());
-    immediateContext->PSSetShaderResources(0, 1, srv.GetAddressOf());
-    immediateContext->PSSetShader(_pixelShader_RGB32.Get(), nullptr, 0);
-    immediateContext->Draw(4, 0);
-
-    // Restore context state
-    immediateContext->RSSetViewports(origViewPortCount, origViewPorts);
-    immediateContext->PSSetShaderResources(0, 1, origSrv.GetAddressOf());
-    immediateContext->OMSetRenderTargets(1, origRtv.GetAddressOf(), origDsv.Get());
-}
-
-void ShaderEffect::_DrawNV12(
-    long long time,
-    const ComPtr<IMFDXGIBuffer>& inputBufferDxgi, 
-    const ComPtr<IMFDXGIBuffer>& outputBufferDxgi
-    )
-{
-    // Setup the viewport to match the back-buffer
-    // Note: width/height set later
-    D3D11_VIEWPORT vp;
-    vp.MinDepth = 0.0f;
-    vp.MaxDepth = 1.0f;
-    vp.TopLeftX = 0.0f;
-    vp.TopLeftY = 0.0f;
-
-    // Get the device immediate context
-    // Lock it: the code below modifies the shader state of the device in a non-atomic way
-    D3D11DeviceLock device(_deviceManager);
-    ComPtr<ID3D11DeviceContext> immediateContext;
-    device->GetImmediateContext(&immediateContext);
-
-    // Get the resource views
-    ComPtr<ID3D11ShaderResourceView> srvY = _CreateShaderResourceView(device.Get(), inputBufferDxgi, DXGI_FORMAT_R8_UNORM);
-    ComPtr<ID3D11ShaderResourceView> srvUV = _CreateShaderResourceView(device.Get(), inputBufferDxgi, DXGI_FORMAT_R8G8_UNORM);
-    ComPtr<ID3D11RenderTargetView> rtvY = _CreateRenderTargetView(device.Get(), outputBufferDxgi, DXGI_FORMAT_R8_UNORM);
-    ComPtr<ID3D11RenderTargetView> rtvUV = _CreateRenderTargetView(device.Get(), outputBufferDxgi, DXGI_FORMAT_R8G8_UNORM);
-
-    // Cache current context state to be able to restore
-    D3D11_VIEWPORT origViewPorts[D3D11_VIEWPORT_AND_SCISSORRECT_MAX_INDEX];
-    UINT origViewPortCount = 1;
-    ComPtr<ID3D11ShaderResourceView> origSrv0;
-    ComPtr<ID3D11ShaderResourceView> origSrv1;
-    ComPtr<ID3D11RenderTargetView> origRtv;
-    ComPtr<ID3D11DepthStencilView> origDsv;
-    immediateContext->RSGetViewports(&origViewPortCount, origViewPorts);
-    immediateContext->PSGetShaderResources(0, 1, &origSrv0);
-    immediateContext->PSGetShaderResources(1, 1, &origSrv1);
-    immediateContext->OMGetRenderTargets(1, &origRtv, &origDsv);
-
-    // Prepare draw Y+UV
-    UINT vbStrides = sizeof(ScreenVertex);
-    UINT vbOffsets = 0;
-    ShaderParameters parameters = { (float)_width, (float)_height, (float)time / 10000000.f, 0.f };
-    immediateContext->UpdateSubresource(_frameInfo.Get(), 0, nullptr, &parameters, 0, 0);
-    immediateContext->IASetInputLayout(_quadLayout.Get());
-    immediateContext->IASetVertexBuffers(0, 1, _screenQuad.GetAddressOf(), &vbStrides, &vbOffsets);
-    immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    immediateContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
-    immediateContext->PSSetConstantBuffers(0, 1, _frameInfo.GetAddressOf());
-    immediateContext->PSSetSamplers(0, 1, _sampleStateLinear.GetAddressOf());
-    immediateContext->PSSetShaderResources(0, 1, srvY.GetAddressOf());
-    immediateContext->PSSetShaderResources(1, 1, srvUV.GetAddressOf());
-
-    // Draw Y
-    vp.Width = (float)_width;
-    vp.Height = (float)_height;
-    immediateContext->RSSetViewports(1, &vp);
-    immediateContext->OMSetRenderTargets(1, rtvY.GetAddressOf(), nullptr);
-    immediateContext->PSSetShader(_pixelShader_NV12_Y.Get(), nullptr, 0);
-    immediateContext->Draw(4, 0);
-
-    // Draw UV
-    vp.Width = (float)(_width / 2);
-    vp.Height = (float)(_height / 2);
-    immediateContext->RSSetViewports(1, &vp);
-    immediateContext->OMSetRenderTargets(1, rtvUV.GetAddressOf(), nullptr);
-    immediateContext->PSSetShader(_pixelShader_NV12_UV.Get(), nullptr, 0);
-    immediateContext->Draw(4, 0);
-
-    // Restore context state
-    immediateContext->RSSetViewports(origViewPortCount, origViewPorts);
-    immediateContext->PSSetShaderResources(0, 1, origSrv0.GetAddressOf());
-    immediateContext->PSSetShaderResources(1, 1, origSrv1.GetAddressOf());
-    immediateContext->OMSetRenderTargets(1, origRtv.GetAddressOf(), origDsv.Get());
 }
 
 void ShaderEffect::EndStreaming()
 {
     _screenQuad = nullptr;
     _vertexShader = nullptr;
-    _pixelShader_NV12_Y = nullptr;
-    _pixelShader_NV12_UV = nullptr;
+    _pixelShader0 = nullptr;
+    _pixelShader1 = nullptr;
     _sampleStateLinear = nullptr;
     _quadLayout = nullptr;
     _frameInfo = nullptr;

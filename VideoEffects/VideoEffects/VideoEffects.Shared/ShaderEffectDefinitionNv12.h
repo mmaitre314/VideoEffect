@@ -2,7 +2,7 @@
 
 namespace VideoEffects
 {
-    public ref class ShaderEffectDefinition sealed
+    public ref class ShaderEffectDefinitionNv12 sealed
 #if WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP
         : public Windows::Media::Effects::IVideoEffectDefinition
 #else
@@ -12,15 +12,10 @@ namespace VideoEffects
     public:
 
         ///<summary>Returns true if the graphics device supports Nv12 pixel shaders.</summary>
-        static bool TestNv12Support();
+        static bool TestGraphicsDeviceSupport();
 
-        ///<summary>Creates an effect definition a Bgrx8 CSO shader (32bpp no alpha).</summary>
-        ShaderEffectDefinition(
-            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderBgrx8
-            );
-
-        ///<summary>Creates an effect definition an Nv12 CSO shader.</summary>
-        ShaderEffectDefinition(
+        ///<summary>Creates an effect definition from a CSO shader.</summary>
+        ShaderEffectDefinitionNv12(
             _In_ Windows::Storage::Streams::IBuffer^ compiledShaderY,
             _In_ Windows::Storage::Streams::IBuffer^ compiledShaderCbCr
             );

@@ -34,8 +34,8 @@
             <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Center" Click="StartMediaElementPreview_Click" MinHeight="0"/>
             <Button Name="StartCaptureElementPreview" Content="MediaCapture Preview" HorizontalAlignment="Center" Click="StartMediaCapturePreview_Click" MinHeight="0"/>
             <Button Name="StartCaptureElementRecord" Content="MediaCapture Record" HorizontalAlignment="Center" Click="StartMediaCaptureRecord_Click" MinHeight="0" />
-            <Button Name="StartMediaCompositionPreview" Content="MediaComposition Preview" HorizontalAlignment="Center" Click="StartMediaCompositionPreview_Click" MinHeight="0"/>
-            <Button Name="StartMediaCompositionRender" Content="MediaComposition Render" HorizontalAlignment="Center" Click="StartMediaCompositionRender_Click" MinHeight="0"/>
+            <Button Name="StartMediaCompositionPreview" Content="MediaComposition Preview" HorizontalAlignment="Center" Click="StartMediaCompositionPreview_Click" MinHeight="0" IsEnabled="False"/>
+            <Button Name="StartMediaCompositionRender" Content="MediaComposition Render" HorizontalAlignment="Center" Click="StartMediaCompositionRender_Click" MinHeight="0" IsEnabled="False"/>
             <Button Name="StartMediaTranscoder" Content="MediaTranscoder" HorizontalAlignment="Center" Click="Transcode_Click" MinHeight="0"/>
         </StackPanel>
 
