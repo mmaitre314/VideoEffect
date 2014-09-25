@@ -129,6 +129,11 @@ namespace VideoEffectsTestApp
         {
             StartMediaElementPreview.IsEnabled = false;
 
+            // Cleanup any previous playback
+            MediaElementPreview.Stop();
+            MediaElementPreview.Source = null;
+            MediaElementPreview.RemoveAllEffects();
+
             var definition = await CreateEffectDefinitionAsync();
 
             MediaElementPreview.Source = new Uri("ms-appx:///Assets/Car.mp4");
