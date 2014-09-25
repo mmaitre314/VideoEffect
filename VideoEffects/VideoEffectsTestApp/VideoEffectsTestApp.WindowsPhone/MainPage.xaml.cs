@@ -48,14 +48,6 @@ namespace VideoEffectsTestApp
                 EffectTypeShaderNv12.Foreground = new SolidColorBrush(Colors.Gray);
                 EffectTypeShaderNv12.IsEnabled = false;
             }
-
-            EffectType.SelectionChanged += EffectType_SelectionChanged;
-        }
-
-        void EffectType_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            StartMediaCompositionPreview.IsEnabled = (EffectType.SelectedIndex != 0);
-            StartMediaCompositionRender.IsEnabled = (EffectType.SelectedIndex != 0);
         }
 
         private async void Transcode_Click(object sender, RoutedEventArgs e)

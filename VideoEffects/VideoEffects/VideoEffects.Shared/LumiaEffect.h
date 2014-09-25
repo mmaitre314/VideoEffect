@@ -12,7 +12,7 @@
 //</Extensions>
 //
 
-class LumiaEffect WrlSealed : public Video1in1outEffect<LumiaEffect, /*D3DAware*/false>
+class LumiaEffect WrlSealed : public Video1in1outEffect<LumiaEffect, /*D3DAware*/true> // On Phone 8.1 MediaComposition requires all effects to be D3D aware
 {
     InspectableClass(L"VideoEffects.LumiaEffect", TrustLevel::BaseTrust);
 

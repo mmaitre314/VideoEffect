@@ -37,7 +37,12 @@ void LumiaEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
 vector<unsigned long> LumiaEffect::GetSupportedFormats()
 {
     vector<unsigned long> formats;
-    formats.push_back(MFVideoFormat_ARGB32.Data1);
+
+    // Imaging SDK really uses ARGB32, but most Phone 8.1 devices are lacking a DX VPBlit ARGB32 -> NV12
+    // and only provide RGB32 -> NV12. On Phone 8.1 MediaComposition only uses VPBlit for color conversion
+    // (no software fallback).
+    formats.push_back(MFVideoFormat_RGB32.Data1);
+
     return formats;
 }
 
