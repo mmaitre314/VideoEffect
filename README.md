@@ -62,7 +62,7 @@ Visual Studio compiles the shaders into .cso files which are included in the app
 ```c#
     IBuffer shaderY = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_Y.cso");
     IBuffer shaderUV = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_UV.cso");
-    var definition = new ShaderEffectDefinition(shaderY, shaderUV);
+    var definition = new ShaderEffectDefinitionNv12(shaderY, shaderUV);
 
     var transcoder = new MediaTranscoder();
     transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
@@ -75,7 +75,7 @@ For the .cso files to be included in the app package, in their file property pag
 Implementation details
 ----------------------
 
-The meat of the code is under VideoEffects/VideoEffects/VideoEffects.Shared. It consists in two Windows Runtime Classes: VideoEffects.LumiaEffect and VideoEffects.ShaderEffect. LumiaEffect wraps a chain of Imaging SDK’s IFilter inside [IMFTransform](http://msdn.microsoft.com/en-us/library/windows/desktop/ms696260)/[IMediaExtension](http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.imediaextension.aspx). ShaderEffect wraps a precompiled DirectX HSLS pixel shader. The rest is mostly support code and unit tests. 
+The meat of the code is under VideoEffects/VideoEffects/VideoEffects.Shared. It consists in three Windows Runtime Classes: VideoEffects.LumiaEffect,  VideoEffects.ShaderEffectNv12, and VideoEffects.ShaderEffectBgrx8. LumiaEffect wraps a chain of Imaging SDK’s IFilter inside [IMFTransform](http://msdn.microsoft.com/en-us/library/windows/desktop/ms696260)/[IMediaExtension](http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.imediaextension.aspx). ShaderEffectXxx wraps a precompiled DirectX HSLS pixel shader. The rest is mostly support code and unit tests. 
 
 The Runtime Classes must be declared in the AppxManifest files of Store apps wanting to call it:
 
@@ -85,7 +85,8 @@ The Runtime Classes must be declared in the AppxManifest files of Store apps wan
     <InProcessServer>
       <Path>VideoEffects.WindowsPhone.dll</Path>
       <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
-      <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffect" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectBgrx8" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectNv12" ThreadingModel="both" />
     </InProcessServer>
   </Extension>
 </Extensions>
