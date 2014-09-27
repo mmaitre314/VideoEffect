@@ -18,7 +18,7 @@
     <AppxBundle>Never</AppxBundle>
     <IsTargetingWindowsPhonePlatform>true</IsTargetingWindowsPhonePlatform>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>9b7c1f6f</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>fedf50a5</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <AppXPackage>True</AppXPackage>
@@ -109,9 +109,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets'))" />
-    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.0.0.3\build\wpa81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.0.0.3\build\wpa81\MMaitre.VideoEffects.targets'))" />
+    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.1.0.0\build\wpa81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.1.0.0\build\wpa81\MMaitre.VideoEffects.targets'))" />
   </Target>
-  <Import Project="..\packages\MMaitre.VideoEffects.0.0.3\build\wpa81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.0.0.3\build\wpa81\MMaitre.VideoEffects.targets')" />
+  <Import Project="..\packages\MMaitre.VideoEffects.1.0.0\build\wpa81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.1.0.0\build\wpa81\MMaitre.VideoEffects.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

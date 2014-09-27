@@ -6,11 +6,11 @@
     <version>$NuGetVersion$</version>
     <authors>Matthieu Maitre</authors>
     <owners>Matthieu Maitre</owners>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/mmaitre314/VideoEffect/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/mmaitre314/VideoEffect</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Applies effects from the Nokia Imaging SDK to videos.</summary>
-    <description>Provides a Media Extension applying image effects from the Nokia Imaging SDK to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1.</description>
+    <summary>Applies effects from the Nokia Imaging SDK and DirectX HLSL pixel shaders to videos.</summary>
+    <description>Provides Media Extensions applying image effects from the Nokia Imaging SDK and DirectX HLSL pixel shaders to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1. For documentation see https://github.com/mmaitre314/VideoEffect .</description>
     <copyright>Copyright © 2014, Matthieu Maitre. All rights reserved.</copyright>
     <tags>Native WinRT</tags>
   </metadata>

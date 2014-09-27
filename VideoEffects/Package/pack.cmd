@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set VERSION=0.0.4
+set VERSION=1.0.0
 
 set OUTPUT=c:\NuGet\
 
