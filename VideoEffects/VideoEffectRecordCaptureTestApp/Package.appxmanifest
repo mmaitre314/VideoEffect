@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="e5f65e97-27ec-4445-bf3f-a28c3ab6f3df" Publisher="CN=mmaitre" Version="1.0.0.12" />
-  <mp:PhoneIdentity PhoneProductId="e5f65e97-27ec-4445-bf3f-a28c3ab6f3df" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="ad873eb2-662d-446e-bc39-34902352db19" Publisher="CN=mmaitre" Version="1.0.0.12" />
+  <mp:PhoneIdentity PhoneProductId="ad873eb2-662d-446e-bc39-34902352db19" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>VideoEffectsTestApp.WindowsPhone</DisplayName>
+    <DisplayName>VideoEffectRecordCaptureTestApp</DisplayName>
     <PublisherDisplayName>mmaitre</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -15,8 +15,8 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="VideoEffectsTestApp.WindowsPhone.App">
-      <m3:VisualElements DisplayName="VideoEffectsTestApp.WindowsPhone" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="VideoEffectsTestApp.WindowsPhone" ForegroundText="light" BackgroundColor="transparent">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="VideoEffectRecordCaptureTestApp.App">
+      <m3:VisualElements DisplayName="VideoEffectRecordCaptureTestApp" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="VideoEffectRecordCaptureTestApp" ForegroundText="light" BackgroundColor="transparent">
         <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" />

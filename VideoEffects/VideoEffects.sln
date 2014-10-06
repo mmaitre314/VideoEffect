@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoEffects", "VideoEffects", "{B71AC1D0-8113-4E4A-833B-A2A2A059CFAB}"
 EndProject
@@ -40,6 +40,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.NuGet.WindowsPhone", "UnitTests.NuGet.WindowsPhone\UnitTests.NuGet.WindowsPhone.csproj", "{0C6838FD-9956-48D1-9BE2-C0FC516028E7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shaders", "Shaders\Shaders.vcxproj", "{FFC1BB14-7629-463F-9328-757C775F549B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoEffectRecordCaptureTestApp", "VideoEffectRecordCaptureTestApp\VideoEffectRecordCaptureTestApp.csproj", "{96F90177-D9E0-4ABB-BC02-5D59E3161030}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -395,6 +397,38 @@ Global
 		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|x64.ActiveCfg = Release|Win32
 		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|x86.ActiveCfg = Release|Win32
 		{FFC1BB14-7629-463F-9328-757C775F549B}.Release|x86.Build.0 = Release|Win32
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|ARM.ActiveCfg = Debug|ARM
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|ARM.Build.0 = Debug|ARM
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|ARM.Deploy.0 = Debug|ARM
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Mixed Platforms.Deploy.0 = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Win32.ActiveCfg = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Win32.Build.0 = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|Win32.Deploy.0 = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|x86.ActiveCfg = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|x86.Build.0 = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Debug|x86.Deploy.0 = Debug|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|ARM.ActiveCfg = Release|ARM
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|ARM.Build.0 = Release|ARM
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|ARM.Deploy.0 = Release|ARM
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Mixed Platforms.Build.0 = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Mixed Platforms.Deploy.0 = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Win32.ActiveCfg = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Win32.Build.0 = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|Win32.Deploy.0 = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|x64.ActiveCfg = Release|Any CPU
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|x86.ActiveCfg = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|x86.Build.0 = Release|x86
+		{96F90177-D9E0-4ABB-BC02-5D59E3161030}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

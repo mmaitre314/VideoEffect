@@ -103,6 +103,7 @@ public:
 
             CHK(MFCreateAttributes(&_attributes, 3));
             CHK(MFCreateAttributes(&_inputAttributes, 3));
+            CHK(MFCreateAttributes(&_outputAttributes, 3));
 
             if (D3DAware)
             {
@@ -218,7 +219,7 @@ public:
         return S_OK;
     }
 
-    IFACEMETHODIMP GetAttributes(__deref_out IMFAttributes** attributes)
+    IFACEMETHODIMP GetAttributes(__deref_out IMFAttributes **attributes)
     {
         auto lock = _lock.LockExclusive();
 
@@ -230,7 +231,7 @@ public:
         return _attributes.CopyTo(attributes);
     }
 
-    IFACEMETHODIMP GetInputStreamAttributes(_In_ DWORD streamId, __deref_out IMFAttributes ** attributes)
+    IFACEMETHODIMP GetInputStreamAttributes(_In_ DWORD streamId, __deref_out IMFAttributes **attributes)
     {
         auto lock = _lock.LockExclusive();
 
@@ -248,9 +249,22 @@ public:
         return _inputAttributes.CopyTo(attributes);
     }
 
-    IFACEMETHODIMP GetOutputStreamAttributes(_In_ DWORD, __deref_out IMFAttributes **)
+    IFACEMETHODIMP GetOutputStreamAttributes(_In_ DWORD streamId, __deref_out IMFAttributes **attributes)
     {
-        return E_NOTIMPL;
+        auto lock = _lock.LockExclusive();
+
+        if (attributes == nullptr)
+        {
+            return OriginateError(E_POINTER);
+        }
+        *attributes = nullptr;
+
+        if (streamId != 0)
+        {
+            return OriginateError(MF_E_INVALIDSTREAMNUMBER);
+        }
+
+        return _outputAttributes.CopyTo(attributes);
     }
 
     IFACEMETHODIMP DeleteInputStream(_In_ DWORD)
@@ -1012,54 +1026,48 @@ private:
             }
 
             // Create the sample allocator
-            ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> allocator;
-            CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&allocator)));
             if (_deviceManager == nullptr)
             {
+                ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> allocator;
+                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&allocator)));
                 CHK(allocator->InitializeSampleAllocatorEx(1, 50, nullptr, _outputType.Get()));
                 _inputAllocator = allocator;
                 _outputAllocator = allocator;
             }
             else
             {
-                CHK(allocator->SetDirectXManager(_deviceManager.Get()));
+                // Input allocator -- only needs D3D11_BIND_SHADER_RESOURCE
+                ::Microsoft::WRL::ComPtr<IMFAttributes> inputAttr;
+                ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
+                CHK(MFCreateAttributes(&inputAttr, 3));
+                CHK(inputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+                CHK(inputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                CHK(inputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE));
+                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
+                CHK(inputAllocator->SetDirectXManager(_deviceManager.Get()));
+                CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, inputAttr.Get(), _inputType.Get()));
 
-                ::Microsoft::WRL::ComPtr<IMFAttributes> attr;
-                CHK(MFCreateAttributes(&attr, 3));
-                CHK(attr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-                CHK(attr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
-                CHK(attr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET));
+                // Output allocator -- if possible respect bind flags requested by downstream component via GetOutputStreamAttributes()
+                ::Microsoft::WRL::ComPtr<IMFAttributes> outputAttr;
+                ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
+                CHK(MFCreateAttributes(&outputAttr, 3));
+                CHK(outputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+                CHK(outputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                unsigned int outputBindFlags = MFGetAttributeUINT32(_outputAttributes.Get(), MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET);
+                outputBindFlags |= D3D11_BIND_RENDER_TARGET; // D3D11_BIND_RENDER_TARGET required, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_VIDEO_ENCODER optional
+                CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, outputBindFlags));
+                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
+                CHK(outputAllocator->SetDirectXManager(_deviceManager.Get()));
 
-                if (SUCCEEDED(allocator->InitializeSampleAllocatorEx(1, 50, attr.Get(), _outputType.Get())))
+                if (FAILED(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get())))
                 {
-                    _inputAllocator = allocator;
-                    _outputAllocator = allocator;
-                }
-                else // Try again only enabling only one bind flag on each allocator (Phone 8.1 DX drivers do not support both flags)
-                {
-                    ::Microsoft::WRL::ComPtr<IMFAttributes> inputAttr;
-                    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
-                    CHK(MFCreateAttributes(&inputAttr, 3));
-                    CHK(inputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-                    CHK(inputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
-                    CHK(inputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE));
-                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
-                    CHK(inputAllocator->SetDirectXManager(_deviceManager.Get()));
-                    CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, inputAttr.Get(), _inputType.Get()));
-
-                    ::Microsoft::WRL::ComPtr<IMFAttributes> outputAttr;
-                    ::Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
-                    CHK(MFCreateAttributes(&outputAttr, 3));
-                    CHK(outputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-                    CHK(outputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                    // Try again with only D3D11_BIND_RENDER_TARGET (downstream component will have to make a copy)
                     CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET));
-                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
-                    CHK(outputAllocator->SetDirectXManager(_deviceManager.Get()));
                     CHK(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get()));
-
-                    _inputAllocator = inputAllocator;
-                    _outputAllocator = outputAllocator;
                 }
+
+                _inputAllocator = inputAllocator;
+                _outputAllocator = outputAllocator;
             }
 
             GUID subtype;
@@ -1146,6 +1154,7 @@ private:
 
     ::Microsoft::WRL::ComPtr<IMFAttributes> _attributes;
     ::Microsoft::WRL::ComPtr<IMFAttributes> _inputAttributes;
+    ::Microsoft::WRL::ComPtr<IMFAttributes> _outputAttributes;
     ::Microsoft::WRL::ComPtr<IMFSample> _sample;
 
     bool _streaming; // use _SetStreamingState() to update
