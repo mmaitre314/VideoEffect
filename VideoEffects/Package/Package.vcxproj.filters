@@ -11,5 +11,6 @@
     <None Include="Pack.sln" />
     <None Include="Package.appxmanifest.win81.transform" />
     <None Include="Package.appxmanifest.wpa81.transform" />
+    <None Include="publish.cmd" />
   </ItemGroup>
 </Project>
