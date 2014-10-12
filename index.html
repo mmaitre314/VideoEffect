@@ -1,1 +1,145 @@
-Test
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Video Effects by mmaitre314</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Video Effects</h1>
+        <p class="header"></p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/mmaitre314/VideoEffect/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/mmaitre314/VideoEffect/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/mmaitre314/VideoEffect">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/mmaitre314">mmaitre314</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a name="videoeffects" class="anchor" href="#videoeffects"><span class="octicon octicon-link"></span></a>VideoEffects</h1>
+
+<table>
+<thead>
+<tr>
+<th>Original</th>
+<th>Antique + HorizontalFlip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="http://mmaitre314.github.io/VideoEffect/car_original.jpg" alt="Original"></td>
+<td><img src="http://mmaitre314.github.io/VideoEffect/car_processed.jpg" alt="Processed"></td>
+</tr>
+</tbody>
+</table>
+
+<p>Apply image effects from the <a href="http://developer.nokia.com/resources/library/Imaging_API_Ref/index.html">Nokia Imaging SDK</a> and <a href="http://msdn.microsoft.com/en-us/library/bb509635(v=VS.85).aspx">DirectX HLSL pixel shaders</a> to videos in <a href="http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx">Universal Store Apps</a> for Windows Phone 8.1 and Windows 8.1.</p>
+
+<p>Effects can be applied via <a href="http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.transcoding.mediatranscoder.aspx">MediaTranscoder</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.editing.mediacomposition.aspx">MediaComposition</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.capture.mediacapture.aspx">MediaCapture</a>, or <a href="http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.ui.xaml.controls.mediaelement.aspx">MediaElement</a>.</p>
+
+<p>Binaries are available via <a href="https://www.nuget.org/packages/MMaitre.VideoEffects/">NuGet</a>.</p>
+
+<h2>
+<a name="nokia-imaging-sdk-effects" class="anchor" href="#nokia-imaging-sdk-effects"><span class="octicon octicon-link"></span></a>Nokia Imaging SDK effects</h2>
+
+<p>A video effect definition is created from a chain of image effects and passed to a video-processing class like MediaTranscoder:</p>
+
+<div class="highlight highlight-c#"><pre><span class="kt">var</span> <span class="n">definition</span> <span class="p">=</span> <span class="k">new</span> <span class="n">LumiaEffectDefinition</span><span class="p">(()</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">IFilter</span><span class="p">[]</span>
+    <span class="p">{</span>
+        <span class="k">new</span> <span class="nf">AntiqueFilter</span><span class="p">(),</span>
+        <span class="k">new</span> <span class="nf">FlipFilter</span><span class="p">(</span><span class="n">FlipMode</span><span class="p">.</span><span class="n">Horizontal</span><span class="p">)</span>
+    <span class="p">};</span>
+<span class="p">});</span>
+
+<span class="kt">var</span> <span class="n">transcoder</span> <span class="p">=</span> <span class="k">new</span> <span class="n">MediaTranscoder</span><span class="p">();</span>
+<span class="n">transcoder</span><span class="p">.</span><span class="n">AddVideoEffect</span><span class="p">(</span><span class="n">definition</span><span class="p">.</span><span class="n">ActivatableClassId</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="n">definition</span><span class="p">.</span><span class="n">Properties</span><span class="p">);</span>
+</pre></div>
+
+<p>See the unit tests for more C# and C++/CX code samples. </p>
+
+<h2>
+<a name="directx-hlsl-pixel-shader-effects" class="anchor" href="#directx-hlsl-pixel-shader-effects"><span class="octicon octicon-link"></span></a>DirectX HLSL Pixel Shader effects</h2>
+
+<p>Effects can process videos in either Bgra8 or Nv12 color spaces. Processing Bgra8 is simpler (one shader to write instead of two) but less efficient (the video pipeline needs to add one or two color conversions from/to Nv12/Yuy2).</p>
+
+<p>In the case of Nv12, the luma (Y) and chroma (UV) color planes are generated separately. For instance, for a basic color-inversion effect:</p>
+
+<pre lang="hlsl"><code>// Y processing
+float4 main(Pixel pixel) : SV_Target
+{
+    float y = bufferY.Sample(ss, pixel.pos);
+    y = 1 - y;
+    return y;
+}
+
+// UV processing
+float4 main(Pixel pixel) : SV_Target
+{
+    float4 uv = bufferUV.Sample(ss, pixel.pos);
+    uv = 1 - uv;
+    return uv;
+}
+</code></pre>
+
+<p>Visual Studio compiles the shaders into .cso files which are included in the app package and loaded at runtime to create a video effect definition:</p>
+
+<div class="highlight highlight-c#"><pre>    <span class="n">IBuffer</span> <span class="n">shaderY</span> <span class="p">=</span> <span class="k">await</span> <span class="n">PathIO</span><span class="p">.</span><span class="n">ReadBufferAsync</span><span class="p">(</span><span class="s">"ms-appx:///Invert_093_NV12_Y.cso"</span><span class="p">);</span>
+    <span class="n">IBuffer</span> <span class="n">shaderUV</span> <span class="p">=</span> <span class="k">await</span> <span class="n">PathIO</span><span class="p">.</span><span class="n">ReadBufferAsync</span><span class="p">(</span><span class="s">"ms-appx:///Invert_093_NV12_UV.cso"</span><span class="p">);</span>
+    <span class="kt">var</span> <span class="n">definition</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ShaderEffectDefinitionNv12</span><span class="p">(</span><span class="n">shaderY</span><span class="p">,</span> <span class="n">shaderUV</span><span class="p">);</span>
+
+    <span class="kt">var</span> <span class="n">transcoder</span> <span class="p">=</span> <span class="k">new</span> <span class="n">MediaTranscoder</span><span class="p">();</span>
+    <span class="n">transcoder</span><span class="p">.</span><span class="n">AddVideoEffect</span><span class="p">(</span><span class="n">definition</span><span class="p">.</span><span class="n">ActivatableClassId</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="n">definition</span><span class="p">.</span><span class="n">Properties</span><span class="p">);</span>
+</pre></div>
+
+<p>For effects to run on Windows Phone 8.1, in the file property page 'Configuration Properties &gt; HLSL Compiler &gt; General &gt; Shader Model' must be set to 'Shader Model 4 Level 9_3 (/4_0_level_9_3)'. Visual Studio only supports compiling shaders in C++ project, so for C# app a separate C++ project should be created to compile the shaders.</p>
+
+<p>For the .cso files to be included in the app package, in their file property page 'Build Action' must be set to 'Content'.</p>
+
+<h2>
+<a name="implementation-details" class="anchor" href="#implementation-details"><span class="octicon octicon-link"></span></a>Implementation details</h2>
+
+<p>The meat of the code is under VideoEffects/VideoEffects/VideoEffects.Shared. It consists in three Windows Runtime Classes: VideoEffects.LumiaEffect,  VideoEffects.ShaderEffectNv12, and VideoEffects.ShaderEffectBgrx8. LumiaEffect wraps a chain of Imaging SDK’s IFilter inside <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms696260">IMFTransform</a>/<a href="http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.imediaextension.aspx">IMediaExtension</a>. ShaderEffectXxx wraps a precompiled DirectX HSLS pixel shader. The rest is mostly support code and unit tests. </p>
+
+<p>The Runtime Classes must be declared in the AppxManifest files of Store apps wanting to call it:</p>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;Extensions&gt;</span>
+  <span class="nt">&lt;Extension</span> <span class="na">Category=</span><span class="s">"windows.activatableClass.inProcessServer"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;InProcessServer&gt;</span>
+      <span class="nt">&lt;Path&gt;</span>VideoEffects.WindowsPhone.dll<span class="nt">&lt;/Path&gt;</span>
+      <span class="nt">&lt;ActivatableClass</span> <span class="na">ActivatableClassId=</span><span class="s">"VideoEffects.LumiaEffect"</span> <span class="na">ThreadingModel=</span><span class="s">"both"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;ActivatableClass</span> <span class="na">ActivatableClassId=</span><span class="s">"VideoEffects.ShaderEffectBgrx8"</span> <span class="na">ThreadingModel=</span><span class="s">"both"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;ActivatableClass</span> <span class="na">ActivatableClassId=</span><span class="s">"VideoEffects.ShaderEffectNv12"</span> <span class="na">ThreadingModel=</span><span class="s">"both"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/InProcessServer&gt;</span>
+  <span class="nt">&lt;/Extension&gt;</span>
+<span class="nt">&lt;/Extensions&gt;</span>
+</pre></div>
+
+<p>Visual Studio does not handle such an <code>&lt;Extension&gt;</code> element. The AppxManifest needs to be opened as raw XML and the XML code snippet above copy/pasted. For Windows Store apps the <code>&lt;path&gt;</code> is VideoEffects.Windows.dll. NuGet packages handle that part automatically when targeting C# Store apps.</p>
+
+<p>Video frames are received as <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/hh447827">IMF2DBuffer2</a> from the Media Foundation pipeline and successively wrapped inside <a href="http://msdn.microsoft.com/en-us/library/windows/apps/windows.storage.streams.ibuffer.aspx">IBuffer</a>, Bitmap, and BitmapImageSource/BitmapRenderer to be handed to the Nokia Imaging SDK.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
