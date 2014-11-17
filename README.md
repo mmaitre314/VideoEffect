@@ -30,6 +30,34 @@ var transcoder = new MediaTranscoder();
 transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
 ```
 
+Image effects changing the image resolution -- cropping for instance -- are also supported. In that case the resolutions at the input and output of the effect need to be specified explicitly. For instance, the following code snippet creates a square video:
+
+```c#
+// Select the largest centered square area in the input video
+var encodingProfile = await MediaEncodingProfile.CreateFromFileAsync(file);
+uint inputWidth = encodingProfile.Video.Width;
+uint inputHeight = encodingProfile.Video.Height;
+uint outputLength = Math.Min(inputWidth, inputHeight);
+Rect cropArea = new Rect(
+    (float)((inputWidth - outputLength) / 2),
+    (float)((inputHeight - outputLength) / 2),
+    (float)outputLength,
+    (float)outputLength
+);
+
+var definition = new LumiaEffectDefinition(() =>
+{
+    return new IFilter[]
+    {
+        new CropFilter(cropArea)
+    };
+});
+definition.InputWidth = inputWidth;
+definition.InputHeight = inputHeight;
+definition.OutputWidth = outputLength;
+definition.OutputHeight = outputLength;
+```
+
 See the unit tests for more C# and C++/CX code samples. 
 
 DirectX HLSL Pixel Shader effects
