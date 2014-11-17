@@ -225,3 +225,21 @@ public:
     PropVariant(const PropVariant&) = delete;
     PropVariant& operator&(const PropVariant&) = delete;
 };
+
+//
+// IPropertySet helpers
+//
+
+inline unsigned int GetUInt32(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ properties, _In_ Platform::String^ key, _In_ unsigned int defaultValue)
+{
+    unsigned int value = defaultValue;
+    if (properties->HasKey(key))
+    {
+        Platform::Object^ boxedValue = properties->Lookup(key);
+        if (Platform::Type::GetTypeCode(boxedValue->GetType()) == Platform::TypeCode::UInt32)
+        {
+            value = (unsigned int)boxedValue;
+        }
+    }
+    return value;
+}

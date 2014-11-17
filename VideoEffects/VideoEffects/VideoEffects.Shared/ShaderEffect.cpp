@@ -23,7 +23,7 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
     }
 }
 
-void ShaderEffect::ValidateDeviceManager(_In_ const ComPtr<IMFDXGIDeviceManager>& deviceManager)
+void ShaderEffect::ValidateDeviceManager(_In_ const ComPtr<IMFDXGIDeviceManager>& deviceManager) const
 {
     // Currently only needs to check device caps for NV12
     if (find(_supportedFormats.begin(), _supportedFormats.end(), MFVideoFormat_NV12.Data1) == _supportedFormats.end())

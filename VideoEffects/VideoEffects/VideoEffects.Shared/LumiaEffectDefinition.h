@@ -11,14 +11,25 @@ namespace VideoEffects
     {
     public:
 
-        ///<summary>Creates an effect definition from a class implementing IFilterChainFactory.</summary>
+        ///<summary>Create an effect definition from a class implementing IFilterChainFactory.</summary>
         ///<param name='filterChainFactory'>ActivatableClassId of the filter factory.</param>
         LumiaEffectDefinition(_In_ Platform::String^ filterChainFactory);
 
-        ///<summary>Creates an effect definition from a FilterChainFactory delegate.
-        ///</summary>
+        ///<summary>Create an effect definition from a FilterChainFactory delegate.</summary>
         [Windows::Foundation::Metadata::DefaultOverload]
         LumiaEffectDefinition(_In_ VideoEffects::FilterChainFactory^ filterChainFactory);
+
+        ///<summary>Override the input width coming from the pipeline.</summary>
+        property unsigned int InputWidth { unsigned int get(); void set(unsigned int value); }
+
+        ///<summary>Override the input height coming from the pipeline.</summary>
+        property unsigned int InputHeight { unsigned int get(); void set(unsigned int value); }
+
+        ///<summary>Override the output width coming from the pipeline.</summary>
+        property unsigned int OutputWidth { unsigned int get(); void set(unsigned int value); }
+
+        ///<summary>Override the output height coming from the pipeline.</summary>
+        property unsigned int OutputHeight { unsigned int get(); void set(unsigned int value); }
 
         virtual property Platform::String^ ActivatableClassId 
         { 

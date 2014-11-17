@@ -9,7 +9,7 @@ using namespace Microsoft::WRL;
 using namespace Platform;
 using namespace std;
 
-vector<unsigned long> ShaderEffectBgrx8::GetSupportedFormats()
+vector<unsigned long> ShaderEffectBgrx8::GetSupportedFormats() const
 {
     vector<unsigned long> formats;
     formats.push_back(MFVideoFormat_RGB32.Data1);

@@ -53,7 +53,9 @@ namespace VideoEffectsTestApp
             StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Car.mp4"));
             StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("VideoEffectsTestApp.MediaTranscoder.mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = await CreateEffectDefinitionAsync();
+            var encodingProfile = await MediaEncodingProfile.CreateFromFileAsync(source);
+
+            var definition = await CreateEffectDefinitionAsync(encodingProfile.Video);
 
             var transcoder = new MediaTranscoder();
             transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
@@ -75,13 +77,16 @@ namespace VideoEffectsTestApp
                 return;
             }
 
-            var definition = await CreateEffectDefinitionAsync();
-
             var capture = new MediaCapture();
             await capture.InitializeAsync(new MediaCaptureInitializationSettings
             {
                 StreamingCaptureMode = StreamingCaptureMode.Video
             });
+
+            var definition = await CreateEffectDefinitionAsync(
+                (VideoEncodingProperties)capture.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview)
+                );
+
             await capture.AddEffectAsync(MediaStreamType.VideoPreview, definition.ActivatableClassId, definition.Properties);
 
             CapturePreview.Source = capture;
@@ -103,13 +108,16 @@ namespace VideoEffectsTestApp
 
             StorageFile destination = await KnownFolders.VideosLibrary.CreateFileAsync("VideoEffectsTestApp.MediaCapture.mp4", CreationCollisionOption.ReplaceExisting);
 
-            var definition = await CreateEffectDefinitionAsync();
-
             var capture = new MediaCapture();
             await capture.InitializeAsync(new MediaCaptureInitializationSettings
             {
                 StreamingCaptureMode = StreamingCaptureMode.Video
             });
+
+            var definition = await CreateEffectDefinitionAsync(
+                (VideoEncodingProperties)capture.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoRecord)
+                );
+
             await capture.AddEffectAsync(MediaStreamType.VideoRecord, definition.ActivatableClassId, definition.Properties);
 
             await capture.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Qvga), destination);
@@ -130,7 +138,10 @@ namespace VideoEffectsTestApp
             MediaElementPreview.Source = null;
             MediaElementPreview.RemoveAllEffects();
 
-            var definition = await CreateEffectDefinitionAsync();
+            StorageFile source = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Car.mp4"));
+            var encodingProfile = await MediaEncodingProfile.CreateFromFileAsync(source);
+
+            var definition = await CreateEffectDefinitionAsync(encodingProfile.Video);
 
             MediaElementPreview.Source = new Uri("ms-appx:///Assets/Car.mp4");
             MediaElementPreview.AddVideoEffect(definition.ActivatableClassId, false, definition.Properties);
@@ -138,7 +149,7 @@ namespace VideoEffectsTestApp
             StartMediaElementPreview.IsEnabled = true;
         }
 
-        private async Task<IVideoEffectDefinition> CreateEffectDefinitionAsync()
+        private async Task<IVideoEffectDefinition> CreateEffectDefinitionAsync(VideoEncodingProperties props)
         {
             switch (EffectType.SelectedIndex)
             {
@@ -160,6 +171,30 @@ namespace VideoEffectsTestApp
                 case 2:
                     IBuffer shader = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_RGB32.cso");
                     return new ShaderEffectDefinitionBgrx8(shader);
+
+                case 3:
+                    // Select the largest centered square area in the input video
+                    uint inputWidth = props.Width;
+                    uint inputHeight = props.Height;
+                    uint outputLength = Math.Min(inputWidth, inputHeight);
+                    Rect cropArea = new Rect(
+                        (float)((inputWidth - outputLength) / 2),
+                        (float)((inputHeight - outputLength) / 2),
+                        (float)outputLength,
+                        (float)outputLength
+                        );
+
+                    var definition = new LumiaEffectDefinition(new FilterChainFactory(() =>
+                    {
+                        var filters = new List<IFilter>();
+                        filters.Add(new CropFilter(cropArea));
+                        return filters;
+                    }));
+                    definition.InputWidth = inputWidth;
+                    definition.InputHeight = inputHeight;
+                    definition.OutputWidth = outputLength;
+                    definition.OutputHeight = outputLength;
+                    return definition;
 
                 default:
                     throw new ArgumentException("Invalid effect type");

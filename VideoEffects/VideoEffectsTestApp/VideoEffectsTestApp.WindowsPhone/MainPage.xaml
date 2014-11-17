@@ -29,6 +29,7 @@
                 <ComboBoxItem IsSelected="True">Lumia effect</ComboBoxItem>
                 <ComboBoxItem Name="EffectTypeShaderNv12">Shader effect (Nv12)</ComboBoxItem>
                 <ComboBoxItem>Shader effect (Bgrx8)</ComboBoxItem>
+                <ComboBoxItem>Lumia Crop effect</ComboBoxItem>
             </ComboBox>
 
             <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Center" Click="StartMediaElementPreview_Click" MinHeight="0"/>

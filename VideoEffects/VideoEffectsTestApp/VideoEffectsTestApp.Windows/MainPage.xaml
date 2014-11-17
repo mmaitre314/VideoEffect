@@ -21,6 +21,7 @@
                 <ComboBoxItem IsSelected="True">Lumia effect</ComboBoxItem>
                 <ComboBoxItem Name="EffectTypeShaderNv12">Shader effect (Nv12)</ComboBoxItem>
                 <ComboBoxItem>Shader effect (Bgrx8)</ComboBoxItem>
+                <ComboBoxItem>Lumia Crop effect</ComboBoxItem>
             </ComboBox>
             <Button Name="ClearPreview" Content="Clear preview" HorizontalAlignment="Right" Click="ClearPreview_Click"/>
         </StackPanel>

@@ -19,3 +19,43 @@ LumiaEffectDefinition::LumiaEffectDefinition(_In_ VideoEffects::FilterChainFacto
 {
     _properties->Insert(L"FilterChainFactory", filterChainFactory);
 }
+
+unsigned int LumiaEffectDefinition::InputWidth::get()
+{
+    return GetUInt32(_properties, L"InputWidth", 0);
+}
+
+void LumiaEffectDefinition::InputWidth::set(unsigned int value)
+{
+    _properties->Insert(L"InputWidth", value);
+}
+
+unsigned int LumiaEffectDefinition::InputHeight::get()
+{
+    return GetUInt32(_properties, L"InputHeight", 0);
+}
+
+void LumiaEffectDefinition::InputHeight::set(unsigned int value)
+{
+    _properties->Insert(L"InputHeight", value);
+}
+
+unsigned int LumiaEffectDefinition::OutputWidth::get()
+{
+    return GetUInt32(_properties, L"OutputWidth", 0);
+}
+
+void LumiaEffectDefinition::OutputWidth::set(unsigned int value)
+{
+    _properties->Insert(L"OutputWidth", value);
+}
+
+unsigned int LumiaEffectDefinition::OutputHeight::get()
+{
+    return GetUInt32(_properties, L"OutputHeight", 0);
+}
+
+void LumiaEffectDefinition::OutputHeight::set(unsigned int value)
+{
+    _properties->Insert(L"OutputHeight", value);
+}

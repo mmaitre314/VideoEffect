@@ -20,7 +20,7 @@ class ShaderEffectBgrx8 WrlSealed : public ShaderEffect
 public:
 
     // Format management
-    std::vector<unsigned long> GetSupportedFormats() override;
+    virtual std::vector<unsigned long> GetSupportedFormats() const override;
 
 private:
 

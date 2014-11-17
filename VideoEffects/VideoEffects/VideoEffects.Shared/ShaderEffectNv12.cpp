@@ -9,7 +9,7 @@ using namespace Microsoft::WRL;
 using namespace Platform;
 using namespace std;
 
-vector<unsigned long> ShaderEffectNv12::GetSupportedFormats()
+vector<unsigned long> ShaderEffectNv12::GetSupportedFormats() const
 {
     vector<unsigned long> formats;
     formats.push_back(MFVideoFormat_NV12.Data1);

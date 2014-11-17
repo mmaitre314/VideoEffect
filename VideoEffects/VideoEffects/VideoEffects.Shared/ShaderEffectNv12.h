@@ -19,7 +19,7 @@ class ShaderEffectNv12 WrlSealed : public ShaderEffect
 
 public:
 
-    std::vector<unsigned long> GetSupportedFormats() override;
+    virtual std::vector<unsigned long> GetSupportedFormats() const override;
 
 private:
 

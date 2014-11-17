@@ -12,39 +12,64 @@
 //</Extensions>
 //
 
-class LumiaEffect WrlSealed : public Video1in1outEffect<LumiaEffect, /*D3DAware*/true> // On Phone 8.1 MediaComposition requires all effects to be D3D aware
+class LumiaEffect WrlSealed : public Video1in1outEffect
 {
     InspectableClass(L"VideoEffects.LumiaEffect", TrustLevel::BaseTrust);
 
 public:
 
     LumiaEffect()
-        : _format(0)
-        , _width(0)
-        , _height(0)
+        : _inputWidthInit(0)
+        , _inputHeightInit(0)
+        , _outputWidthInit(0)
+        , _outputHeightInit(0)
+        , _inputWidth(0)
+        , _inputHeight(0)
+        , _outputWidth(0)
+        , _outputHeight(0)
     {
     }
 
-    void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props);
+    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props);
 
     // Format management
-    std::vector<unsigned long> GetSupportedFormats();
-    bool IsFormatSupported(_In_ unsigned long /*format*/, _In_ unsigned int /*width*/, _In_ unsigned int /*height*/)
-    {
-        return true; // no constraint beyond set of supported formats 
-    }
+    virtual std::vector<unsigned long> GetSupportedFormats() const;
+    virtual bool IsValidInputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const;
+    virtual bool IsValidOutputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const;
+    virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateInputAvailableType(_In_ unsigned int typeIndex) const;
+    virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateOutputAvailableType(_In_ unsigned int typeIndex) const;
 
     // Data processing
-    void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
-    bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample);
-    void EndStreaming();
+    virtual void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
+    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample);
 
 private:
 
-    unsigned long _format;
-    unsigned int _width;
-    unsigned int _height;
-    
+    bool _IsValidType(
+        _In_ const Microsoft::WRL::ComPtr<IMFMediaType> &type,
+        unsigned int width,
+        unsigned int height,
+        unsigned int framerateNum,
+        unsigned int framerateDenom
+        ) const;
+
+    _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> _CreatePartialType(
+        _In_ unsigned int typeIndex,
+        unsigned int width,
+        unsigned int height,
+        unsigned int framerateNum,  // 0 if no framerate
+        unsigned int framerateDenom // 0 if no framerate
+        ) const;
+
+    unsigned int _inputWidthInit;
+    unsigned int _inputHeightInit;
+    unsigned int _outputWidthInit;
+    unsigned int _outputHeightInit;
+    unsigned int _inputWidth;
+    unsigned int _inputHeight;
+    unsigned int _outputWidth;
+    unsigned int _outputHeight;
+
     Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ _filters;
 };
 
