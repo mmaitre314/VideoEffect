@@ -25,16 +25,16 @@ public:
     {
     }
 
-    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props);
+    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props) override;
 
     // Format management
     virtual std::vector<unsigned long> GetSupportedFormats() const = 0;
-    virtual void ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& deviceManager) const;
+    virtual void ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& deviceManager) const override;
 
     // Data processing
-    virtual void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
-    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample);
-    virtual void EndStreaming();
+    virtual void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height) override;
+    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample) override;
+    virtual void EndStreaming() override;
 
 protected:
 

@@ -30,18 +30,18 @@ public:
     {
     }
 
-    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props);
+    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props) override;
 
     // Format management
-    virtual std::vector<unsigned long> GetSupportedFormats() const;
-    virtual bool IsValidInputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const;
-    virtual bool IsValidOutputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const;
-    virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateInputAvailableType(_In_ unsigned int typeIndex) const;
-    virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateOutputAvailableType(_In_ unsigned int typeIndex) const;
+    virtual std::vector<unsigned long> GetSupportedFormats() const override;
+    virtual bool IsValidInputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const override;
+    virtual bool IsValidOutputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const override;
+    virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateInputAvailableType(_In_ unsigned int typeIndex) const override;
+    virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateOutputAvailableType(_In_ unsigned int typeIndex) const override;
 
     // Data processing
-    virtual void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height);
-    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample);
+    virtual void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height) override;
+    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample) override;
 
 private:
 

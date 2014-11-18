@@ -764,7 +764,7 @@ protected:
         return true;
     }
 
-    virtual void ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& /*deviceManager*/)
+    virtual void ValidateDeviceManager(_In_ const Microsoft::WRL::ComPtr<IMFDXGIDeviceManager>& /*deviceManager*/) const
     {
     }
 
