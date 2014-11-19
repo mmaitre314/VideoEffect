@@ -27,6 +27,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinitionBgrx8.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinitionNv12.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectNv12.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Video1in1outEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferOnMF2DBuffer.h" />
   </ItemGroup>
@@ -44,6 +46,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinitionBgrx8.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinitionNv12.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectNv12.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />

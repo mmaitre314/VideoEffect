@@ -96,13 +96,14 @@ class Video1in1outEffect : public Microsoft::WRL::RuntimeClass<
 
 public:
 
-    Video1in1outEffect()
+    Video1in1outEffect(_In_ bool passthrough = false)
         : _streaming(false)
         , _inputProgressive(false)
         , _inputDefaultStride(0)
         , _inputDefaultSize(0)
         , _outputDefaultStride(0)
         , _outputDefaultSize(0)
+        , _passthrough(passthrough)
     {
     }
 
@@ -588,7 +589,7 @@ public:
                 CHK(OriginateError(E_INVALIDARG, L"Interlaced content not supported"));
             }
 
-            _sample = _NormalizeSample(sample);
+            _sample = _passthrough ? sample : _NormalizeSample(sample);
         });
 
         hr = FAILED(hr) ? hr : notAccepting ? MF_E_NOTACCEPTING : S_OK;
@@ -632,20 +633,27 @@ public:
                 return;
             }
 
-            Microsoft::WRL::ComPtr<IMFSample> outputSample;
-            CHK(_outputAllocator->AllocateSample(&outputSample));
-
-            bool producedData = ProcessSample(_sample, outputSample);
-
-            _sample = nullptr;
-
-            if (!producedData)
+            if (_passthrough)
             {
-                needMoreInput = true;
+                outputSamples[0].pSample = _sample.Detach();
             }
             else
             {
-                outputSamples[0].pSample = outputSample.Detach();
+                Microsoft::WRL::ComPtr<IMFSample> outputSample;
+                CHK(_outputAllocator->AllocateSample(&outputSample));
+
+                bool producedData = ProcessSample(_sample, outputSample);
+
+                _sample = nullptr;
+
+                if (!producedData)
+                {
+                    needMoreInput = true;
+                }
+                else
+                {
+                    outputSamples[0].pSample = outputSample.Detach();
+                }
             }
         });
 
@@ -771,8 +779,8 @@ protected:
     Microsoft::WRL::ComPtr<IMFMediaType> _inputType;
     Microsoft::WRL::ComPtr<IMFMediaType> _outputType;
     Microsoft::WRL::ComPtr<IMFDXGIDeviceManager> _deviceManager;
-    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _inputAllocator;
-    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _outputAllocator;
+    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _inputAllocator;  // null if passthrough
+    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _outputAllocator; // null if passthrough
     std::vector<unsigned long> _supportedFormats;
     unsigned int _inputDefaultStride; // Buffer stride when receiving 1D buffers (happens sometimes in MediaElement)
     unsigned int _outputDefaultStride;
@@ -1073,55 +1081,58 @@ private:
             }
 
             // Create the sample allocators
-            if (_deviceManager == nullptr)
+            if (!_passthrough)
             {
-                // Input allocator
-                Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
-                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
-                CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, nullptr, _inputType.Get()));
-
-                // Output allocator
-                Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
-                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
-                CHK(outputAllocator->InitializeSampleAllocatorEx(1, 50, nullptr, _outputType.Get()));
-
-                _inputAllocator = inputAllocator;
-                _outputAllocator = outputAllocator;
-            }
-            else
-            {
-                // Input allocator -- only needs D3D11_BIND_SHADER_RESOURCE
-                Microsoft::WRL::ComPtr<IMFAttributes> inputAttr;
-                Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
-                CHK(MFCreateAttributes(&inputAttr, 3));
-                CHK(inputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-                CHK(inputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
-                CHK(inputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE));
-                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
-                CHK(inputAllocator->SetDirectXManager(_deviceManager.Get()));
-                CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, inputAttr.Get(), _inputType.Get()));
-
-                // Output allocator -- if possible respect bind flags requested by downstream component via GetOutputStreamAttributes()
-                Microsoft::WRL::ComPtr<IMFAttributes> outputAttr;
-                Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
-                CHK(MFCreateAttributes(&outputAttr, 3));
-                CHK(outputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
-                CHK(outputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
-                unsigned int outputBindFlags = MFGetAttributeUINT32(_outputAttributes.Get(), MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET);
-                outputBindFlags |= D3D11_BIND_RENDER_TARGET; // D3D11_BIND_RENDER_TARGET required, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_VIDEO_ENCODER optional
-                CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, outputBindFlags));
-                CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
-                CHK(outputAllocator->SetDirectXManager(_deviceManager.Get()));
-
-                if (FAILED(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get())))
+                if (_deviceManager == nullptr)
                 {
-                    // Try again with only D3D11_BIND_RENDER_TARGET (downstream component will have to make a copy)
-                    CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET));
-                    CHK(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get()));
-                }
+                    // Input allocator
+                    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
+                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
+                    CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, nullptr, _inputType.Get()));
 
-                _inputAllocator = inputAllocator;
-                _outputAllocator = outputAllocator;
+                    // Output allocator
+                    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
+                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
+                    CHK(outputAllocator->InitializeSampleAllocatorEx(1, 50, nullptr, _outputType.Get()));
+
+                    _inputAllocator = inputAllocator;
+                    _outputAllocator = outputAllocator;
+                }
+                else
+                {
+                    // Input allocator -- only needs D3D11_BIND_SHADER_RESOURCE
+                    Microsoft::WRL::ComPtr<IMFAttributes> inputAttr;
+                    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> inputAllocator;
+                    CHK(MFCreateAttributes(&inputAttr, 3));
+                    CHK(inputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+                    CHK(inputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                    CHK(inputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE));
+                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&inputAllocator)));
+                    CHK(inputAllocator->SetDirectXManager(_deviceManager.Get()));
+                    CHK(inputAllocator->InitializeSampleAllocatorEx(1, 50, inputAttr.Get(), _inputType.Get()));
+
+                    // Output allocator -- if possible respect bind flags requested by downstream component via GetOutputStreamAttributes()
+                    Microsoft::WRL::ComPtr<IMFAttributes> outputAttr;
+                    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> outputAllocator;
+                    CHK(MFCreateAttributes(&outputAttr, 3));
+                    CHK(outputAttr->SetUINT32(MF_SA_BUFFERS_PER_SAMPLE, 1));
+                    CHK(outputAttr->SetUINT32(MF_SA_D3D11_USAGE, D3D11_USAGE_DEFAULT));
+                    unsigned int outputBindFlags = MFGetAttributeUINT32(_outputAttributes.Get(), MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET);
+                    outputBindFlags |= D3D11_BIND_RENDER_TARGET; // D3D11_BIND_RENDER_TARGET required, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_VIDEO_ENCODER optional
+                    CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, outputBindFlags));
+                    CHK(MFCreateVideoSampleAllocatorEx(IID_PPV_ARGS(&outputAllocator)));
+                    CHK(outputAllocator->SetDirectXManager(_deviceManager.Get()));
+
+                    if (FAILED(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get())))
+                    {
+                        // Try again with only D3D11_BIND_RENDER_TARGET (downstream component will have to make a copy)
+                        CHK(outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_RENDER_TARGET));
+                        CHK(outputAllocator->InitializeSampleAllocatorEx(1, 50, outputAttr.Get(), _outputType.Get()));
+                    }
+
+                    _inputAllocator = inputAllocator;
+                    _outputAllocator = outputAllocator;
+                }
             }
 
             GUID subtype;
@@ -1213,6 +1224,7 @@ private:
 
     bool _streaming; // use _SetStreamingState() to update
     bool _inputProgressive;
+    const bool _passthrough;
     unsigned int _inputDefaultSize;
     unsigned int _outputDefaultSize;
 

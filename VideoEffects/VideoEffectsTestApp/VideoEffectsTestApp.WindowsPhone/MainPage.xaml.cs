@@ -243,6 +243,9 @@ namespace VideoEffectsTestApp
                     definition.OutputHeight = outputLength;
                     return definition;
 
+                case 4:
+                    return new SquareEffectDefinition();
+
                 default:
                     throw new ArgumentException("Invalid effect type");
             }
