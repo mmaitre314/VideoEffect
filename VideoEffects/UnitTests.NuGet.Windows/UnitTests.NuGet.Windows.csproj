@@ -19,7 +19,7 @@
     <PackageCertificateKeyFile>UnitTests.NuGet.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>6a4ea454</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>a46c7569</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -122,7 +122,9 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Help\Nokia Imaging SDK.chm" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="UnitTests.NuGet.Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -149,9 +151,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets'))" />
-    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.1.0.1\build\win81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.1.0.1\build\win81\MMaitre.VideoEffects.targets'))" />
+    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.1.0.2\build\win81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.1.0.2\build\win81\MMaitre.VideoEffects.targets'))" />
   </Target>
-  <Import Project="..\packages\MMaitre.VideoEffects.1.0.1\build\win81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.1.0.1\build\win81\MMaitre.VideoEffects.targets')" />
+  <Import Project="..\packages\MMaitre.VideoEffects.1.0.2\build\win81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.1.0.2\build\win81\MMaitre.VideoEffects.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
