@@ -58,6 +58,8 @@ definition.OutputWidth = outputLength;
 definition.OutputHeight = outputLength;
 ```
 
+Note: in Windows Phone 8.1 a bug in MediaComposition prevents the width/height information to be properly passed to the effect.
+
 See the unit tests for more C# and C++/CX code samples. 
 
 DirectX HLSL Pixel Shader effects
