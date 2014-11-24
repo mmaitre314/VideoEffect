@@ -19,6 +19,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FilterChainFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TranscodingProfile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SampleFormatter.h" />
@@ -36,6 +37,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)DebuggerLogger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TranscodingProfile.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

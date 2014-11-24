@@ -20,6 +20,7 @@
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
     <NuGetPackageImportStamp>cfc83be9</NuGetPackageImportStamp>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -123,6 +124,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Help\Nokia Imaging SDK.chm" />
+    <Content Include="Input\OriginalR.mp4" />
     <Content Include="Invert_093_NV12_UV.cso" />
     <Content Include="Invert_093_NV12_Y.cso" />
     <Content Include="Invert_093_RGB32.cso" />

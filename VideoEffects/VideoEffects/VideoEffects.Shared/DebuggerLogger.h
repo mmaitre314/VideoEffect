@@ -19,10 +19,17 @@ public:
 
     DebuggerLogger();
 
-    bool IsEnabled(_In_ LogLevel level)
+#ifdef NDEBUG
+    bool IsEnabled(_In_ LogLevel /*level*/) const
+    {
+        return false; // Store validation rejects OutputDebugString()
+    }
+#else
+    bool IsEnabled(_In_ LogLevel level) const
     {
         return (level <= _level) && ::IsDebuggerPresent();
     }
+#endif
 
     template <size_t L>
     void Log(_In_ char const (&function)[L], _In_ LogLevel level, _In_ PCSTR format, ...)

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="556934d0-8491-442e-9ca6-4d60aa8bd9ca" Publisher="CN=mmaitre" Version="1.0.0.1" />
+  <Identity Name="556934d0-8491-442e-9ca6-4d60aa8bd9ca" Publisher="CN=mmaitre" Version="1.0.0.2" />
   <Properties>
     <DisplayName>VideoEffectsTestApp.Windows</DisplayName>
     <PublisherDisplayName>mmaitre</PublisherDisplayName>

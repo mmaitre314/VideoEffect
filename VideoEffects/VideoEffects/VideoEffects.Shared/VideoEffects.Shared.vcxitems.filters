@@ -18,6 +18,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ShaderEffectDefinitionNv12.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TranscodingProfile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -35,6 +36,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectDefinitionNv12.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TranscodingProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl" />

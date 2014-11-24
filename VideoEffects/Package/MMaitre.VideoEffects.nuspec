@@ -11,7 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Applies effects from the Nokia Imaging SDK and DirectX HLSL pixel shaders to videos.</summary>
     <description>Provides Media Extensions applying image effects from the Nokia Imaging SDK and DirectX HLSL pixel shaders to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1. For documentation see https://github.com/mmaitre314/VideoEffect .</description>
-    <releaseNotes>Lumia effect now supports cropping.</releaseNotes>
+    <releaseNotes>Add TranscodingProfile.CreateFromFileAsync() API to create profiles handling video orientation and remove calls to OutputDebugStringA() to pass Store certification.</releaseNotes>
     <copyright>Copyright © 2014, Matthieu Maitre. All rights reserved.</copyright>
     <tags>Native WinRT Nokia DirectX HLSL shader</tags>
     <dependencies>

@@ -45,6 +45,9 @@
     <ClCompile Include="LumiaEffectTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TranscodingProfileTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\UnitTestLogo.scale-100.png">
@@ -68,16 +71,19 @@
   <ItemGroup>
     <None Include="UnitTestsCx.Windows_TemporaryKey.pfx" />
     <None Include="packages.config" />
-    <None Include="$(MSBuildThisFileDirectory)\..\..\content\$(MappedPlatformToolset)\Help\Nokia Imaging SDK.chm" />
     <None Include="Invert_093_NV12_UV.cso" />
     <None Include="Invert_093_NV12_Y.cso" />
     <None Include="Invert_093_RGB32.cso" />
     <None Include="Invert_100_NV12_UV.cso" />
     <None Include="Invert_100_NV12_Y.cso" />
     <None Include="Invert_100_RGB32.cso" />
+    <None Include="$(MSBuildThisFileDirectory)\..\..\content\$(MappedPlatformToolset)\Help\Nokia Imaging SDK.chm" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Input\Car.mp4">
+      <Filter>Input</Filter>
+    </Media>
+    <Media Include="Input\OriginalR.mp4">
       <Filter>Input</Filter>
     </Media>
   </ItemGroup>

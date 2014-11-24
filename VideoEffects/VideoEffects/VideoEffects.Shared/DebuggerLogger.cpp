@@ -4,9 +4,17 @@
 DebuggerLogger::DebuggerLogger()
     : _level(LogLevel::Information)
 {
+#ifndef NDEBUG // Store validation rejects OutputDebugString()
     OutputDebugStringA("Starting tracing\n");
+#endif
 }
 
+#ifdef NDEBUG
+void DebuggerLogger::_Log(_In_reads_(L) const char * /*function*/, _In_ size_t /*L*/, _In_ PCSTR /*format*/, va_list /*args*/)
+{
+    // Store validation rejects OutputDebugString()
+}
+#else
 void DebuggerLogger::_Log(_In_reads_(L) const char *function, _In_ size_t L, _In_ PCSTR format, va_list args)
 {
     char message[2048];
@@ -51,3 +59,4 @@ void DebuggerLogger::_Log(_In_reads_(L) const char *function, _In_ size_t L, _In
 
     OutputDebugStringA(message);
 }
+#endif

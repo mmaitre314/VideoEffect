@@ -254,6 +254,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="MediaTranscoderTests.cpp" />
+    <ClCompile Include="TranscodingProfileTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <SDKReference Include="CppUnitTestFramework, Version=11.0" />
@@ -292,6 +293,7 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="Input\Car.mp4" />
+    <Media Include="Input\OriginalR.mp4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoEffects\VideoEffects.Windows\VideoEffects.Windows.vcxproj">

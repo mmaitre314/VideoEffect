@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set VERSION=1.0.2
+set VERSION=1.0.3
 
 set OUTPUT=c:\NuGet\
 
@@ -21,5 +21,5 @@ REM Build
 %BUILD% .\pack.sln /maxcpucount /target:build /nologo /p:Configuration=Release /p:Platform=ARM
 
 REM Pack
-nuget.exe pack MMaitre.VideoEffects.nuspec -OutputDirectory %OUTPUT%Packages -Prop NuGetVersion=%VERSION% -NoPackageAnalysis
-nuget.exe pack MMaitre.VideoEffects.Symbols.nuspec -OutputDirectory %OUTPUT%Symbols -Prop NuGetVersion=%VERSION% -NoPackageAnalysis
+%OUTPUT%nuget.exe pack MMaitre.VideoEffects.nuspec -OutputDirectory %OUTPUT%Packages -Prop NuGetVersion=%VERSION% -NoPackageAnalysis
+%OUTPUT%nuget.exe pack MMaitre.VideoEffects.Symbols.nuspec -OutputDirectory %OUTPUT%Symbols -Prop NuGetVersion=%VERSION% -NoPackageAnalysis

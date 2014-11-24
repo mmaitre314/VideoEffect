@@ -170,6 +170,7 @@ LPCSTR MediaTypeFormatter::_GetGuidFriendlyName(const GUID& guid)
     IF_EQUAL_RETURN(guid, MFVideoFormat_DVSL); //     FCC('dvsl')
     IF_EQUAL_RETURN(guid, MFVideoFormat_H264); //     FCC('H264')
     IF_EQUAL_RETURN(guid, MFVideoFormat_I420); //     FCC('I420')
+    IF_EQUAL_RETURN(guid, MFVideoFormat_420O); //     FCC('420O')
     IF_EQUAL_RETURN(guid, MFVideoFormat_IYUV); //     FCC('IYUV')
     IF_EQUAL_RETURN(guid, MFVideoFormat_M4S2); //     FCC('M4S2')
     IF_EQUAL_RETURN(guid, MFVideoFormat_MJPG);
