@@ -34,7 +34,7 @@ Image effects changing the image resolution -- cropping for instance -- are also
 
 ```c#
 // Select the largest centered square area in the input video
-var encodingProfile = await MediaEncodingProfile.CreateFromFileAsync(file);
+var encodingProfile = await TranscodingProfile.CreateFromFileAsync(file);
 uint inputWidth = encodingProfile.Video.Width;
 uint inputHeight = encodingProfile.Video.Height;
 uint outputLength = Math.Min(inputWidth, inputHeight);
