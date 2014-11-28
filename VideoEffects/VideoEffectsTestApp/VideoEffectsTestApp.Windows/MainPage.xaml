@@ -23,6 +23,8 @@
                 <ComboBoxItem>Shader effect (Bgrx8)</ComboBoxItem>
                 <ComboBoxItem>Lumia Crop effect</ComboBoxItem>
                 <ComboBoxItem>Square effect</ComboBoxItem>
+                <ComboBoxItem>Lumia Overlay effect</ComboBoxItem>
+                <ComboBoxItem>Lumia Animated effect</ComboBoxItem>
             </ComboBox>
             <Button Name="ClearPreview" Content="Clear preview" HorizontalAlignment="Right" Click="ClearPreview_Click"/>
         </StackPanel>

@@ -71,6 +71,7 @@ private:
     unsigned int _outputHeight;
 
     Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ _filters;
+    VideoEffects::IAnimatedFilterChain^ _animatedFilters;
 };
 
 ActivatableClass(LumiaEffect);

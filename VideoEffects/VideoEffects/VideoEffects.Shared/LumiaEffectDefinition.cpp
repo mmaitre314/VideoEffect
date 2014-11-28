@@ -13,11 +13,18 @@ LumiaEffectDefinition::LumiaEffectDefinition(_In_ String^ filterChainFactory)
     _properties->Insert(L"FilterChainFactory", filterChainFactory);
 }
 
-LumiaEffectDefinition::LumiaEffectDefinition(_In_ VideoEffects::FilterChainFactory^ filterChainFactory)
+LumiaEffectDefinition::LumiaEffectDefinition(_In_ FilterChainFactory^ filterChainFactory)
     : _activatableClassId(L"VideoEffects.LumiaEffect")
     , _properties(ref new PropertySet())
 {
     _properties->Insert(L"FilterChainFactory", filterChainFactory);
+}
+
+LumiaEffectDefinition::LumiaEffectDefinition(_In_ AnimatedFilterChainFactory^ filterChainFactory)
+    : _activatableClassId(L"VideoEffects.LumiaEffect")
+    , _properties(ref new PropertySet())
+{
+    _properties->Insert(L"AnimatedFilterChainFactory", filterChainFactory);
 }
 
 unsigned int LumiaEffectDefinition::InputWidth::get()

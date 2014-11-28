@@ -17,8 +17,11 @@ namespace VideoEffects
 
         ///<summary>Create an effect definition from a FilterChainFactory delegate.</summary>
         [Windows::Foundation::Metadata::DefaultOverload]
-        LumiaEffectDefinition(_In_ VideoEffects::FilterChainFactory^ filterChainFactory);
+        LumiaEffectDefinition(_In_ FilterChainFactory^ filterChainFactory);
 
+        ///<summary>Create an effect definition from an AnimatedFilterChainFactory delegate.</summary>
+        LumiaEffectDefinition(_In_ AnimatedFilterChainFactory^ filterChainFactory);
+        
         ///<summary>Override the input width coming from the pipeline.</summary>
         property unsigned int InputWidth { unsigned int get(); void set(unsigned int value); }
 

@@ -155,13 +155,13 @@ namespace VideoEffectsTestApp
             {
                 case 0: 
                     return new LumiaEffectDefinition(() =>
-                {
-                    return new IFilter[]
                     {
-                        new AntiqueFilter(),
-                        new FlipFilter(FlipMode.Horizontal)
-                    };
-                });
+                        return new IFilter[]
+                        {
+                            new AntiqueFilter(),
+                            new FlipFilter(FlipMode.Horizontal)
+                        };
+                    });
 
                 case 1:
                     IBuffer shaderY = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_Y.cso");
@@ -198,6 +198,23 @@ namespace VideoEffectsTestApp
 
                 case 4:
                     return new SquareEffectDefinition();
+
+                case 5:
+                    var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/traffic.png"));
+                    var foreground = new StorageFileImageSource(file);
+                    return new LumiaEffectDefinition(() =>
+                    {
+                        var filter = new BlendFilter(foreground);
+                        filter.TargetOutputOption = OutputOption.PreserveAspectRatio;
+                        filter.TargetArea = new Rect(0, 0, .4, .4);
+                        return new IFilter[] { filter };
+                    });
+
+                case 6:
+                    return new LumiaEffectDefinition(() =>
+                    {
+                        return new AnimatedWarp();
+                    });
 
                 default:
                     throw new ArgumentException("Invalid effect type");

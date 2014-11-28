@@ -20,17 +20,29 @@ void LumiaEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
     CHKNULL(props);
 
     // Get the list of filters
-    Object^ factoryObject = props->Lookup(L"FilterChainFactory");
-    auto factoryAcid = dynamic_cast<String^>(factoryObject);
-    if (factoryAcid != nullptr)
+    if (props->HasKey(L"FilterChainFactory"))
     {
-        ComPtr<IInspectable> factoryInspectable;
-        CHK(RoActivateInstance(StringReference(factoryAcid->Data()).GetHSTRING(), &factoryInspectable));
-        _filters = safe_cast<IFilterChainFactory^>(reinterpret_cast<Object^>(factoryInspectable.Get()))->Create();
+        Object^ factoryObject = props->Lookup(L"FilterChainFactory");
+        auto factoryAcid = dynamic_cast<String^>(factoryObject);
+        if (factoryAcid != nullptr)
+        {
+            ComPtr<IInspectable> factoryInspectable;
+            CHK(RoActivateInstance(StringReference(factoryAcid->Data()).GetHSTRING(), &factoryInspectable));
+            _filters = safe_cast<IFilterChainFactory^>(reinterpret_cast<Object^>(factoryInspectable.Get()))->Create();
+        }
+        else
+        {
+            _filters = safe_cast<FilterChainFactory^>(factoryObject)();
+        }
+    }
+    else if (props->HasKey(L"AnimatedFilterChainFactory"))
+    {
+        Object^ factoryObject = props->Lookup(L"AnimatedFilterChainFactory");
+        _animatedFilters = safe_cast<AnimatedFilterChainFactory^>(factoryObject)();
     }
     else
     {
-        _filters = safe_cast<FilterChainFactory^>(factoryObject)();
+        throw ref new InvalidArgumentException(L"Filter-chain factory key not found");
     }
 
     // Get the input/output resolution (0x0 if not specified, in which case the values from the pipeline are used)
@@ -276,9 +288,14 @@ bool LumiaEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_ 
     auto outputBitmap = ref new Bitmap(outputSize, ColorMode::Bgra8888, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());
     auto inputBitmap = ref new Bitmap(inputSize, ColorMode::Bgra8888, inputWinRTBuffer->GetStride(), inputWinRTBuffer->GetIBuffer());
 
+    if (_animatedFilters != nullptr)
+    {
+        _animatedFilters->UpdateTime(TimeSpan{ time });
+    }
+
     // Process the bitmap
     FilterEffect^ effect = ref new FilterEffect();
-    effect->Filters = _filters;
+    effect->Filters = _filters != nullptr ? _filters : _animatedFilters->Filters;
     effect->Source = ref new BitmapImageSource(inputBitmap);
     auto renderer = ref new BitmapRenderer(effect, outputBitmap);
     create_task(renderer->RenderAsync()).get(); // Blocks for the duration of processing (must be called in MTA)
