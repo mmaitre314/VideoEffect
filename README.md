@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/vkkt3t5i4av2trs0?svg=true)](https://ci.appveyor.com/project/mmaitre314/videoeffect)
+
 VideoEffects
 ============
 
