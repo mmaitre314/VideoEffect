@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using Nokia.Graphics.Imaging;
+using Lumia.Imaging;
+using Lumia.Imaging.Artistic;
+using Lumia.Imaging.Transforms;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

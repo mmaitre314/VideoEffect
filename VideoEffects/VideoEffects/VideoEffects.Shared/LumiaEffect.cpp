@@ -6,7 +6,7 @@
 
 using namespace concurrency;
 using namespace Microsoft::WRL;
-using namespace Nokia::Graphics::Imaging;
+using namespace Lumia::Imaging;
 using namespace Platform;
 using namespace std;
 using namespace VideoEffects;
@@ -282,7 +282,7 @@ bool LumiaEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_ 
     CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&outputWinRTBuffer, outputBuffer, MF2DBuffer_LockFlags_Write, _inputDefaultStride));
     CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&inputWinRTBuffer, inputBuffer, MF2DBuffer_LockFlags_Read, _inputDefaultStride));
 
-    // Create input/Ouput bitmap wrappers
+    // Create input/output bitmap wrappers
     Size outputSize = { (float)_outputWidth, (float)_outputHeight };
     Size inputSize = { (float)_inputWidth, (float)_inputHeight };
     auto outputBitmap = ref new Bitmap(outputSize, ColorMode::Bgra8888, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());

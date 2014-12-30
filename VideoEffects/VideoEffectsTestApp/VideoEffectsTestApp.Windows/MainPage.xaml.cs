@@ -1,4 +1,7 @@
-﻿using Nokia.Graphics.Imaging;
+﻿using Lumia.Imaging;
+using Lumia.Imaging.Artistic;
+using Lumia.Imaging.Compositing;
+using Lumia.Imaging.Transforms;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -204,6 +207,7 @@ namespace VideoEffectsTestApp
                     var foreground = new StorageFileImageSource(file);
                     return new LumiaEffectDefinition(() =>
                     {
+#pragma warning disable 618
                         var filter = new BlendFilter(foreground);
                         filter.TargetOutputOption = OutputOption.PreserveAspectRatio;
                         filter.TargetArea = new Rect(0, 0, .4, .4);

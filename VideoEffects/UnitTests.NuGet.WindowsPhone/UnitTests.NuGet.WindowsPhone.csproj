@@ -18,7 +18,7 @@
     <AppxBundle>Never</AppxBundle>
     <IsTargetingWindowsPhonePlatform>true</IsTargetingWindowsPhonePlatform>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>eecfe1c8</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>5931843e</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <AppXPackage>True</AppXPackage>
@@ -81,8 +81,11 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Help\Lumia Imaging SDK.chm" />
     <None Include="Help\Nokia Imaging SDK.chm" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="UnitTests.NuGet.WindowsPhone_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -103,15 +106,15 @@
     <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <Import Project="..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets" Condition="Exists('..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets'))" />
-    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.1.0.3\build\wpa81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.1.0.3\build\wpa81\MMaitre.VideoEffects.targets'))" />
+    <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.2.0.0\build\wpa81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.2.0.0\build\wpa81\MMaitre.VideoEffects.targets'))" />
   </Target>
-  <Import Project="..\packages\MMaitre.VideoEffects.1.0.3\build\wpa81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.1.0.3\build\wpa81\MMaitre.VideoEffects.targets')" />
+  <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets')" />
+  <Import Project="..\packages\MMaitre.VideoEffects.2.0.0\build\wpa81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.2.0.0\build\wpa81\MMaitre.VideoEffects.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

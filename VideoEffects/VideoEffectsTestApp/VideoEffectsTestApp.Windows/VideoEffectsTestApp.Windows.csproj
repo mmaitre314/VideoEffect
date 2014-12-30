@@ -16,7 +16,7 @@
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>VideoEffectsTestApp.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <NuGetPackageImportStamp>3c82166a</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>8edbfef9</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
   </PropertyGroup>
@@ -115,6 +115,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Help\Lumia Imaging SDK.chm" />
     <None Include="Help\Nokia Imaging SDK.chm" />
     <None Include="packages.config" />
     <None Include="VideoEffectsTestApp.Windows_TemporaryKey.pfx" />
@@ -144,12 +145,12 @@
   </PropertyGroup>
   <Import Project="..\VideoEffectsTestApp.Shared\VideoEffectsTestApp.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <Import Project="..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" />
+  <Import Project="..\..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets" Condition="Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

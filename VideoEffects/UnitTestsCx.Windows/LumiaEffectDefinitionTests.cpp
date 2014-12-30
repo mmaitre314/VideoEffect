@@ -2,7 +2,9 @@
 
 using namespace concurrency;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace Nokia::Graphics::Imaging;
+using namespace Lumia::Imaging;
+using namespace Lumia::Imaging::Artistic;
+using namespace Lumia::Imaging::Transforms;
 using namespace Platform;
 using namespace Platform::Collections;
 using namespace VideoEffects;

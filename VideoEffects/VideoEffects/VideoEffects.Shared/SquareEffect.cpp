@@ -5,7 +5,7 @@
 
 using namespace concurrency;
 using namespace Microsoft::WRL;
-using namespace Nokia::Graphics::Imaging;
+using namespace Lumia::Imaging;
 using namespace Platform;
 using namespace std;
 using namespace VideoEffects;
@@ -14,7 +14,7 @@ using namespace Windows::Foundation::Collections;
 using namespace Windows::Storage;
 using namespace Windows::Storage::Streams;
 
-void SquareEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
+void SquareEffect::Initialize(_In_ IMap<String^, Object^>^ props)
 {
     CHKNULL(props);
 }

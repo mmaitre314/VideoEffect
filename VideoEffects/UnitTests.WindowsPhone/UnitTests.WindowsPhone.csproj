@@ -18,7 +18,7 @@
     <AppxBundle>Never</AppxBundle>
     <IsTargetingWindowsPhonePlatform>true</IsTargetingWindowsPhonePlatform>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>02f170bc</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>98871833</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <PropertyGroup>
@@ -84,6 +84,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Help\Lumia Imaging SDK.chm" />
     <None Include="Help\Nokia Imaging SDK.chm" />
     <Content Include="Invert_093_NV12_UV.cso" />
     <Content Include="Invert_093_NV12_Y.cso" />
@@ -119,12 +120,12 @@
     <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <Import Project="..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets" Condition="Exists('..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" />
+  <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -30,7 +30,7 @@
     <ApplicationType>Windows Phone</ApplicationType>
     <ApplicationTypeRevision>8.1</ApplicationTypeRevision>
     <ConvergedProjectType>CodeSharingWindowsRuntimeComponent</ConvergedProjectType>
-    <NuGetPackageImportStamp>7d3a80e4</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>b18ef02b</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -151,12 +151,12 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets')" />
+    <Import Project="..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets" Condition="Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets'))" />
   </Target>
 </Project>

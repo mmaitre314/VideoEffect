@@ -154,3 +154,18 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/VideoEffects/packages
+/VideoEffects/UnitTests.NuGet.Windows/Help/Lumia Imaging SDK.chm
+/VideoEffects/UnitTests.NuGet.WindowsPhone/Help
+/VideoEffects/UnitTests.NuGet.WindowsPhone/Help/Lumia Imaging SDK.chm
+/VideoEffects/UnitTests.Windows/Help
+/VideoEffects/UnitTests.Windows/Help/Lumia Imaging SDK.chm
+/VideoEffects/UnitTests.WindowsPhone/Help
+/VideoEffects/UnitTests.WindowsPhone/Help/Lumia Imaging SDK.chm
+/VideoEffects/VideoEffectMediaCompositionTestApp/Help
+/VideoEffects/VideoEffectMediaCompositionTestApp/Help/Lumia Imaging SDK.chm
+/VideoEffects/VideoEffectsTestApp
+/VideoEffects/VideoEffectsTestApp/VideoEffectsTestApp.Windows/Help
+/VideoEffects/VideoEffectsTestApp/VideoEffectsTestApp.Windows/Help/Lumia Imaging SDK.chm
+/VideoEffects/VideoEffectsTestApp/VideoEffectsTestApp.WindowsPhone/Help
+/VideoEffects/VideoEffectsTestApp/VideoEffectsTestApp.WindowsPhone/Help/Lumia Imaging SDK.chm

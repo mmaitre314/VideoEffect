@@ -70,7 +70,7 @@ private:
     unsigned int _outputWidth;
     unsigned int _outputHeight;
 
-    Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ _filters;
+    Windows::Foundation::Collections::IIterable<Lumia::Imaging::IFilter^>^ _filters;
     VideoEffects::IAnimatedFilterChain^ _animatedFilters;
 };
 

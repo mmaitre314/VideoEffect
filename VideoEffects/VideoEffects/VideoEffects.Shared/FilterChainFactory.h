@@ -5,19 +5,19 @@ namespace VideoEffects
     //<summary>Serializable Lumia filter factory</summary>
     public interface class IFilterChainFactory
     {
-        Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ Create();
+        Windows::Foundation::Collections::IIterable<Lumia::Imaging::IFilter^>^ Create();
     };
 
     //<summary>Basic Lumia filter factory</summary>
-    public delegate Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ FilterChainFactory();
+    public delegate Windows::Foundation::Collections::IIterable<Lumia::Imaging::IFilter^>^ FilterChainFactory();
 
     //<summary>Animated Lumia filter chain</summary>
     public interface class IAnimatedFilterChain
     {
         ///<summary>The chain of Lumia image filters at the current time.</summary>
-        property Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ Filters
+        property Windows::Foundation::Collections::IIterable<Lumia::Imaging::IFilter^>^ Filters
         {
-            Windows::Foundation::Collections::IIterable<Nokia::Graphics::Imaging::IFilter^>^ get();
+            Windows::Foundation::Collections::IIterable<Lumia::Imaging::IFilter^>^ get();
         }
 
         ///<summary>Update the current time.</summary>

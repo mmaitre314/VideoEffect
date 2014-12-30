@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using VideoEffects;
-using Nokia.Graphics.Imaging;
+using Lumia.Imaging;
+using Lumia.Imaging.Artistic;
+using Lumia.Imaging.Transforms;
 using Windows.Storage.Streams;
 
 namespace UnitTests.NuGet.Windows

@@ -185,15 +185,15 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsPhone\v$(TargetPlatformVersion)\Microsoft.Cpp.WindowsPhone.$(TargetPlatformVersion).targets" />
   <PropertyGroup>
     <_DefineDefaultConvergedProjectType>False</_DefineDefaultConvergedProjectType>
-    <NuGetPackageImportStamp>ce1d1c03</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>3602d249</NuGetPackageImportStamp>
   </PropertyGroup>
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets" Condition="Exists('..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets')" />
+    <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NokiaImagingSDK.1.2.151\build\native\NokiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets'))" />
   </Target>
 </Project>
