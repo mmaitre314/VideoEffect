@@ -1,3 +1,6 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/vkkt3t5i4av2trs0?svg=true)](https://ci.appveyor.com/project/mmaitre314/videoeffect)
+[![NuGet package](http://mmaitre314.github.io/images/nuget.png)](https://www.nuget.org/packages/MMaitre.VideoEffects/)
+
 VideoEffects
 ============
 
@@ -30,7 +33,9 @@ var transcoder = new MediaTranscoder();
 transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
 ```
 
-Image effects changing the image resolution -- cropping for instance -- are also supported. In that case the resolutions at the input and output of the effect need to be specified explicitly. For instance, the following code snippet creates a square video:
+### Square videos
+
+Image effects changing the image resolution -- cropping for instance -- are also supported. In that case the resolutions of the input and output of the effect need to be specified explicitly. For instance, the following code snippet creates a square video:
 
 ```c#
 // Select the largest centered square area in the input video
@@ -60,7 +65,49 @@ definition.OutputHeight = outputLength;
 
 Note: in Windows Phone 8.1 a bug in MediaComposition prevents the width/height information to be properly passed to the effect.
 
-See the unit tests for more C# and C++/CX code samples. 
+### Overlays
+
+BlendFilter can overlay an image on top of a video: 
+
+```c#
+var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/traffic.png"));
+var foreground = new StorageFileImageSource(file);
+var definition = new LumiaEffectDefinition(() =>
+{
+    var filter = new BlendFilter(foreground);
+    filter.TargetOutputOption = OutputOption.PreserveAspectRatio;
+    filter.TargetArea = new Rect(0, 0, .4, .4);
+    return new IFilter[] { filter };
+});
+```
+
+### Animations
+
+The LumiaEffectDefinition() constructor is overloaded to support effects whose properties vary based on time. This requires creating a class implementing the IAnimatedFilterChain interface, with a 'Filters' property returning the current effect chain and an 'UpdateTime()' method receiving the current time. 
+
+```c#
+class AnimatedWarp : IAnimatedFilterChain
+{
+    WarpFilter _filter = new WarpFilter(WarpEffect.Twister, 0);
+
+    public IEnumerable<IFilter> Filters { get; private set; }
+
+    public void UpdateTime(TimeSpan time)
+    {
+        _filter.Level = .5 * (Math.Sin(2 * Math.PI * time.TotalSeconds) + 1); // 1Hz oscillation between 0 and 1
+    }
+
+    public AnimatedWarp()
+    {
+        Filters = new List<IFilter> { _filter };
+    }
+}
+
+var definition = new LumiaEffectDefinition(() =>
+{
+    return new AnimatedWarp();
+});
+```
 
 DirectX HLSL Pixel Shader effects
 ---------------------------------
