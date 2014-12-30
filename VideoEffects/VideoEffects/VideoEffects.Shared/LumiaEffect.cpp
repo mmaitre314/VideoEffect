@@ -23,16 +23,13 @@ void LumiaEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
     if (props->HasKey(L"FilterChainFactory"))
     {
         Object^ factoryObject = props->Lookup(L"FilterChainFactory");
-        auto factoryAcid = dynamic_cast<String^>(factoryObject);
-        if (factoryAcid != nullptr)
+        _filters = dynamic_cast<FilterChainFactory^>(factoryObject)();
+        if (_filters == nullptr)
         {
+            auto factoryAcid = safe_cast<String^>(factoryObject);
             ComPtr<IInspectable> factoryInspectable;
             CHK(RoActivateInstance(StringReference(factoryAcid->Data()).GetHSTRING(), &factoryInspectable));
             _filters = safe_cast<IFilterChainFactory^>(reinterpret_cast<Object^>(factoryInspectable.Get()))->Create();
-        }
-        else
-        {
-            _filters = safe_cast<FilterChainFactory^>(factoryObject)();
         }
     }
     else if (props->HasKey(L"AnimatedFilterChainFactory"))
