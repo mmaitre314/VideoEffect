@@ -6,25 +6,32 @@ using namespace Platform;
 using namespace VideoEffects;
 using namespace Windows::Foundation::Collections;
 
-LumiaEffectDefinition::LumiaEffectDefinition(_In_ String^ filterChainFactory)
+LumiaEffectDefinition::LumiaEffectDefinition(_In_ String^ factory)
     : _activatableClassId(L"VideoEffects.LumiaEffect")
     , _properties(ref new PropertySet())
 {
-    _properties->Insert(L"FilterChainFactory", filterChainFactory);
+    _properties->Insert(L"FilterChainFactory", factory);
 }
 
-LumiaEffectDefinition::LumiaEffectDefinition(_In_ FilterChainFactory^ filterChainFactory)
+LumiaEffectDefinition::LumiaEffectDefinition(_In_ FilterChainFactory^ factory)
     : _activatableClassId(L"VideoEffects.LumiaEffect")
     , _properties(ref new PropertySet())
 {
-    _properties->Insert(L"FilterChainFactory", filterChainFactory);
+    _properties->Insert(L"FilterChainFactory", factory);
 }
 
-LumiaEffectDefinition::LumiaEffectDefinition(_In_ AnimatedFilterChainFactory^ filterChainFactory)
+LumiaEffectDefinition::LumiaEffectDefinition(_In_ AnimatedFilterChainFactory^ factory)
     : _activatableClassId(L"VideoEffects.LumiaEffect")
     , _properties(ref new PropertySet())
 {
-    _properties->Insert(L"AnimatedFilterChainFactory", filterChainFactory);
+    _properties->Insert(L"AnimatedFilterChainFactory", factory);
+}
+
+LumiaEffectDefinition::LumiaEffectDefinition(_In_ BitmapVideoEffectFactory^ factory)
+    : _activatableClassId(L"VideoEffects.LumiaEffect")
+    , _properties(ref new PropertySet())
+{
+    _properties->Insert(L"BitmapVideoEffectFactory", factory);
 }
 
 unsigned int LumiaEffectDefinition::InputWidth::get()

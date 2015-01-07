@@ -13,15 +13,18 @@ namespace VideoEffects
 
         ///<summary>Create an effect definition from a class implementing IFilterChainFactory.</summary>
         ///<param name='filterChainFactory'>ActivatableClassId of the filter factory.</param>
-        LumiaEffectDefinition(_In_ Platform::String^ filterChainFactory);
+        LumiaEffectDefinition(_In_ Platform::String^ factory);
 
         ///<summary>Create an effect definition from a FilterChainFactory delegate.</summary>
         [Windows::Foundation::Metadata::DefaultOverload]
-        LumiaEffectDefinition(_In_ FilterChainFactory^ filterChainFactory);
+        LumiaEffectDefinition(_In_ FilterChainFactory^ factory);
 
         ///<summary>Create an effect definition from an AnimatedFilterChainFactory delegate.</summary>
-        LumiaEffectDefinition(_In_ AnimatedFilterChainFactory^ filterChainFactory);
-        
+        LumiaEffectDefinition(_In_ AnimatedFilterChainFactory^ factory);
+
+        ///<summary>Create an effect definition from an BitmapVideoEffectFactory delegate.</summary>
+        LumiaEffectDefinition(_In_ BitmapVideoEffectFactory^ factory);
+
         ///<summary>Override the input width coming from the pipeline.</summary>
         property unsigned int InputWidth { unsigned int get(); void set(unsigned int value); }
 

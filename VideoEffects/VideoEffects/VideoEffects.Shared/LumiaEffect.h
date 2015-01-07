@@ -72,6 +72,7 @@ private:
 
     Windows::Foundation::Collections::IIterable<Lumia::Imaging::IFilter^>^ _filters;
     VideoEffects::IAnimatedFilterChain^ _animatedFilters;
+    VideoEffects::IBitmapVideoEffect^ _bitmapEffect;
 };
 
 ActivatableClass(LumiaEffect);

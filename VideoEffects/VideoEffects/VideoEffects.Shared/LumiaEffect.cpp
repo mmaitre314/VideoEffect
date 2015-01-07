@@ -37,6 +37,11 @@ void LumiaEffect::Initialize(_In_ IMap<Platform::String^, Object^>^ props)
         Object^ factoryObject = props->Lookup(L"AnimatedFilterChainFactory");
         _animatedFilters = safe_cast<AnimatedFilterChainFactory^>(factoryObject)();
     }
+    else if (props->HasKey(L"BitmapVideoEffectFactory"))
+    {
+        Object^ factoryObject = props->Lookup(L"BitmapVideoEffectFactory");
+        _bitmapEffect = safe_cast<BitmapVideoEffectFactory^>(factoryObject)();
+    }
     else
     {
         throw ref new InvalidArgumentException(L"Filter-chain factory key not found");
@@ -285,17 +290,24 @@ bool LumiaEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_ 
     auto outputBitmap = ref new Bitmap(outputSize, ColorMode::Bgra8888, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());
     auto inputBitmap = ref new Bitmap(inputSize, ColorMode::Bgra8888, inputWinRTBuffer->GetStride(), inputWinRTBuffer->GetIBuffer());
 
-    if (_animatedFilters != nullptr)
+    if (_bitmapEffect != nullptr)
     {
-        _animatedFilters->UpdateTime(TimeSpan{ time });
+        _bitmapEffect->Process(inputBitmap, outputBitmap, TimeSpan{ time });
     }
+    else
+    {
+        if (_animatedFilters != nullptr)
+        {
+            _animatedFilters->UpdateTime(TimeSpan{ time });
+        }
 
-    // Process the bitmap
-    FilterEffect^ effect = ref new FilterEffect();
-    effect->Filters = _filters != nullptr ? _filters : _animatedFilters->Filters;
-    effect->Source = ref new BitmapImageSource(inputBitmap);
-    auto renderer = ref new BitmapRenderer(effect, outputBitmap);
-    create_task(renderer->RenderAsync()).get(); // Blocks for the duration of processing (must be called in MTA)
+        // Process the bitmap
+        FilterEffect^ effect = ref new FilterEffect();
+        effect->Filters = _filters != nullptr ? _filters : _animatedFilters->Filters;
+        effect->Source = ref new BitmapImageSource(inputBitmap);
+        auto renderer = ref new BitmapRenderer(effect, outputBitmap);
+        create_task(renderer->RenderAsync()).get(); // Blocks for the duration of processing (must be called in MTA)
+    }
 
     // Force MF buffer unlocking (race-condition refcount leak in effects? xVP cannot always lock the buffer afterward)
     outputWinRTBuffer->Unlock();
