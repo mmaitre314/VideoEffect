@@ -120,7 +120,7 @@ The following code snippet shows how to apply a watercolor effect to the video:
 ```c#
 class WatercolorEffect : IBitmapVideoEffect
 {
-    public unsafe void Process(Bitmap input, Bitmap output, TimeSpan time)
+    public void Process(Bitmap input, Bitmap output, TimeSpan time)
     {
         var effect = new FilterEffect();
         effect.Filters = new IFilter[]{ new WatercolorFilter() };
