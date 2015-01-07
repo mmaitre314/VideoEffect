@@ -1,8 +1,8 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/vkkt3t5i4av2trs0?svg=true)](https://ci.appveyor.com/project/mmaitre314/videoeffect)
 [![NuGet package](http://mmaitre314.github.io/images/nuget.png)](https://www.nuget.org/packages/MMaitre.VideoEffects/)
 
-VideoEffects
-============
+Video Effects
+=============
 
 Original|Antique + HorizontalFlip
 ----|----
@@ -107,6 +107,67 @@ var definition = new LumiaEffectDefinition(() =>
 {
     return new AnimatedWarp();
 });
+```
+
+### Bitmaps and pixel data
+
+For cases where IFilter is not flexible enough, another overload of the LumiaEffectDefinition() constructor supports effects which handle Bitmap objects directly. This requires implementing IBitmapVideoEffect, which has a single Process() method called with an input bitmap, an output bitmap, and the current time for each frame in the video.
+
+The bitmaps passed to the Process() call get destroyed when the call returns, so any async call in this method must be executed synchronously using '.AsTask().Wait()'.
+
+The following code snippet shows how to apply a watercolor effect to the video:
+
+```c#
+class WatercolorEffect : IBitmapVideoEffect
+{
+    public unsafe void Process(Bitmap input, Bitmap output, TimeSpan time)
+    {
+        var effect = new FilterEffect();
+        effect.Filters = new IFilter[]{ new WatercolorFilter() };
+        effect.Source = new BitmapImageSource(input);
+        var renderer = new BitmapRenderer(effect, output);
+        renderer.RenderAsync().AsTask().Wait(); // Async calls must run sync inside Process()
+    }
+}
+
+var definition = new LumiaEffectDefinition(() =>
+{
+    return new WatercolorEffect();
+});
+```
+
+IBitmapVideoEffect also allows raw pixel-data processing. Pixel data is provided in Bgra888 format (32 bits per pixel). The content of the alpha channel is undefined and should not be used.
+
+For efficiency, a GetData() method extension is provided on IBuffer. It is enabled by adding a 'using VideoEffectExtensions;' statement. GetData() returns an 'unsafe' byte* pointing to the IBuffer data. This requires methods calling GetData() to be marked using the 'unsafe' keyword and to check the 'Allow unsafe code' checkbox in the project build properties.
+
+The following code snippet shows how to apply a blue filter by setting both the red and green channels to zero:
+
+```c#
+using VideoEffectExtensions;
+
+class BlueEffect : IBitmapVideoEffect
+{
+    public unsafe void Process(Bitmap input, Bitmap output, TimeSpan time)
+    {
+        uint width = (uint)input.Dimensions.Width;
+        uint height = (uint)input.Dimensions.Height;
+
+        uint  inputPitch = input.Buffers[0].Pitch;
+        byte* inputData  = input.Buffers[0].Buffer.GetData();
+        uint  outputPitch = output.Buffers[0].Pitch;
+        byte* outputData  = output.Buffers[0].Buffer.GetData();
+
+        for (uint i = 0; i < height; i++)
+        {
+            for (uint j = 0; j < width; j++)
+            {
+                outputData[i * outputPitch + 4 * j + 0] = inputData[i * inputPitch + 4 * j + 0]; // B
+                outputData[i * outputPitch + 4 * j + 1] = 0; // G
+                outputData[i * outputPitch + 4 * j + 2] = 0; // R
+            }
+        }
+    }
+}
 ```
 
 DirectX HLSL Pixel Shader effects
