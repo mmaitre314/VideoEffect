@@ -38,7 +38,7 @@ namespace VideoEffectsTestApp
     /// </summary>
     class BitmapEffect2 : IBitmapVideoEffect
     {
-        public unsafe void Process(Bitmap input, Bitmap output, TimeSpan time)
+        public void Process(Bitmap input, Bitmap output, TimeSpan time)
         {
             var effect = new FilterEffect();
             effect.Filters = new IFilter[]{ new WatercolorFilter() };
