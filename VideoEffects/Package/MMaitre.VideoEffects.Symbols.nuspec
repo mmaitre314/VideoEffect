@@ -21,10 +21,12 @@
     <file src="ARM\Release\VideoEffects.Windows\VideoEffects.Windows.pdb" target="build\native\Windows\Arm\" />
     <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.pdb" target="build\native\WindowsPhone\x86\" />
     <file src="ARM\Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.pdb" target="build\native\WindowsPhone\Arm\" />
-    
+    <file src="Release\VideoEffectExtensions\VideoEffectExtensions.pdb" target="lib\portable-netcore451+wpa81\" />
+
     <!-- source -->
     <file src="..\VideoEffects\**\*.cpp" target="src\" />
     <file src="..\VideoEffects\**\*.h"   target="src\" />
+    <file src="..\VideoEffects\**\*.cs"  target="src\" />
   </files>
 </package>
 

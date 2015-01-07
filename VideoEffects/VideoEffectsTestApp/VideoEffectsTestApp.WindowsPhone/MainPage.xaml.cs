@@ -267,6 +267,18 @@ namespace VideoEffectsTestApp
                         return new AnimatedWarp();
                     });
 
+                case 7:
+                    return new LumiaEffectDefinition(() =>
+                    {
+                        return new BitmapEffect();
+                    });
+
+                case 8:
+                    return new LumiaEffectDefinition(() =>
+                    {
+                        return new BitmapEffect2();
+                    });
+
                 default:
                     throw new ArgumentException("Invalid effect type");
             }

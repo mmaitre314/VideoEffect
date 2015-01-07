@@ -8,6 +8,7 @@ using Lumia.Imaging;
 using Lumia.Imaging.Artistic;
 using Lumia.Imaging.Transforms;
 using Windows.Storage.Streams;
+using VideoEffectExtensions;
 
 namespace UnitTests.NuGet.WindowsPhone
 {
@@ -29,6 +30,13 @@ namespace UnitTests.NuGet.WindowsPhone
             IBuffer buffer = new global::Windows.Storage.Streams.Buffer(10);
             var definition2 = new ShaderEffectDefinitionBgrx8(buffer);
             var definition3 = new ShaderEffectDefinitionNv12(buffer, buffer);
+        }
+
+        [TestMethod]
+        public unsafe void CS_WP_N_BufferExtension()
+        {
+            var buffer = new global::Windows.Storage.Streams.Buffer(10);
+            byte* data = buffer.GetData();
         }
     }
 }

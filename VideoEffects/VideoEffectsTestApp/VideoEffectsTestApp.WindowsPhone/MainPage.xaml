@@ -33,6 +33,8 @@
                 <ComboBoxItem>Lumia Square effect</ComboBoxItem>
                 <ComboBoxItem>Lumia Overlay effect</ComboBoxItem>
                 <ComboBoxItem>Lumia Animated effect</ComboBoxItem>
+                <ComboBoxItem>Bitmap Blue Effect</ComboBoxItem>
+                <ComboBoxItem>Bitmap Watercolor Effect</ComboBoxItem>
             </ComboBox>
 
             <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Center" Click="StartMediaElementPreview_Click" MinHeight="0"/>

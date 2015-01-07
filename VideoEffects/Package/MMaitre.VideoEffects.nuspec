@@ -25,6 +25,7 @@
     <file src="ARM\Release\VideoEffects.Windows\VideoEffects.Windows.dll" target="build\native\Windows\Arm\" />
     <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.dll" target="build\native\WindowsPhone\x86\" />
     <file src="ARM\Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.dll" target="build\native\WindowsPhone\Arm\" />
+    <file src="Release\VideoEffectExtensions\VideoEffectExtensions.dll" target="lib\portable-netcore451+wpa81\" />
 
     <!-- metadata -->
     <file src="Release\VideoEffects.Windows\VideoEffects.winmd" target="build\native\Windows\x86\" />
@@ -39,7 +40,8 @@
     <file src="Release\VideoEffects.Windows\VideoEffects.Windows.xml" target="build\native\Windows\Arm\VideoEffects.xml" />
     <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.xml" target="build\native\WindowsPhone\x86\VideoEffects.xml" />
     <file src="Release\VideoEffects.WindowsPhone\VideoEffects.WindowsPhone.xml" target="build\native\WindowsPhone\Arm\VideoEffects.xml" />
-
+    <file src="Release\VideoEffectExtensions\VideoEffectExtensions.xml" target="lib\portable-netcore451+wpa81\" />
+    
     <!-- build -->
     <file src="MMaitre.VideoEffects.native.targets" target="build\native\MMaitre.VideoEffects.targets" />
     <file src="MMaitre.VideoEffects.win81.targets" target="build\win81\MMaitre.VideoEffects.targets" />
