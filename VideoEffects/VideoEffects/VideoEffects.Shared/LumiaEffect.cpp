@@ -310,8 +310,8 @@ bool LumiaEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_ 
     }
 
     // Force MF buffer unlocking (race-condition refcount leak in effects? xVP cannot always lock the buffer afterward)
-    outputWinRTBuffer->Unlock();
-    inputWinRTBuffer->Unlock();
+    outputWinRTBuffer->Close();
+    inputWinRTBuffer->Close();
 
     return true; // Always produces data
 }

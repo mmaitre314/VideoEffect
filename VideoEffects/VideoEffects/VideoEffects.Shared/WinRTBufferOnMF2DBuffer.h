@@ -54,6 +54,7 @@ public:
 
     unsigned int GetStride() const
     {
+        auto lock = _lock.LockExclusive();
         return _stride;
     }
 
@@ -64,19 +65,10 @@ public:
             );
     }
 
-    void Unlock()
+    void Close()
     {
-        if (_pBuffer != nullptr)
-        {
-            if (_buffer2D != nullptr)
-            {
-                (void)_buffer2D->Unlock2D();
-            }
-            if (_buffer1D != nullptr)
-            {
-                (void)_buffer1D->Unlock();
-            }
-        }
+        auto lock = _lock.LockExclusive();
+        _Close();
     }
 
     //
@@ -85,6 +77,7 @@ public:
 
     IFACEMETHODIMP get_Capacity(_Out_ unsigned int *pValue) override
     {
+        auto lock = _lock.LockExclusive();
         if (pValue == nullptr)
         {
             return OriginateError(E_POINTER);
@@ -96,6 +89,7 @@ public:
 
     IFACEMETHODIMP get_Length(_Out_ unsigned int *pValue) override
     {
+        auto lock = _lock.LockExclusive();
         if (pValue == nullptr)
         {
             return OriginateError(E_POINTER);
@@ -107,6 +101,7 @@ public:
 
     IFACEMETHODIMP put_Length(_In_ unsigned int value) override
     {
+        auto lock = _lock.LockExclusive();
         if (value > _capacity)
         {
             return OriginateError(E_INVALIDARG);
@@ -122,9 +117,16 @@ public:
 
     IFACEMETHODIMP Buffer(_Outptr_result_buffer_(_Inexpressible_("size given by different API")) unsigned char **ppValue) override
     {
+        auto lock = _lock.LockExclusive();
         if (ppValue == nullptr)
         {
             return OriginateError(E_POINTER);
+        }
+        *ppValue = nullptr;
+
+        if (_pBuffer == nullptr)
+        {
+            return OriginateError(RO_E_CLOSED);
         }
 
         *ppValue = _pBuffer;
@@ -135,7 +137,31 @@ private:
 
     virtual ~WinRTBufferOnMF2DBuffer()
     {
-        Unlock();
+        _Close();
+    }
+
+    void _Close()
+    {
+        if (_pBuffer == nullptr)
+        {
+            return;
+        }
+
+        if (_buffer2D != nullptr)
+        {
+            (void)_buffer2D->Unlock2D();
+            _buffer2D = nullptr;
+        }
+        if (_buffer1D != nullptr)
+        {
+            (void)_buffer1D->Unlock();
+            _buffer1D = nullptr;
+        }
+
+        _pBuffer = nullptr;
+        _capacity = 0;
+        _length = 0;
+        _stride = 0;
     }
 
     unsigned char *_pBuffer;
@@ -145,4 +171,6 @@ private:
 
     Microsoft::WRL::ComPtr<IMF2DBuffer2> _buffer2D;
     Microsoft::WRL::ComPtr<IMFMediaBuffer> _buffer1D;
+
+    mutable Microsoft::WRL::Wrappers::SRWLock _lock;
 };
