@@ -27,6 +27,7 @@
                 <ComboBoxItem>Lumia Animated effect</ComboBoxItem>
                 <ComboBoxItem>Bitmap Blue Effect</ComboBoxItem>
                 <ComboBoxItem>Bitmap Watercolor Effect</ComboBoxItem>
+                <ComboBoxItem>QR Code Detector</ComboBoxItem>
             </ComboBox>
             <Button Name="ClearPreview" Content="Clear preview" HorizontalAlignment="Right" Click="ClearPreview_Click"/>
         </StackPanel>

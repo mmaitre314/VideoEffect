@@ -7,6 +7,8 @@ class WinRTBufferOnMF2DBuffer WrlSealed : public Microsoft::WRL::RuntimeClass <
     Microsoft::WRL::FtmBase // if cross-process support is needed, replace with IMarshal from RoGetBufferMarshaler()
 >
 {
+    InspectableClass(L"VideoEffects.WinRTBufferOnMF2DBuffer", TrustLevel::BaseTrust);
+
 public:
 
     WinRTBufferOnMF2DBuffer()

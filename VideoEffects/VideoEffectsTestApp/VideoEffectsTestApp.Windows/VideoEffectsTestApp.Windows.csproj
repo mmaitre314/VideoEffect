@@ -152,6 +152,11 @@
       <Name>VideoEffects.Windows</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ZXing">
+      <HintPath>..\..\packages\ZXing.Net.0.14.0.1\lib\windows8\ZXing.winmd</HintPath>
+    </Reference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

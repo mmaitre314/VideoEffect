@@ -3,6 +3,10 @@ using Lumia.Imaging.Artistic;
 using System;
 using VideoEffects;
 using VideoEffectExtensions;
+using ZXing;
+using ZXing.Common;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Diagnostics;
 
 namespace VideoEffectsTestApp
 {
@@ -45,6 +49,32 @@ namespace VideoEffectsTestApp
             effect.Source = new BitmapImageSource(input);
             var renderer = new BitmapRenderer(effect, output);
             renderer.RenderAsync().AsTask().Wait(); // Async calls must run sync inside Process()
+        }
+    }
+
+    /// <summary>
+    /// Detects QR codes
+    /// </summary>
+    class QrCodeDetector : IBitmapVideoEffect
+    {
+        BarcodeReader m_reader = new BarcodeReader
+        {
+            PossibleFormats = new BarcodeFormat[] { BarcodeFormat.QR_CODE }
+        };
+
+        public void Process(Bitmap input, Bitmap output, TimeSpan time)
+        {
+            // Pass-through effect
+            output.CopyDataFrom(input);
+
+            Result result = m_reader.Decode(
+                input.Buffers[0].Buffer.ToArray(), 
+                (int)input.Dimensions.Width, 
+                (int)input.Dimensions.Height, 
+                BitmapFormat.BGR32
+                );
+
+            Debug.WriteLine("Result: {0}", result == null ? "<none>" : result.Text);
         }
     }
 }

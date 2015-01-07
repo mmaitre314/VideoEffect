@@ -232,6 +232,12 @@ namespace VideoEffectsTestApp
                         return new BitmapEffect2();
                     });
 
+                case 9:
+                    return new LumiaEffectDefinition(() =>
+                    {
+                        return new QrCodeDetector();
+                    });
+
                 default:
                     throw new ArgumentException("Invalid effect type");
             }
