@@ -152,6 +152,93 @@ definition.OutputHeight = outputLength;</pre></div>
     <span class="pl-k">return</span> <span class="pl-s">new</span> AnimatedWarp();
 });</pre></div>
 
+<h3>
+<a id="bitmaps-and-pixel-data" class="anchor" href="#bitmaps-and-pixel-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bitmaps and pixel data</h3>
+
+<p>For cases where IFilter is not flexible enough, another overload of the LumiaEffectDefinition() constructor supports effects which handle Bitmap objects directly. This requires implementing IBitmapVideoEffect, which has a single Process() method called with an input bitmap, an output bitmap, and the current time for each frame in the video.</p>
+
+<p>The bitmaps passed to the Process() call get destroyed when the call returns, so any async call in this method must be executed synchronously using '.AsTask().Wait()'.</p>
+
+<p>The following code snippet shows how to apply a watercolor effect to the video:</p>
+
+<div class="highlight highlight-c#"><pre><span class="pl-s">class</span> <span class="pl-en">WatercolorEffect</span> : <span class="pl-st">IBitmapVideoEffect</span>
+{
+    <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">Process</span>(<span class="pl-st">Bitmap</span> <span class="pl-vpf">input</span>, <span class="pl-st">Bitmap</span> <span class="pl-vpf">output</span>, <span class="pl-st">TimeSpan</span> <span class="pl-vpf">time</span>)
+    {
+        <span class="pl-k">var</span> effect = <span class="pl-s">new</span> FilterEffect();
+        effect.Filters = <span class="pl-s">new</span> IFilter[]{ <span class="pl-s">new</span> WatercolorFilter() };
+        effect.Source = <span class="pl-s">new</span> BitmapImageSource(input);
+        <span class="pl-k">var</span> renderer = <span class="pl-s">new</span> BitmapRenderer(effect, output);
+        renderer.RenderAsync().AsTask().Wait(); <span class="pl-c">// Async calls must run sync inside Process()</span>
+    }
+}
+
+<span class="pl-k">var</span> definition = <span class="pl-s">new</span> LumiaEffectDefinition(() =&gt;
+{
+    <span class="pl-k">return</span> <span class="pl-s">new</span> WatercolorEffect();
+});</pre></div>
+
+<p>IBitmapVideoEffect also allows raw pixel-data processing. Pixel data is provided in Bgra888 format (32 bits per pixel). The content of the alpha channel is undefined and should not be used.</p>
+
+<p>For efficiency, a GetData() method extension is provided on IBuffer. It is enabled by adding a 'using VideoEffectExtensions;' statement. GetData() returns an 'unsafe' byte* pointing to the IBuffer data. This requires methods calling GetData() to be marked using the 'unsafe' keyword and to check the 'Allow unsafe code' checkbox in the project build properties.</p>
+
+<p>The following code snippet shows how to apply a blue filter by setting both the red and green channels to zero:</p>
+
+<div class="highlight highlight-c#"><pre><span class="pl-k">using</span> VideoEffectExtensions;
+
+<span class="pl-s">class</span> <span class="pl-en">BlueEffect</span> : <span class="pl-st">IBitmapVideoEffect</span>
+{
+    <span class="pl-s">public</span> <span class="pl-s">unsafe</span> <span class="pl-st">void</span> <span class="pl-en">Process</span>(<span class="pl-st">Bitmap</span> <span class="pl-vpf">input</span>, <span class="pl-st">Bitmap</span> <span class="pl-vpf">output</span>, <span class="pl-st">TimeSpan</span> <span class="pl-vpf">time</span>)
+    {
+        <span class="pl-st">uint</span> width = (<span class="pl-st">uint</span>)input.Dimensions.Width;
+        <span class="pl-st">uint</span> height = (<span class="pl-st">uint</span>)input.Dimensions.Height;
+
+        <span class="pl-st">uint</span>  inputPitch = input.Buffers[<span class="pl-c1">0</span>].Pitch;
+        <span class="pl-st">byte</span>* inputData  = input.Buffers[<span class="pl-c1">0</span>].Buffer.GetData();
+        <span class="pl-st">uint</span>  outputPitch = output.Buffers[<span class="pl-c1">0</span>].Pitch;
+        <span class="pl-st">byte</span>* outputData  = output.Buffers[<span class="pl-c1">0</span>].Buffer.GetData();
+
+        <span class="pl-k">for</span> (<span class="pl-st">uint</span> i = <span class="pl-c1">0</span>; i &lt; height; i++)
+        {
+            <span class="pl-k">for</span> (<span class="pl-st">uint</span> j = <span class="pl-c1">0</span>; j &lt; width; j++)
+            {
+                outputData[i * outputPitch + <span class="pl-c1">4</span> * j + <span class="pl-c1">0</span>] = inputData[i * inputPitch + <span class="pl-c1">4</span> * j + <span class="pl-c1">0</span>]; <span class="pl-c">// B</span>
+                outputData[i * outputPitch + <span class="pl-c1">4</span> * j + <span class="pl-c1">1</span>] = <span class="pl-c1">0</span>; <span class="pl-c">// G</span>
+                outputData[i * outputPitch + <span class="pl-c1">4</span> * j + <span class="pl-c1">2</span>] = <span class="pl-c1">0</span>; <span class="pl-c">// R</span>
+            }
+        }
+    }
+}</pre></div>
+
+<p>Raw pixel data tends to be the least common denominator of image-processing libraries. It can be used for instance to detect QR codes and barcodes using the <a href="http://www.nuget.org/packages/ZXing.Net/">ZXing.Net</a> library:</p>
+
+<div class="highlight highlight-c#"><pre><span class="pl-k">using</span> System.Runtime.InteropServices.WindowsRuntime;
+
+<span class="pl-s">class</span> <span class="pl-en">QrCodeDetector</span> : <span class="pl-st">IBitmapVideoEffect</span>
+{
+    BarcodeReader m_reader = <span class="pl-s">new</span> BarcodeReader
+    {
+        PossibleFormats = <span class="pl-s">new</span> BarcodeFormat[] { BarcodeFormat.QR_CODE }
+    };
+
+    <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">Process</span>(<span class="pl-st">Bitmap</span> <span class="pl-vpf">input</span>, <span class="pl-st">Bitmap</span> <span class="pl-vpf">output</span>, <span class="pl-st">TimeSpan</span> <span class="pl-vpf">time</span>)
+    {
+        <span class="pl-c">// Pass-through effect</span>
+        output.CopyDataFrom(input);
+
+        Result result = m_reader.Decode(
+            input.Buffers[<span class="pl-c1">0</span>].Buffer.ToArray(), 
+            (<span class="pl-st">int</span>)input.Dimensions.Width, 
+            (<span class="pl-st">int</span>)input.Dimensions.Height, 
+            BitmapFormat.BGR32
+            );
+
+        Debug.WriteLine(<span class="pl-s1"><span class="pl-pds">"</span>Result: {0}<span class="pl-pds">"</span></span>, result == <span class="pl-c1">null</span> ? <span class="pl-s1"><span class="pl-pds">"</span>&lt;none&gt;<span class="pl-pds">"</span></span> : result.Text);
+    }
+}</pre></div>
+
+<p>The code snippet above is fairly inefficient though (unnecessary copies/conversions, etc.) and could be improved, so if realtime detection is a scenario of interest let me know.</p>
+
 <h2>
 <a id="directx-hlsl-pixel-shader-effects" class="anchor" href="#directx-hlsl-pixel-shader-effects" aria-hidden="true"><span class="octicon octicon-link"></span></a>DirectX HLSL Pixel Shader effects</h2>
 
