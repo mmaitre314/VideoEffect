@@ -1,14 +1,11 @@
 #pragma once
 
 //
-// An implementation of IMFTransform specialized for video 1-in 1-out which forward calls 
-// to a simplified "Plugin" derived class.
-//
-// The "D3DAware" template parameter controls D3D support in the MFT.
+// A base class implementing IMFTransform for video 1-in 1-out effects
 //
 // The derived class must look something along those lines:
 //
-//    class PluginEffect WrlSealed : public Video1in1outEffect<PluginEffect, /*D3DAware*/true>
+//    class PluginEffect WrlSealed : public Video1in1outEffect
 //    {
 //        InspectableClass(L"Namespace.PluginEffect", TrustLevel::BaseTrust);
 //
@@ -40,7 +37,7 @@
 //
 //ActivatableClass(PluginEffect);
 //
-// Note: when the Plugin methods are called, the base-class lock is taken.
+// Note: when the derived methods are called, the base-class lock is taken.
 //
 // The following XML snippet needs to be added to Package.appxmanifest:
 //
@@ -584,9 +581,12 @@ public:
                 return;
             }
 
-            if (!_inputProgressive && MFGetAttributeUINT32(sample, MFSampleExtension_Interlaced, false))
+            if (!_passthrough)
             {
-                CHK(OriginateError(E_INVALIDARG, L"Interlaced content not supported"));
+                if (!_inputProgressive && MFGetAttributeUINT32(sample, MFSampleExtension_Interlaced, false))
+                {
+                    CHK(OriginateError(E_INVALIDARG, L"Interlaced content not supported"));
+                }
             }
 
             _sample = _passthrough ? sample : _NormalizeSample(sample);
@@ -635,6 +635,7 @@ public:
 
             if (_passthrough)
             {
+                ProcessSample(_sample);
                 outputSamples[0].pSample = _sample.Detach();
             }
             else
@@ -674,23 +675,33 @@ public:
 protected:
 
     //
-    // Required overrides
+    // Overrides - misc
     //
 
-    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props) = 0;
-
-    // Format management
-    virtual std::vector<unsigned long> GetSupportedFormats() const = 0; // After initialization, _supportedFormats can be updated directly
-
-    // Data processing
-    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample) = 0; // Returns true if produced data
+    virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props)
+    {
+    }
 
     //
-    // Optional overrides - data processing
+    // Overrides - data processing
     //
 
     virtual void StartStreaming(_In_ unsigned long /*format*/, _In_ unsigned int /*width*/, _In_ unsigned int /*height*/)
     {
+    }
+
+    // Called in non-pass-through mode
+    // Returns true if produced data
+    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& /*inputSample*/, _In_ const Microsoft::WRL::ComPtr<IMFSample>& /*outputSample*/)
+    {
+        assert(!_passthrough);
+        return false;
+    }
+
+    // Called in pass-through mode
+    virtual void ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& /*sample*/)
+    {
+        assert(_passthrough);
     }
 
     virtual void EndStreaming()
@@ -698,8 +709,16 @@ protected:
     }
 
     //
-    // Optional overrides - format management
+    // Overrides - format management
     //
+
+    // After initialization, _supportedFormats can be updated directly
+    virtual std::vector<unsigned long> GetSupportedFormats() const
+    {
+        std::vector<unsigned long> formats;
+        formats.push_back(MFVideoFormat_NV12.Data1);
+        return formats;
+    }
 
     // Returns nullptr if typeIndex out of range
     // The default implementation assumes input media type same as output media type
@@ -779,8 +798,8 @@ protected:
     Microsoft::WRL::ComPtr<IMFMediaType> _inputType;
     Microsoft::WRL::ComPtr<IMFMediaType> _outputType;
     Microsoft::WRL::ComPtr<IMFDXGIDeviceManager> _deviceManager;
-    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _inputAllocator;  // null if passthrough
-    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _outputAllocator; // null if passthrough
+    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _inputAllocator;  // null if pass-through
+    Microsoft::WRL::ComPtr<IMFVideoSampleAllocatorEx> _outputAllocator; // null if pass-through
     std::vector<unsigned long> _supportedFormats;
     unsigned int _inputDefaultStride; // Buffer stride when receiving 1D buffers (happens sometimes in MediaElement)
     unsigned int _outputDefaultStride;
@@ -975,7 +994,7 @@ private:
             Buffer1DUnlocker buffer1DUnlocker(buffer1D);
             if ((subtype == MFVideoFormat_ARGB32) || (subtype == MFVideoFormat_RGB32))
             {
-                // RGB in system memory in bottom-up and ContiguousCopyFrom() does not handle the vertial flipping needed
+                // RGB in system memory in bottom-up and ContiguousCopyFrom() does not handle the vertical flipping needed
                 // so do a custom copy here
 
                 unsigned long normalizedCapacity;

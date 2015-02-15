@@ -171,3 +171,5 @@ $RECYCLE.BIN/
 /VideoEffects/VideoEffectsTestApp/VideoEffectsTestApp.WindowsPhone/Help/Lumia Imaging SDK.chm
 /VideoEffects/VideoEffectExtensions/$(SolutionDir)$(Configuration)/$(MSBuildProjectName)
 /VideoEffects/VideoEffectExtensions/VideoEffectExtensions.xml
+/VideoEffects/VideoEffects/VideoEffects.Windows/Events
+/VideoEffects/VideoEffects/VideoEffects.WindowsPhone/Events

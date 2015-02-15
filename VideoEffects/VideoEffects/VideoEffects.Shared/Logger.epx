@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventProvider
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://mmaitre314.github.io/EventProvider.xsd"
+    Name="MMaitre-VideoEffects"
+    >
+  
+  <Event Name="Info">
+    <VarArgs Type="AnsiString" Name="Message" />
+  </Event>
+  <Event Name="Error" Level="Error">
+    <VarArgs Type="AnsiString" Name="Message" />
+  </Event>
+    
+  <!-- VideoProcessor -->
+  <Task Name="VideoProcessor_Create">
+    <Start />
+    <Stop>
+      <Arg Type="Pointer" Name="VideoProcessor" />
+    </Stop>
+  </Task>
+  
+  <!-- LumiaAnalyzer -->
+  <Task Name="LumiaAnalyzer_Process">
+    <Start>
+      <Arg Type="Pointer" Name="LumiaAnalyzer" />
+    </Start>
+    <Stop>
+      <Arg Type="Pointer" Name="LumiaAnalyzer" />
+    </Stop>
+  </Task>
+  <Task Name="LumiaAnalyzer_Convert">
+    <Start>
+      <Arg Type="Pointer" Name="LumiaAnalyzer" />
+      <Arg Type="Pointer" Name="VideoProcessor" />
+    </Start>
+    <Stop>
+      <Arg Type="Pointer" Name="LumiaAnalyzer" />
+    </Stop>
+  </Task>
+  <Task Name="LumiaAnalyzer_Analyze">
+    <Start>
+      <Arg Type="Pointer" Name="LumiaAnalyzer" />
+    </Start>
+    <Stop>
+      <Arg Type="Pointer" Name="LumiaAnalyzer" />
+    </Stop>
+  </Task>
+
+</EventProvider>

@@ -17,6 +17,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)D3D11DeviceLock.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)DebuggerLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FilterChainFactory.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)TranscodingProfile.h" />
@@ -31,10 +33,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Video1in1outEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)VideoProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferOnMF2DBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)DebuggerLogger.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)TranscodingProfile.cpp" />
@@ -50,6 +55,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ShaderEffectNv12.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)VideoProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />

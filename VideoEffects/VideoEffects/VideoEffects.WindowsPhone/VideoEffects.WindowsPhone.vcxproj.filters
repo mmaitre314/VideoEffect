@@ -3,4 +3,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <EventProvider Include="..\VideoEffects.Shared\Logger.epx" />
+  </ItemGroup>
 </Project>

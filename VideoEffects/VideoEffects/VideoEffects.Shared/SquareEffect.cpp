@@ -160,9 +160,3 @@ ComPtr<IMFMediaType> SquareEffect::_CreateOutputType() const
 
     return type;
 }
-
-bool SquareEffect::ProcessSample(_In_ const ComPtr<IMFSample>& /*inputSample*/, _In_ const ComPtr<IMFSample>& /*outputSample*/)
-{
-    CHK(E_ILLEGAL_METHOD_CALL);
-    return false;
-}

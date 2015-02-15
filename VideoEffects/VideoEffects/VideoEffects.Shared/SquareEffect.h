@@ -19,7 +19,7 @@ class SquareEffect WrlSealed : public Video1in1outEffect
 public:
 
     SquareEffect()
-        : Video1in1outEffect(/*passthrough*/true)
+        : Video1in1outEffect(/*pass-through*/true)
     {
     }
 
@@ -31,9 +31,6 @@ public:
     virtual bool IsValidOutputType(_In_ const Microsoft::WRL::ComPtr<IMFMediaType>& type) const override;
     virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateInputAvailableType(_In_ unsigned int typeIndex) const override;
     virtual _Ret_maybenull_ Microsoft::WRL::ComPtr<IMFMediaType> CreateOutputAvailableType(_In_ unsigned int typeIndex) const override;
-
-    // Data processing
-    virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample) override;
 
 private:
 

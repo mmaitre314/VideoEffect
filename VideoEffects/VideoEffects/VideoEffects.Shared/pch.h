@@ -17,10 +17,35 @@
 #include <mfapi.h>
 #include <mfidl.h>
 #include <Mferror.h>
+#include <mfreadwrite.h>
 
 #include <windows.media.h>
 
+//
+// Asserts
+//
+
+#ifndef NDEBUG
+#define NT_ASSERT(expr) if (!(expr)) { __debugbreak(); }
+#else
+#define NT_ASSERT(expr)
+#endif
+
+//
+// Tracing
+//
+
+#include "Events\Logger.h"
 #include "DebuggerLogger.h"
+
+#define Trace(format, ...) { \
+    if(s_logger.IsEnabled(LogLevel::Information)) { s_logger.Log(__FUNCTION__, LogLevel::Information, format, __VA_ARGS__); } \
+    Logger.Info("%s " ## format, __FUNCTION__, __VA_ARGS__); \
+}
+#define TraceError(format, ...) { \
+    if(s_logger.IsEnabled(LogLevel::Error)) { s_logger.Log(__FUNCTION__, LogLevel::Error, format, __VA_ARGS__); } \
+    Logger.Error("%s " ## format, __FUNCTION__, __VA_ARGS__); \
+}
 
 //
 // Error handling
@@ -29,6 +54,7 @@
 // Exception-based error handling
 #define CHK(statement)  {HRESULT _hr = (statement); if (FAILED(_hr)) { throw ref new Platform::COMException(_hr); };}
 #define CHKNULL(p)  {if ((p) == nullptr) { throw ref new Platform::NullReferenceException(L#p); };}
+#define CHKOOM(p)  {if ((p) == nullptr) { throw ref new Platform::OutOfMemoryException(L#p); };}
 
 // Exception-free error handling
 #define CHK_RETURN(statement) {hr = (statement); if (FAILED(hr)) { return hr; };}

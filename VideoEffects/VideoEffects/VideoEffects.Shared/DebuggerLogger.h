@@ -66,6 +66,3 @@ private:
 };
 
 extern __declspec(selectany) DebuggerLogger s_logger;
-
-#define Trace(format, ...) { if(s_logger.IsEnabled(LogLevel::Information)) { s_logger.Log(__FUNCTION__, LogLevel::Information, format, __VA_ARGS__); } }
-#define TraceError(format, ...) { if(s_logger.IsEnabled(LogLevel::Error)) { s_logger.Log(__FUNCTION__, LogLevel::Error, format, __VA_ARGS__); } }

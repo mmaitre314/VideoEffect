@@ -19,6 +19,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SquareEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)TranscodingProfile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)VideoProcessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -37,6 +40,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffectDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SquareEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)TranscodingProfile.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)VideoProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl" />
