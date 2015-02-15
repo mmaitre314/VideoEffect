@@ -170,6 +170,37 @@ class BlueEffect : IBitmapVideoEffect
 }
 ```
 
+Raw pixel data tends to be the least common denominator of image-processing libraries. It can be used for instance to detect QR codes and barcodes using the [ZXing.Net](http://www.nuget.org/packages/ZXing.Net/) library:
+
+```c#
+using System.Runtime.InteropServices.WindowsRuntime;
+
+class QrCodeDetector : IBitmapVideoEffect
+{
+    BarcodeReader m_reader = new BarcodeReader
+    {
+        PossibleFormats = new BarcodeFormat[] { BarcodeFormat.QR_CODE }
+    };
+
+    public void Process(Bitmap input, Bitmap output, TimeSpan time)
+    {
+        // Pass-through effect
+        output.CopyDataFrom(input);
+
+        Result result = m_reader.Decode(
+            input.Buffers[0].Buffer.ToArray(), 
+            (int)input.Dimensions.Width, 
+            (int)input.Dimensions.Height, 
+            BitmapFormat.BGR32
+            );
+
+        Debug.WriteLine("Result: {0}", result == null ? "<none>" : result.Text);
+    }
+}
+```
+
+The code snippet above is fairly inefficient though (unnecessary copies/conversions, etc.) and could be improved, so if realtime detection is a scenario of interest let me know.
+
 DirectX HLSL Pixel Shader effects
 ---------------------------------
 
