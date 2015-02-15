@@ -60,7 +60,7 @@ void LumiaAnalyzer::StartStreaming(_In_ unsigned long /*format*/, _In_ unsigned 
     auto lock = _analyzerLock.LockExclusive();
 
     // Isotropic scaling
-    float scale = max(width, height) / (float)_length;
+    float scale = _length / (float)max(width, height);
     _outputWidth = (unsigned int)(scale * width);
     _outputHeight = (unsigned int)(scale * height);
 

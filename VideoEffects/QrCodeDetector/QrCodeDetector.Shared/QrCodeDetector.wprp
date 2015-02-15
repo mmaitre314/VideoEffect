@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WindowsPerformanceRecorder Version="1.0">
+  <Profiles>
+    <EventCollector Id="EventCollector" Name="EventCollector">
+      <BufferSize Value="1024" />
+      <Buffers Value="200" />
+    </EventCollector>
+    <EventProvider Id="Logger" Name="*MMaitre-VideoEffects" />
+
+    <Profile Id="Logger.Verbose.File" Name="Logger" Description="MMaitre-VideoEffects" LoggingMode="File" DetailLevel="Verbose">
+      <Collectors>
+        <EventCollectorId Value="EventCollector">
+          <EventProviders>
+            <EventProviderId Value="Logger" />
+          </EventProviders>
+        </EventCollectorId>
+      </Collectors>
+    </Profile>
+    
+    <Profile Id="Logger.Verbose.Memory" Name="Logger" Description="MMaitre-VideoEffects" Base="Logger.Verbose.File" LoggingMode="Memory" DetailLevel="Verbose" />
+  </Profiles>
+</WindowsPerformanceRecorder>
