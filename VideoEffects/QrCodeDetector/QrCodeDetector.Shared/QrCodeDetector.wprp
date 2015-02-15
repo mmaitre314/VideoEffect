@@ -1,22 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WindowsPerformanceRecorder Version="1.0">
   <Profiles>
-    <EventCollector Id="EventCollector" Name="EventCollector">
-      <BufferSize Value="1024" />
-      <Buffers Value="200" />
-    </EventCollector>
-    <EventProvider Id="Logger" Name="*MMaitre-VideoEffects" />
 
-    <Profile Id="Logger.Verbose.File" Name="Logger" Description="MMaitre-VideoEffects" LoggingMode="File" DetailLevel="Verbose">
+    <SystemCollector Id="SystemCollector" Name="SystemCollector" Realtime="false">
+      <BufferSize Value="1024"/> <!-- in KB -->
+      <Buffers Value="20"/>
+    </SystemCollector>
+    
+    <EventCollector Id="EventCollector" Name="EventCollector">
+      <BufferSize Value="1024" /> <!-- in KB -->
+      <Buffers Value="20" />
+    </EventCollector>
+
+    <SystemProvider Id="SystemProvider">
+      <Keywords>
+        <!-- keywords doc: http://msdn.microsoft.com/en-us/library/windows/hardware/hh448147.aspx -->
+        <Keyword Value="ProcessThread"/>
+        <Keyword Value="Loader"/>
+        <Keyword Value="SampledProfile"/>
+      </Keywords>
+      <Stacks>
+        <!-- values doc: http://msdn.microsoft.com/en-us/library/windows/hardware/hh448161.aspx -->
+        <Stack Value="SampledProfile"/>
+      </Stacks>
+    </SystemProvider>
+    
+    <EventProvider Id="VideoEffects" Name="*MMaitre-VideoEffects" />
+    <EventProvider Id="QrCodeDetector" Name="*MMaitre-QrCodeDetector" />
+
+    <Profile Id="Logger.Verbose.File" Name="Logger" Description="QrCodeDetector" LoggingMode="File" DetailLevel="Verbose">
       <Collectors>
+        <SystemCollectorId Value="SystemCollector">
+          <SystemProviderId Value="SystemProvider" />
+        </SystemCollectorId>
         <EventCollectorId Value="EventCollector">
           <EventProviders>
-            <EventProviderId Value="Logger" />
+            <EventProviderId Value="VideoEffects" />
+            <EventProviderId Value="QrCodeDetector" />
           </EventProviders>
         </EventCollectorId>
       </Collectors>
     </Profile>
     
-    <Profile Id="Logger.Verbose.Memory" Name="Logger" Description="MMaitre-VideoEffects" Base="Logger.Verbose.File" LoggingMode="Memory" DetailLevel="Verbose" />
+    <!-- Must be commented out for Field Medic and uncommented for WPR -->
+    <!--<Profile Id="Logger.Verbose.Memory" Name="Logger" Description="QrCodeDetector" Base="Logger.Verbose.File" LoggingMode="Memory" DetailLevel="Verbose" />-->
   </Profiles>
+
+  <TraceMergeProperties>
+    <TraceMergeProperty Name="TraceMerge" Id="TraceMerge">
+      <CustomEvents>
+        <CustomEvent Value="ImageId"/>
+        <CustomEvent Value="BuildInfo"/>
+        <CustomEvent Value="VolumeMapping"/>
+        <CustomEvent Value="EventMetadata"/>
+        <CustomEvent Value="PerfTrackMetadata"/>
+        <CustomEvent Value="WinSAT"/>
+        <CustomEvent Value="NetworkInterface"/>
+      </CustomEvents>
+    </TraceMergeProperty>
+  </TraceMergeProperties>
+  
 </WindowsPerformanceRecorder>

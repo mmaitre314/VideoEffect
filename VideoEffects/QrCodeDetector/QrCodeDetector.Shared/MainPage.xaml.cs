@@ -177,12 +177,16 @@ namespace QrCodeDetector
 
         private void AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
         {
+            Log.Events.QrCodeDecodeStart();
+            
             Result result = m_reader.Decode(
                 bitmap.Buffers[0].Buffer.ToArray(),
                 (int)bitmap.Dimensions.Width,
                 (int)bitmap.Dimensions.Height,
                 BitmapFormat.BGR32
                 );
+
+            Log.Events.QrCodeDecodeStop(result != null);
 
             var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
