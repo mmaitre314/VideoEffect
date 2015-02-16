@@ -37,8 +37,8 @@ void LumiaAnalyzer::Initialize(_In_ IMap<String^, Object^>^ props)
     _length = (unsigned int)props->Lookup(L"Length");
     _analyzer = safe_cast<BitmapVideoAnalyzer^>(props->Lookup(L"Analyzer"));
 
-    NT_ASSERT((_colorMode == ColorMode::Bgra8888) || (_colorMode == ColorMode::Yuv420Sp));
-    _outputSubtype = _colorMode == ColorMode::Bgra8888 ? MFVideoFormat_RGB32 : MFVideoFormat_NV12;
+    NT_ASSERT((_colorMode == ColorMode::Bgra8888) || (_colorMode == ColorMode::Yuv420Sp) || (_colorMode == ColorMode::Gray8));
+    _outputSubtype = _colorMode == ColorMode::Bgra8888 ? MFVideoFormat_RGB32 : MFVideoFormat_NV12; // Gray8 maps to NV12 in MF
 }
 
 vector<unsigned long> LumiaAnalyzer::GetSupportedFormats() const
@@ -152,6 +152,10 @@ void LumiaAnalyzer::ProcessSample(_In_ const ComPtr<IMFSample>& sample)
                 ref new Array<IBuffer^>{ outputWinRTBufferY->GetIBuffer(), outputWinRTBufferUV->GetIBuffer() }
             );
         }
+            break;
+
+        case ColorMode::Gray8:
+            outputBitmap = ref new Bitmap(outputSize, ColorMode::Gray8, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());
             break;
 
         default:

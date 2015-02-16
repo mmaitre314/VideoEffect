@@ -16,7 +16,8 @@ LumiaAnalyzerDefinition::LumiaAnalyzerDefinition(
 {
     CHKNULL(analyzer);
     if ((colorMode != ColorMode::Bgra8888) &&
-        (colorMode != ColorMode::Yuv420Sp))
+        (colorMode != ColorMode::Yuv420Sp) &&
+        (colorMode != ColorMode::Gray8))
     {
         throw ref new InvalidArgumentException(L"color mode");
     }

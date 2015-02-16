@@ -16,7 +16,7 @@ namespace VideoEffects
 
         ///<summary>Constructor</summary>
         ///<param name='colorMode'>
-        /// The color mode must be either Bgra8888 or Yuv420Sp. In either case no alpha
+        /// The color mode must be either Bgra8888, Yuv420Sp, or Gray8. In either case no alpha
         /// is present.
         /// The color mode of bitmaps passed to Process() is independent from the
         /// one of frames flowing through the video pipeline. Color conversion, frame
