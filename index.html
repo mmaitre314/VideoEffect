@@ -210,34 +210,45 @@ definition.OutputHeight = outputLength;</pre></div>
     }
 }</pre></div>
 
-<p>Raw pixel data tends to be the least common denominator of image-processing libraries. It can be used for instance to detect QR codes and barcodes using the <a href="http://www.nuget.org/packages/ZXing.Net/">ZXing.Net</a> library:</p>
+<h3>
+<a id="realtime-video-analysis-and-qr-code-detection" class="anchor" href="#realtime-video-analysis-and-qr-code-detection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Realtime video analysis and QR code detection</h3>
 
-<div class="highlight highlight-c#"><pre><span class="pl-k">using</span> System.Runtime.InteropServices.WindowsRuntime;
+<p><code>LumiaAnalyzerDefinition</code> allows running image analysis realtime on video streams. It sends video frames to the app as it receives them without delaying frames inside the video stream. If the app needs a long time to process each frame it just receives less frames and the video keeps on playing smoothly (to some extent: maxing out CPU/GPU still impacts playback).</p>
 
-<span class="pl-s">class</span> <span class="pl-en">QrCodeDetector</span> : <span class="pl-st">IBitmapVideoEffect</span>
+<p>The following code snippet shows how to use the <a href="http://www.nuget.org/packages/ZXing.Net/">ZXing.Net</a> library to detect QR codes on a camera preview video stream. The app requests bitmaps with Bgra8888 color mode and largest dimension (typically width) of 640px. The smaller dimension is derived from the <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb530115(v=vs.85).aspx">picture aspect ratio</a> of the video.</p>
+
+<div class="highlight highlight-c#"><pre><span class="pl-k">var</span> capture = <span class="pl-s">new</span> MediaCapture();
+await capture.InitializeAsync();
+
+<span class="pl-k">var</span> definition = <span class="pl-s">new</span> LumiaAnalyzerDefinition(ColorMode.Bgra8888, <span class="pl-c1">640</span>, AnalyzeBitmap);
+await capture.AddEffectAsync(
+    MediaStreamType.VideoPreview, 
+    definition.ActivatableClassId, 
+    definition.Properties
+    );
+
+BarcodeReader reader = <span class="pl-s">new</span> BarcodeReader
 {
-    BarcodeReader m_reader = <span class="pl-s">new</span> BarcodeReader
+    Options = <span class="pl-s">new</span> DecodingOptions
     {
-        PossibleFormats = <span class="pl-s">new</span> BarcodeFormat[] { BarcodeFormat.QR_CODE }
-    };
-
-    <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">Process</span>(<span class="pl-st">Bitmap</span> <span class="pl-vpf">input</span>, <span class="pl-st">Bitmap</span> <span class="pl-vpf">output</span>, <span class="pl-st">TimeSpan</span> <span class="pl-vpf">time</span>)
-    {
-        <span class="pl-c">// Pass-through effect</span>
-        output.CopyDataFrom(input);
-
-        Result result = m_reader.Decode(
-            input.Buffers[<span class="pl-c1">0</span>].Buffer.ToArray(), 
-            (<span class="pl-st">int</span>)input.Dimensions.Width, 
-            (<span class="pl-st">int</span>)input.Dimensions.Height, 
-            BitmapFormat.BGR32
-            );
-
-        Debug.WriteLine(<span class="pl-s1"><span class="pl-pds">"</span>Result: {0}<span class="pl-pds">"</span></span>, result == <span class="pl-c1">null</span> ? <span class="pl-s1"><span class="pl-pds">"</span>&lt;none&gt;<span class="pl-pds">"</span></span> : result.Text);
+        PossibleFormats = <span class="pl-s">new</span> BarcodeFormat[] { BarcodeFormat.QR_CODE },
+        TryHarder = <span class="pl-c1">true</span>
     }
+};
+
+<span class="pl-st">void</span> AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
+{
+    Result result = reader.Decode(
+        bitmap.Buffers[<span class="pl-c1">0</span>].Buffer.ToArray(),
+        (<span class="pl-st">int</span>)bitmap.Dimensions.Width,
+        (<span class="pl-st">int</span>)bitmap.Dimensions.Height,
+        BitmapFormat.BGR32
+        );
+
+    Debug.WriteLine(<span class="pl-s1"><span class="pl-pds">"</span>Result: {0}<span class="pl-pds">"</span></span>, result == <span class="pl-c1">null</span> ? <span class="pl-s1"><span class="pl-pds">"</span>&lt;none&gt;<span class="pl-pds">"</span></span> : result.Text);
 }</pre></div>
 
-<p>The code snippet above is fairly inefficient though (unnecessary copies/conversions, etc.) and could be improved, so if realtime detection is a scenario of interest let me know.</p>
+<p>For a more complete code sample see <a href="https://github.com/mmaitre314/VideoEffect/blob/master/VideoEffects/QrCodeDetector/QrCodeDetector.Shared/MainPage.xaml.cs">MainPage.xaml.cs</a> in the QrCodeDetector test app.</p>
 
 <h2>
 <a id="directx-hlsl-pixel-shader-effects" class="anchor" href="#directx-hlsl-pixel-shader-effects" aria-hidden="true"><span class="octicon octicon-link"></span></a>DirectX HLSL Pixel Shader effects</h2>
