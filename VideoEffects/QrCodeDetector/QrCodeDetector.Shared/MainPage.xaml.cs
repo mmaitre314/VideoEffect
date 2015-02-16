@@ -164,7 +164,7 @@ namespace QrCodeDetector
             BarcodeOutline.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
 
             // Enable QR code detection
-            var definition = new LumiaAnalyzerDefinition(ColorMode.Bgra8888, 640, AnalyzeBitmap);
+            var definition = new LumiaAnalyzerDefinition(ColorMode.Yuv420Sp, 640, AnalyzeBitmap);
             await capture.AddEffectAsync(MediaStreamType.VideoPreview, definition.ActivatableClassId, definition.Properties);
 
             // Start preview
@@ -183,7 +183,7 @@ namespace QrCodeDetector
                 bitmap.Buffers[0].Buffer.ToArray(),
                 (int)bitmap.Dimensions.Width,
                 (int)bitmap.Dimensions.Height,
-                BitmapFormat.BGR32
+                BitmapFormat.Gray8
                 );
 
             Log.Events.QrCodeDecodeStop(result != null);
