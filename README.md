@@ -176,13 +176,13 @@ class BlueEffect : IBitmapVideoEffect
 
 `LumiaAnalyzerDefinition` allows running image analysis realtime on video streams. It sends video frames to the app as it receives them without delaying frames inside the video stream. If the app needs a long time to process each frame it just receives less frames and the video keeps on playing smoothly (to some extent: maxing out CPU/GPU still impacts playback).
 
-The following code snippet shows how to use the [ZXing.Net](http://www.nuget.org/packages/ZXing.Net/) library to detect QR codes on a camera preview video stream. The app requests bitmaps with Bgra8888 color mode and largest dimension (typically width) of 640px. The smaller dimension is derived from the [picture aspect ratio](https://msdn.microsoft.com/en-us/library/windows/desktop/bb530115(v=vs.85).aspx) of the video.
+The following code snippet shows how to use the [ZXing.Net](http://www.nuget.org/packages/ZXing.Net/) library to detect QR codes on a camera preview video stream. The app requests bitmaps with Yuv420Sp color mode and largest dimension (typically width) of 640px. The smaller dimension is derived from the [picture aspect ratio](https://msdn.microsoft.com/en-us/library/windows/desktop/bb530115(v=vs.85).aspx) of the video.
 
 ```c#
 var capture = new MediaCapture();
 await capture.InitializeAsync();
 
-var definition = new LumiaAnalyzerDefinition(ColorMode.Bgra8888, 640, AnalyzeBitmap);
+var definition = new LumiaAnalyzerDefinition(ColorMode.Yuv420Sp, 640, AnalyzeBitmap);
 await capture.AddEffectAsync(
     MediaStreamType.VideoPreview, 
     definition.ActivatableClassId, 
@@ -204,12 +204,14 @@ void AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
         bitmap.Buffers[0].Buffer.ToArray(),
         (int)bitmap.Dimensions.Width,
         (int)bitmap.Dimensions.Height,
-        BitmapFormat.BGR32
+        BitmapFormat.Gray8
         );
 
     Debug.WriteLine("Result: {0}", result == null ? "<none>" : result.Text);
 }
 ```
+
+Note that Yuv420Sp bitmaps are made of two planes (Y grayscale + UV color) so the first plane can be passed as Gray8 to the QR code decoder.
 
 For a more complete code sample see [MainPage.xaml.cs](https://github.com/mmaitre314/VideoEffect/blob/master/VideoEffects/QrCodeDetector/QrCodeDetector.Shared/MainPage.xaml.cs) in the QrCodeDetector test app.
 
