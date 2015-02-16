@@ -172,6 +172,8 @@ class BlueEffect : IBitmapVideoEffect
 
 ### Realtime video analysis and QR code detection
 
+![QrCodeDetector](http://mmaitre314.github.io/images/QrCodeDetector.jpg)
+
 `LumiaAnalyzerDefinition` allows running image analysis realtime on video streams. It sends video frames to the app as it receives them without delaying frames inside the video stream. If the app needs a long time to process each frame it just receives less frames and the video keeps on playing smoothly (to some extent: maxing out CPU/GPU still impacts playback).
 
 The following code snippet shows how to use the [ZXing.Net](http://www.nuget.org/packages/ZXing.Net/) library to detect QR codes on a camera preview video stream. The app requests bitmaps with Bgra8888 color mode and largest dimension (typically width) of 640px. The smaller dimension is derived from the [picture aspect ratio](https://msdn.microsoft.com/en-us/library/windows/desktop/bb530115(v=vs.85).aspx) of the video.
