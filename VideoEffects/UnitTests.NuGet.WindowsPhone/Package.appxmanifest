@@ -35,6 +35,7 @@
       <InProcessServer>
         <Path>VideoEffects.WindowsPhone.dll</Path>
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="VideoEffects.LumiaAnalyzer" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectBgrx8" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectNv12" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.SquareEffect" ThreadingModel="both" />

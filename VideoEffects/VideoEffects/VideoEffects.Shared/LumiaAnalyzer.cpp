@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "WinRTBufferOnMF2DBuffer.h"
+#include "WinRTBufferView.h"
 #include "VideoProcessor.h"
 #include "Video1in1outEffect.h"
 #include "LumiaAnalyzerDefinition.h"
@@ -125,13 +126,37 @@ void LumiaAnalyzer::ProcessSample(_In_ const ComPtr<IMFSample>& sample)
         CHK(sample->GetBufferByIndex(0, &inputBuffer));
         ComPtr<IMFMediaBuffer> outputBuffer = _ConvertBuffer(inputBuffer);
 
-        // Create input/output IBuffer wrappers
+        // Create IBuffer wrappers
         ComPtr<WinRTBufferOnMF2DBuffer> outputWinRTBuffer;
         CHK(MakeAndInitialize<WinRTBufferOnMF2DBuffer>(&outputWinRTBuffer, outputBuffer, MF2DBuffer_LockFlags_Read, _inputDefaultStride));
 
-        // Create input/output bitmap wrappers
+        // Create bitmap wrappers
         Size outputSize = { (float)_outputWidth, (float)_outputHeight };
-        auto outputBitmap = ref new Bitmap(outputSize, _colorMode, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());
+        Bitmap^ outputBitmap;
+        switch (_colorMode)
+        {
+        case ColorMode::Bgra8888:
+            outputBitmap = ref new Bitmap(outputSize, ColorMode::Bgra8888, outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetIBuffer());
+            break;
+
+        case ColorMode::Yuv420Sp:
+        {
+            ComPtr<WinRTBufferView> outputWinRTBufferY;
+            ComPtr<WinRTBufferView> outputWinRTBufferUV;
+            CHK(MakeAndInitialize<WinRTBufferView>(&outputWinRTBufferY, outputWinRTBuffer, 0));
+            CHK(MakeAndInitialize<WinRTBufferView>(&outputWinRTBufferUV, outputWinRTBuffer, outputWinRTBuffer->GetStride() * _outputHeight));
+            outputBitmap = ref new Bitmap(
+                outputSize, 
+                ColorMode::Yuv420Sp, 
+                ref new Array<unsigned int>{ outputWinRTBuffer->GetStride(), outputWinRTBuffer->GetStride() }, 
+                ref new Array<IBuffer^>{ outputWinRTBufferY->GetIBuffer(), outputWinRTBufferUV->GetIBuffer() }
+            );
+        }
+            break;
+
+        default:
+            throw ref new InvalidArgumentException(L"Unexpected color mode");
+        }
 
         Logger.LumiaAnalyzer_AnalyzeStart((void*)this);
         _analyzer(outputBitmap, TimeSpan{ time });

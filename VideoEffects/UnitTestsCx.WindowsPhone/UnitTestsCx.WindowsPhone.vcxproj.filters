@@ -21,7 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="UnitTestsCx.WindowsPhone_TemporaryKey.pfx" />
-    <None Include="$(MSBuildThisFileDirectory)\..\..\content\$(MappedPlatformToolset)\Help\Nokia Imaging SDK.chm" />
     <None Include="Invert_093_NV12_UV.cso" />
     <None Include="Invert_093_NV12_Y.cso" />
     <None Include="Invert_093_RGB32.cso" />
@@ -29,6 +28,7 @@
     <None Include="Invert_100_NV12_Y.cso" />
     <None Include="Invert_100_RGB32.cso" />
     <None Include="packages.config" />
+    <None Include="$(MSBuildThisFileDirectory)\..\..\content\$(MappedPlatformToolset)\Help\Lumia Imaging SDK.chm" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Input">

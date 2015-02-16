@@ -19,7 +19,7 @@ public:
     {
     }
 
-    HRESULT RuntimeClassInitialize(_In_ const Microsoft::WRL::ComPtr<IMFMediaBuffer> buffer, _In_ MF2DBuffer_LockFlags lockFlags, _In_ unsigned int defaultStride)
+    HRESULT RuntimeClassInitialize(_In_ const Microsoft::WRL::ComPtr<IMFMediaBuffer>& buffer, _In_ MF2DBuffer_LockFlags lockFlags, _In_ unsigned int defaultStride)
     {
         return ExceptionBoundary([=]()
         {

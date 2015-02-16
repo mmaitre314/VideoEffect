@@ -35,6 +35,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Video1in1outEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)VideoProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferOnMF2DBuffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferView.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)DebuggerLogger.cpp" />

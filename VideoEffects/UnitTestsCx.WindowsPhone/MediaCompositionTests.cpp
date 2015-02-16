@@ -75,4 +75,37 @@ public:
             ));
         Await(transcode->TranscodeAsync());
     }
+
+    TEST_METHOD(CX_WP_MC_Analysis)
+    {
+        StorageFile^ source = Await(StorageFile::GetFileFromApplicationUriAsync(ref new Uri(L"ms-appx:///Car.mp4")));
+        StorageFile^ destination = Await(KnownFolders::VideosLibrary->CreateFileAsync(L"CX_WP_MC_Analysis.mp4", CreationCollisionOption::ReplaceExisting));
+
+        unsigned int callbackCount = 0;
+        auto definition = ref new LumiaAnalyzerDefinition(
+            ColorMode::Yuv420Sp,
+            320,
+            ref new BitmapVideoAnalyzer([&callbackCount](Bitmap^ bitmap, TimeSpan /*time*/)
+        {
+            Assert::IsNotNull(bitmap);
+            Assert::AreEqual((int)ColorMode::Yuv420Sp, (int)bitmap->ColorMode);
+            Assert::AreEqual(320, (int)bitmap->Dimensions.Width);
+            Assert::AreEqual(240, (int)bitmap->Dimensions.Height);
+            Assert::AreEqual(2, (int)bitmap->Buffers->Length);
+            InterlockedIncrement(&callbackCount);
+        }));
+
+        auto clip = Await(MediaClip::CreateFromFileAsync(source));
+        clip->VideoEffectDefinitions->Append(definition);
+
+        auto composition = ref new MediaComposition();
+        composition->Clips->Append(clip);
+
+        Await(composition->RenderToFileAsync(destination));
+
+        Log() << L"Callback count: " << callbackCount;
+
+        Assert::IsTrue(callbackCount > 0);
+    }
+
 };

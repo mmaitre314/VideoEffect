@@ -19,7 +19,7 @@
     <PackageCertificateKeyFile>UnitTests.NuGet.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>d2449a15</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>d27b6035</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -151,8 +151,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="VideoEffectExtensions">
-      <HintPath>..\packages\MMaitre.VideoEffects.2.1.0\lib\portable-netcore451+wpa81\VideoEffectExtensions.dll</HintPath>
+    <Reference Include="VideoEffectExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MMaitre.VideoEffects.2.2.0\lib\portable-netcore451+wpa81\VideoEffectExtensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
@@ -164,10 +165,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets'))" />
-    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.2.1.0\build\win81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.2.1.0\build\win81\MMaitre.VideoEffects.targets'))" />
+    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.2.2.0\build\win81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.2.2.0\build\win81\MMaitre.VideoEffects.targets'))" />
   </Target>
   <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" />
-  <Import Project="..\packages\MMaitre.VideoEffects.2.1.0\build\win81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.2.1.0\build\win81\MMaitre.VideoEffects.targets')" />
+  <Import Project="..\packages\MMaitre.VideoEffects.2.2.0\build\win81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.2.2.0\build\win81\MMaitre.VideoEffects.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

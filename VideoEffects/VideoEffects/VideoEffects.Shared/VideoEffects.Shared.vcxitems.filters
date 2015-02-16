@@ -22,6 +22,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)VideoProcessor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferView.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
