@@ -12,5 +12,6 @@
         <CaptureElement Name="Preview" Stretch="None"/>
         <Polyline Name="BarcodeOutline" Stroke="Red" StrokeThickness="3"/>
         <TextBlock Name="TextLog" VerticalAlignment="Bottom" FontSize="24"/>
+        <Button Name="Snap" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Snap" Click="Snap_Click"/>
     </Grid>
 </Page>

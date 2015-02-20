@@ -14,6 +14,8 @@ using Windows.Graphics.Display;
 using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
+using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.System.Display;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -44,6 +46,7 @@ namespace QrCodeDetector
             }
         };
         Stopwatch m_time = new Stopwatch();
+        volatile bool m_snapRequested;
 
         public MainPage()
         {
@@ -177,6 +180,15 @@ namespace QrCodeDetector
 
         private void AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
         {
+            if (m_snapRequested)
+            {
+                m_snapRequested = false;
+
+                IBuffer jpegBuffer = (new JpegRenderer(new BitmapImageSource(bitmap))).RenderAsync().AsTask().Result;
+                var jpegFile = KnownFolders.PicturesLibrary.CreateFileAsync("QrCodeSnap.jpg", CreationCollisionOption.GenerateUniqueName).AsTask().Result;
+                FileIO.WriteBufferAsync(jpegFile, jpegBuffer).AsTask().Wait();
+            }
+
             Log.Events.QrCodeDecodeStart();
             
             Result result = m_reader.Decode(
@@ -244,6 +256,11 @@ namespace QrCodeDetector
                     m_capture = null;
                 }
             }
+        }
+
+        private void Snap_Click(object sender, RoutedEventArgs e)
+        {
+            m_snapRequested = true;
         }
     }
 }
