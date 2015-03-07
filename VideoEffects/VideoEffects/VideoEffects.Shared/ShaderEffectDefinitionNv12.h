@@ -20,6 +20,12 @@ namespace VideoEffects
             _In_ Windows::Storage::Streams::IBuffer^ compiledShaderCbCr
             );
 
+        ///<summary>Replaces the current shader.</summary>
+        void UpdateShader(
+            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderY,
+            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderCbCr
+            );
+
         virtual property Platform::String^ ActivatableClassId 
         { 
             Platform::String^ get()

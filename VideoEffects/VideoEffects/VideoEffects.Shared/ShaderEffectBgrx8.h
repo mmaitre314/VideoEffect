@@ -13,11 +13,16 @@
 //</Extensions>
 //
 
-class ShaderEffectBgrx8 WrlSealed : public ShaderEffect
+class ShaderEffectBgrx8 WrlSealed : public Microsoft::WRL::RuntimeClass<ShaderEffect>
 {
     InspectableClass(L"VideoEffects.ShaderEffectBgrx8", TrustLevel::BaseTrust);
 
 public:
+
+    HRESULT RuntimeClassInitialize()
+    {
+        return Video1in1outEffect::RuntimeClassInitialize();
+    }
 
     // Format management
     virtual std::vector<unsigned long> GetSupportedFormats() const override;

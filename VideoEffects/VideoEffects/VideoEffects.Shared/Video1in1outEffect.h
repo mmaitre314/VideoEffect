@@ -5,7 +5,7 @@
 //
 // The derived class must look something along those lines:
 //
-//    class PluginEffect WrlSealed : public Video1in1outEffect
+//    class PluginEffect WrlSealed : public Microsoft::WRL::RuntimeClass<Video1in1outEffect>
 //    {
 //        InspectableClass(L"Namespace.PluginEffect", TrustLevel::BaseTrust);
 //
@@ -83,7 +83,7 @@ typedef enum D3D11_BIND_FLAG
 
 // Note: this base MFT is always D3D aware because on Phone 8.1 MediaComposition 
 // requires all effects to be D3D aware
-class Video1in1outEffect : public Microsoft::WRL::RuntimeClass<
+class Video1in1outEffect : public Microsoft::WRL::Implements<
     Microsoft::WRL::RuntimeClassFlags<Microsoft::WRL::RuntimeClassType::WinRtClassicComMix>,
     ABI::Windows::Media::IMediaExtension,
     Microsoft::WRL::CloakedIid<IMFTransform>,
@@ -93,14 +93,14 @@ class Video1in1outEffect : public Microsoft::WRL::RuntimeClass<
 
 public:
 
-    Video1in1outEffect(_In_ bool passthrough = false)
+    Video1in1outEffect()
         : _streaming(false)
         , _inputProgressive(false)
         , _inputDefaultStride(0)
         , _inputDefaultSize(0)
         , _outputDefaultStride(0)
         , _outputDefaultSize(0)
-        , _passthrough(passthrough)
+        , _passthrough(false)
     {
     }
 
@@ -803,6 +803,8 @@ protected:
     std::vector<unsigned long> _supportedFormats;
     unsigned int _inputDefaultStride; // Buffer stride when receiving 1D buffers (happens sometimes in MediaElement)
     unsigned int _outputDefaultStride;
+    bool _passthrough;
+    ::Microsoft::WRL::Wrappers::SRWLock _lock;
 
     ~Video1in1outEffect()
     {
@@ -1243,11 +1245,8 @@ private:
 
     bool _streaming; // use _SetStreamingState() to update
     bool _inputProgressive;
-    const bool _passthrough;
     unsigned int _inputDefaultSize;
     unsigned int _outputDefaultSize;
-
-    ::Microsoft::WRL::Wrappers::SRWLock _lock;
 };
 
 #pragma warning(pop)

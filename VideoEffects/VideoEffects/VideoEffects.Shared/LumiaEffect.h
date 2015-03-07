@@ -12,7 +12,7 @@
 //</Extensions>
 //
 
-class LumiaEffect WrlSealed : public Video1in1outEffect
+class LumiaEffect WrlSealed : public Microsoft::WRL::RuntimeClass<Video1in1outEffect>
 {
     InspectableClass(L"VideoEffects.LumiaEffect", TrustLevel::BaseTrust);
 
@@ -28,6 +28,11 @@ public:
         , _outputWidth(0)
         , _outputHeight(0)
     {
+    }
+
+    HRESULT RuntimeClassInitialize()
+    {
+        return Video1in1outEffect::RuntimeClassInitialize();
     }
 
     virtual void Initialize(_In_ Windows::Foundation::Collections::IMap<Platform::String^, Platform::Object^>^ props) override;

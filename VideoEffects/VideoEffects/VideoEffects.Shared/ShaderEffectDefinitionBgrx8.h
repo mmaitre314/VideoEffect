@@ -16,6 +16,11 @@ namespace VideoEffects
             _In_ Windows::Storage::Streams::IBuffer^ compiledShaderBgrx8
             );
 
+        ///<summary>Replaces the current shader.</summary>
+        void UpdateShader(
+            _In_ Windows::Storage::Streams::IBuffer^ compiledShaderBgrx8
+            );
+
         virtual property Platform::String^ ActivatableClassId 
         { 
             Platform::String^ get()

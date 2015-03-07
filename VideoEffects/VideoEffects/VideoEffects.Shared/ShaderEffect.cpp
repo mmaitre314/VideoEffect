@@ -8,6 +8,7 @@ using namespace concurrency;
 using namespace Microsoft::WRL;
 using namespace Platform;
 using namespace std;
+using namespace Windows::Foundation::Collections;
 using namespace Windows::Storage;
 using namespace Windows::Storage::Streams;
 
@@ -21,6 +22,70 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
     {
         _bufferShader1 = safe_cast<IBuffer^>(props->Lookup(L"Shader1"));
     }
+
+    ComPtr<IWeakReference> weakRef;
+    CHK(As<IWeakReferenceSource>(static_cast<IMediaExtension*>(this))->GetWeakReference(&weakRef));
+    safe_cast<IObservableMap<String^, Object^>^>(props)->MapChanged += ref new MapChangedEventHandler<String^, Object^>(
+        [weakRef](IObservableMap<String^, Object^>^ map, IMapChangedEventArgs<String^>^ args)
+    {
+        // Only handle shader updates
+        if ((args->Key != L"Shader0") && (args->Key != "Shader1"))
+        {
+            return;
+        }
+
+        // Get the latest shader buffers
+        IBuffer^ bufferShader0;
+        IBuffer^ bufferShader1;
+        if (map->HasKey(L"Shader0"))
+        {
+            bufferShader0 = safe_cast<IBuffer^>(map->Lookup(L"Shader0"));
+        }
+        if (map->HasKey(L"Shader1"))
+        {
+            bufferShader1 = safe_cast<IBuffer^>(map->Lookup(L"Shader1"));
+        }
+
+        ComPtr<IShaderUpdate> shaderUpdate;
+        (void)weakRef->Resolve(__uuidof(IShaderUpdate), &shaderUpdate);
+        if (shaderUpdate != nullptr)
+        {
+            (void)shaderUpdate->UpdateShaders(bufferShader0, bufferShader1);
+        }
+    });
+}
+
+HRESULT ShaderEffect::UpdateShaders(_In_opt_ IBuffer^ bufferShader0, _In_opt_ IBuffer^ bufferShader1)
+{
+    return ExceptionBoundary([=]()
+    {
+        auto lock = _lock.LockExclusive();
+
+        Trace("@%p shader buffers: @%p, @%p", this, (void*)bufferShader0, (void*)bufferShader1);
+
+        if (bufferShader0 != nullptr)
+        {
+            _bufferShader0 = bufferShader0;
+        }
+        if (bufferShader1 != nullptr)
+        {
+            _bufferShader1 = bufferShader1;
+        }
+
+        if (_deviceManager != nullptr)
+        {
+            D3D11DeviceLock device(_deviceManager);
+
+            if (bufferShader0 != nullptr)
+            {
+                CHK(device->CreatePixelShader(GetData(bufferShader0), bufferShader0->Length, nullptr, &_pixelShader0));
+            }
+            if (bufferShader1 != nullptr)
+            {
+                CHK(device->CreatePixelShader(GetData(bufferShader1), bufferShader1->Length, nullptr, &_pixelShader1));
+            }
+        }
+    });
 }
 
 void ShaderEffect::ValidateDeviceManager(_In_ const ComPtr<IMFDXGIDeviceManager>& deviceManager) const

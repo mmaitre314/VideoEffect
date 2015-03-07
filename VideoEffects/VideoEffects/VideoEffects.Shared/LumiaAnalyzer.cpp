@@ -19,13 +19,13 @@ using namespace Windows::Storage;
 using namespace Windows::Storage::Streams;
 
 LumiaAnalyzer::LumiaAnalyzer()
-    : Video1in1outEffect(/*pass-through*/true)
-    , _colorMode(ColorMode::Yuv420Sp)
+    : _colorMode(ColorMode::Yuv420Sp)
     , _length(0)
     , _outputWidth(0)
     , _outputHeight(0)
     , _processingSample(false)
 {
+    _passthrough = true;
     _outputSubtype = {};
 }
 

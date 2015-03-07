@@ -14,7 +14,20 @@ struct ScreenVertex
     float Tex[2];
 };
 
-class ShaderEffect : public Video1in1outEffect
+MIDL_INTERFACE("{78654633-EEFC-4437-90BE-15D88DC204D6}")
+IShaderUpdate : public IInspectable
+{
+    // Passes new buffers (null if no update)
+    IFACEMETHOD(UpdateShaders)(
+        _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader0,
+        _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader1
+        ) = 0;
+};
+
+class ShaderEffect : public Microsoft::WRL::Implements<
+    Video1in1outEffect,
+    IShaderUpdate
+    >
 {
 public:
 
@@ -35,6 +48,12 @@ public:
     virtual void StartStreaming(_In_ unsigned long format, _In_ unsigned int width, _In_ unsigned int height) override;
     virtual bool ProcessSample(_In_ const Microsoft::WRL::ComPtr<IMFSample>& inputSample, _In_ const Microsoft::WRL::ComPtr<IMFSample>& outputSample) override;
     virtual void EndStreaming() override;
+
+    // IShaderUpdate
+    IFACEMETHOD(UpdateShaders)(
+        _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader0,
+        _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader1
+        ) override;
 
 protected:
 

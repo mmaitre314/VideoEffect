@@ -13,5 +13,14 @@ ShaderEffectDefinitionBgrx8::ShaderEffectDefinitionBgrx8(
     : _activatableClassId(L"VideoEffects.ShaderEffectBgrx8")
     , _properties(ref new PropertySet())
 {
+    CHKNULL(compiledShaderBgrx8);
+    _properties->Insert(L"Shader0", compiledShaderBgrx8);
+}
+
+void ShaderEffectDefinitionBgrx8::UpdateShader(
+    _In_ Windows::Storage::Streams::IBuffer^ compiledShaderBgrx8
+    )
+{
+    CHKNULL(compiledShaderBgrx8);
     _properties->Insert(L"Shader0", compiledShaderBgrx8);
 }

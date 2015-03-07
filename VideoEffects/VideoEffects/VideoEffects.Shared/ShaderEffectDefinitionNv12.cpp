@@ -14,6 +14,19 @@ ShaderEffectDefinitionNv12::ShaderEffectDefinitionNv12(
     : _activatableClassId(L"VideoEffects.ShaderEffectNv12")
     , _properties(ref new PropertySet())
 {
+    CHKNULL(compiledShaderY);
+    CHKNULL(compiledShaderCbCr);
+    _properties->Insert(L"Shader0", compiledShaderY);
+    _properties->Insert(L"Shader1", compiledShaderCbCr);
+}
+
+void ShaderEffectDefinitionNv12::UpdateShader(
+    _In_ Windows::Storage::Streams::IBuffer^ compiledShaderY,
+    _In_ Windows::Storage::Streams::IBuffer^ compiledShaderCbCr
+    )
+{
+    CHKNULL(compiledShaderY);
+    CHKNULL(compiledShaderCbCr);
     _properties->Insert(L"Shader0", compiledShaderY);
     _properties->Insert(L"Shader1", compiledShaderCbCr);
 }

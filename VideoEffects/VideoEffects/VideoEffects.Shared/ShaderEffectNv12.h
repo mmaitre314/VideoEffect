@@ -13,11 +13,16 @@
 //</Extensions>
 //
 
-class ShaderEffectNv12 WrlSealed : public ShaderEffect
+class ShaderEffectNv12 WrlSealed : public Microsoft::WRL::RuntimeClass<ShaderEffect>
 {
     InspectableClass(L"VideoEffects.ShaderEffectNv12", TrustLevel::BaseTrust);
 
 public:
+
+    HRESULT RuntimeClassInitialize()
+    {
+        return Video1in1outEffect::RuntimeClassInitialize();
+    }
 
     virtual std::vector<unsigned long> GetSupportedFormats() const override;
 
