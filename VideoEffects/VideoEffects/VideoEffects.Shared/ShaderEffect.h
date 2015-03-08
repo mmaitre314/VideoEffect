@@ -19,7 +19,7 @@ IShaderUpdate : public IInspectable
 {
     // Passes new buffers (null if no update)
     IFACEMETHOD(UpdateShaders)(
-        _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader0,
+        _In_ Windows::Storage::Streams::IBuffer^ bufferShader0,
         _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader1
         ) = 0;
 };
@@ -51,7 +51,7 @@ public:
 
     // IShaderUpdate
     IFACEMETHOD(UpdateShaders)(
-        _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader0,
+        _In_ Windows::Storage::Streams::IBuffer^ bufferShader0,
         _In_opt_ Windows::Storage::Streams::IBuffer^ bufferShader1
         ) override;
 

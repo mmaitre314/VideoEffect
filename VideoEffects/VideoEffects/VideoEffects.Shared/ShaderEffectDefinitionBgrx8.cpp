@@ -14,7 +14,7 @@ ShaderEffectDefinitionBgrx8::ShaderEffectDefinitionBgrx8(
     , _properties(ref new PropertySet())
 {
     CHKNULL(compiledShaderBgrx8);
-    _properties->Insert(L"Shader0", compiledShaderBgrx8);
+    _properties->Insert(L"Shader", compiledShaderBgrx8);
 }
 
 void ShaderEffectDefinitionBgrx8::UpdateShader(
@@ -22,5 +22,5 @@ void ShaderEffectDefinitionBgrx8::UpdateShader(
     )
 {
     CHKNULL(compiledShaderBgrx8);
-    _properties->Insert(L"Shader0", compiledShaderBgrx8);
+    _properties->Insert(L"Shader", compiledShaderBgrx8);
 }

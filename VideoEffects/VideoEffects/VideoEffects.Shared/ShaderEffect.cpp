@@ -16,11 +16,17 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
 {
     CHKNULL(props);
 
-    _bufferShader0 = safe_cast<IBuffer^>(props->Lookup(L"Shader0"));
-
-    if (props->HasKey(L"Shader1"))
+    auto object = props->Lookup(L"Shader");
+    _bufferShader0 = dynamic_cast<IBuffer^>(object);
+    if (_bufferShader0 == nullptr)
     {
-        _bufferShader1 = safe_cast<IBuffer^>(props->Lookup(L"Shader1"));
+        auto buffers = safe_cast<IVector<IBuffer^>^>(object);
+        if (buffers->Size != 2)
+        {
+            throw ref new InvalidArgumentException(L"Wrong shader-buffer count");
+        }
+        _bufferShader0 = buffers->GetAt(0);
+        _bufferShader1 = buffers->GetAt(1);
     }
 
     ComPtr<IWeakReference> weakRef;
@@ -29,7 +35,7 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
         [weakRef](IObservableMap<String^, Object^>^ map, IMapChangedEventArgs<String^>^ args)
     {
         // Only handle shader updates
-        if ((args->Key != L"Shader0") && (args->Key != "Shader1"))
+        if (args->Key != L"Shader")
         {
             return;
         }
@@ -37,13 +43,17 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
         // Get the latest shader buffers
         IBuffer^ bufferShader0;
         IBuffer^ bufferShader1;
-        if (map->HasKey(L"Shader0"))
+        auto object = map->Lookup(L"Shader");
+        bufferShader0 = dynamic_cast<IBuffer^>(object);
+        if (bufferShader0 == nullptr)
         {
-            bufferShader0 = safe_cast<IBuffer^>(map->Lookup(L"Shader0"));
-        }
-        if (map->HasKey(L"Shader1"))
-        {
-            bufferShader1 = safe_cast<IBuffer^>(map->Lookup(L"Shader1"));
+            auto buffers = safe_cast<IVector<IBuffer^>^>(object);
+            if (buffers->Size != 2)
+            {
+                throw ref new InvalidArgumentException(L"Wrong shader-buffer count");
+            }
+            bufferShader0 = buffers->GetAt(0);
+            bufferShader1 = buffers->GetAt(1);
         }
 
         ComPtr<IShaderUpdate> shaderUpdate;
@@ -55,7 +65,7 @@ void ShaderEffect::Initialize(_In_ Windows::Foundation::Collections::IMap<Platfo
     });
 }
 
-HRESULT ShaderEffect::UpdateShaders(_In_opt_ IBuffer^ bufferShader0, _In_opt_ IBuffer^ bufferShader1)
+HRESULT ShaderEffect::UpdateShaders(_In_ IBuffer^ bufferShader0, _In_opt_ IBuffer^ bufferShader1)
 {
     return ExceptionBoundary([=]()
     {
@@ -63,10 +73,7 @@ HRESULT ShaderEffect::UpdateShaders(_In_opt_ IBuffer^ bufferShader0, _In_opt_ IB
 
         Trace("@%p shader buffers: @%p, @%p", this, (void*)bufferShader0, (void*)bufferShader1);
 
-        if (bufferShader0 != nullptr)
-        {
-            _bufferShader0 = bufferShader0;
-        }
+        _bufferShader0 = bufferShader0;
         if (bufferShader1 != nullptr)
         {
             _bufferShader1 = bufferShader1;
@@ -76,10 +83,7 @@ HRESULT ShaderEffect::UpdateShaders(_In_opt_ IBuffer^ bufferShader0, _In_opt_ IB
         {
             D3D11DeviceLock device(_deviceManager);
 
-            if (bufferShader0 != nullptr)
-            {
-                CHK(device->CreatePixelShader(GetData(bufferShader0), bufferShader0->Length, nullptr, &_pixelShader0));
-            }
+            CHK(device->CreatePixelShader(GetData(bufferShader0), bufferShader0->Length, nullptr, &_pixelShader0));
             if (bufferShader1 != nullptr)
             {
                 CHK(device->CreatePixelShader(GetData(bufferShader1), bufferShader1->Length, nullptr, &_pixelShader1));

@@ -2,6 +2,7 @@
 #include "ShaderEffectDefinitionNv12.h"
 
 using namespace Platform;
+using namespace Platform::Collections;
 using namespace Microsoft::WRL;
 using namespace VideoEffects;
 using namespace Windows::Foundation::Collections;
@@ -16,8 +17,12 @@ ShaderEffectDefinitionNv12::ShaderEffectDefinitionNv12(
 {
     CHKNULL(compiledShaderY);
     CHKNULL(compiledShaderCbCr);
-    _properties->Insert(L"Shader0", compiledShaderY);
-    _properties->Insert(L"Shader1", compiledShaderCbCr);
+
+    auto shaders = ref new Vector<IBuffer^>();
+    shaders->Append(compiledShaderY);
+    shaders->Append(compiledShaderCbCr);
+
+    _properties->Insert(L"Shader", shaders);
 }
 
 void ShaderEffectDefinitionNv12::UpdateShader(
@@ -27,8 +32,12 @@ void ShaderEffectDefinitionNv12::UpdateShader(
 {
     CHKNULL(compiledShaderY);
     CHKNULL(compiledShaderCbCr);
-    _properties->Insert(L"Shader0", compiledShaderY);
-    _properties->Insert(L"Shader1", compiledShaderCbCr);
+
+    auto shaders = ref new Vector<IBuffer^>();
+    shaders->Append(compiledShaderY);
+    shaders->Append(compiledShaderCbCr);
+
+    _properties->Insert(L"Shader", shaders);
 }
 
 bool ShaderEffectDefinitionNv12::TestGraphicsDeviceSupport()
