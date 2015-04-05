@@ -218,10 +218,9 @@ For a more complete code sample see [MainPage.xaml.cs](https://github.com/mmaitr
 DirectX HLSL Pixel Shader effects
 ---------------------------------
 
-Effects can process videos in either Bgra8 or Nv12 color spaces. Processing Bgra8 is simpler (one shader to write instead of two) but less efficient (the video pipeline needs to add one or two color conversions from/to Nv12/Yuy2).
+Effects can process videos in either Bgra8 or Nv12 color spaces. Processing Bgra8 is simpler (one shader to write instead of two) but less efficient (the video pipeline needs to add one or two color conversions from/to Nv12/Yuy2). Bgra8 is also the solution with the widest device support as phones released before Windows Phone 8.1 did not support Nv12 shaders.
 
 In the case of Nv12, the luma (Y) and chroma (UV) color planes are generated separately. For instance, for a basic color-inversion effect:
-
 ```hlsl
 // Y processing
 float4 main(Pixel pixel) : SV_Target
@@ -241,19 +240,24 @@ float4 main(Pixel pixel) : SV_Target
 ```
 
 Visual Studio compiles the shaders into .cso files which are included in the app package and loaded at runtime to create a video effect definition:
-
 ```c#
-    IBuffer shaderY = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_Y.cso");
-    IBuffer shaderUV = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_UV.cso");
-    var definition = new ShaderEffectDefinitionNv12(shaderY, shaderUV);
+IBuffer shaderY = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_Y.cso");
+IBuffer shaderUV = await PathIO.ReadBufferAsync("ms-appx:///Invert_093_NV12_UV.cso");
+var definition = new ShaderEffectDefinitionNv12(shaderY, shaderUV);
 
-    var transcoder = new MediaTranscoder();
-    transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
+var transcoder = new MediaTranscoder();
+transcoder.AddVideoEffect(definition.ActivatableClassId, true, definition.Properties);
 ```
 
 For effects to run on Windows Phone 8.1, in the file property page 'Configuration Properties > HLSL Compiler > General > Shader Model' must be set to 'Shader Model 4 Level 9_3 (/4_0_level_9_3)'. Visual Studio only supports compiling shaders in C++ project, so for C# app a separate C++ project should be created to compile the shaders.
 
 For the .cso files to be included in the app package, in their file property page 'Build Action' must be set to 'Content'.
+
+Shaders can be updated at any time by calling the `UpdateShader()` methods on effect definitions:
+```c#
+definition.UpdateShader(shaderY, shaderUV);
+```
+This avoids having to remove the effect and insert a new one to update it in `MediaCapture`, which often creates video glitches.
 
 Implementation details
 ----------------------
