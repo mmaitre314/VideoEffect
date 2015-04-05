@@ -202,7 +202,7 @@ void AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
 {
     Result result = reader.Decode(
         bitmap.Buffers[0].Buffer.ToArray(),
-        (int)bitmap.Dimensions.Width,
+        (int)bitmap.Buffers[0].Pitch,
         (int)bitmap.Dimensions.Height,
         BitmapFormat.Gray8
         );
