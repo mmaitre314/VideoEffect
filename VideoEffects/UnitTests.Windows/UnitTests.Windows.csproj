@@ -19,7 +19,7 @@
     <PackageCertificateKeyFile>UnitTests.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>e941cda2</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>b1826bd3</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -126,14 +126,16 @@
     <Compile Include="MediaTranscoderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="ZXingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Help\Lumia Imaging SDK.chm" />
-    <None Include="Help\Nokia Imaging SDK.chm" />
+    <Content Include="Input\262px-Code_128B-2009-06-02_svg.png" />
+    <Content Include="Input\524px-Code_128B-2009-06-02_svg.png" />
     <Content Include="Input\OriginalR.mp4" />
+    <Content Include="Input\Wikipedia_mobile_en_svg.png" />
     <Content Include="Invert_093_NV12_UV.cso" />
     <Content Include="Invert_093_NV12_Y.cso" />
     <Content Include="Invert_093_RGB32.cso" />
@@ -170,16 +172,21 @@
       <Name>VideoEffects.Windows</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ZXing">
+      <HintPath>..\packages\ZXing.Net.0.14.0.1\lib\windows8\ZXing.winmd</HintPath>
+    </Reference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" />
+  <Import Project="..\packages\LumiaImagingSDK.2.0.208\build\win81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.208\build\win81\LumiaImagingSDK.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.208\build\win81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.208\build\win81\LumiaImagingSDK.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
