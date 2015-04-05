@@ -193,7 +193,7 @@ namespace QrCodeDetector
             
             Result result = m_reader.Decode(
                 bitmap.Buffers[0].Buffer.ToArray(),
-                (int)bitmap.Dimensions.Width,
+                (int)bitmap.Buffers[0].Pitch, // Should be width here but I haven't found a way to pass both width and stride to ZXing yet
                 (int)bitmap.Dimensions.Height,
                 BitmapFormat.Gray8
                 );
