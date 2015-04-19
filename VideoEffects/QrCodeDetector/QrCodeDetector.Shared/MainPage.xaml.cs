@@ -14,6 +14,9 @@ using Windows.Graphics.Display;
 using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
+#if WINDOWS_PHONE_APP
+using Windows.Phone.UI.Input;
+#endif
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System.Display;
@@ -34,6 +37,9 @@ namespace QrCodeDetector
     {
         DisplayRequest m_displayRequest = new DisplayRequest();
         MediaCapture m_capture;
+        ContinuousAutoFocus m_autoFocus;
+        bool m_initializing;
+
 #if !WINDOWS_PHONE_APP
         SystemMediaTransportControls m_mediaControls;
 #endif
@@ -67,6 +73,7 @@ namespace QrCodeDetector
 #if WINDOWS_PHONE_APP
             Application.Current.Resuming += App_Resuming;
             Application.Current.Suspending += App_Suspending;
+            Window.Current.VisibilityChanged += Current_VisibilityChanged;
             var ignore = InitializeCaptureAsync();
 #else
             m_mediaControls = SystemMediaTransportControls.GetForCurrentView();
@@ -79,11 +86,12 @@ namespace QrCodeDetector
 #endif
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        protected override async void OnNavigatedFrom(NavigationEventArgs e)
         {
 #if WINDOWS_PHONE_APP
             Application.Current.Resuming -= App_Resuming;
             Application.Current.Suspending -= App_Suspending;
+            Window.Current.VisibilityChanged -= Current_VisibilityChanged;
 #else
             m_mediaControls.PropertyChanged -= m_mediaControls_PropertyChanged;
 #endif
@@ -91,6 +99,8 @@ namespace QrCodeDetector
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
 
             m_displayRequest.RequestRelease();
+
+            await DisposeCaptureAsync();
         }
 
 #if WINDOWS_PHONE_APP
@@ -105,7 +115,23 @@ namespace QrCodeDetector
 
         private void App_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
-            DisposeCapture();
+            // Dispatch call to the UI thread since the event may get fired on some other thread
+            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                await DisposeCaptureAsync();
+            });
+        }
+
+        async void Current_VisibilityChanged(object sender, VisibilityChangedEventArgs e)
+        {
+            if (e.Visible)
+            {
+                await InitializeCaptureAsync();
+            }
+            else
+            {
+                await DisposeCaptureAsync();
+            }
         }
 #else
         void m_mediaControls_PropertyChanged(SystemMediaTransportControls sender, SystemMediaTransportControlsPropertyChangedEventArgs args)
@@ -115,18 +141,18 @@ namespace QrCodeDetector
                 return;
             }
 
-            if (!IsInBackground())
+            // Dispatch call to the UI thread since the event may get fired on some other thread
+            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                // Dispatch call to the UI thread since the event may get fired on some other thread
-                var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                if (!IsInBackground())
                 {
                     await InitializeCaptureAsync();
-                });
-            }
-            else
-            {
-                DisposeCapture();
-            }
+                }
+                else
+                {
+                    await DisposeCaptureAsync();
+                }
+            });
         }
 
         private bool IsInBackground()
@@ -135,47 +161,76 @@ namespace QrCodeDetector
         }
 #endif
 
+        void capture_Failed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
+        {
+            // Dispatch call to the UI thread since the event may get fired on some other thread
+            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                await DisposeCaptureAsync();
+            });
+        }
+
+        // Must be called on the UI thread
         private async Task InitializeCaptureAsync()
         {
-            var settings = new MediaCaptureInitializationSettings
+            if (m_initializing || (m_capture != null))
             {
-                VideoDeviceId = await GetBackOrDefaulCameraIdAsync(),
-                StreamingCaptureMode = StreamingCaptureMode.Video
-            };
+                return;
+            }
+            m_initializing = true;
 
-            var capture = new MediaCapture();
-            await capture.InitializeAsync(settings);
-
-            // Select the capture resolution closest to screen resolution
-            var formats = capture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoPreview);
-            var format = (VideoEncodingProperties)formats.OrderBy((item) =>
+            try
             {
-                var props = (VideoEncodingProperties)item;
-                return Math.Abs(props.Width - this.ActualWidth) + Math.Abs(props.Height - this.ActualHeight);
-            }).First();
-            await capture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoPreview, format);
+                var settings = new MediaCaptureInitializationSettings
+                {
+                    VideoDeviceId = await GetBackOrDefaulCameraIdAsync(),
+                    StreamingCaptureMode = StreamingCaptureMode.Video
+                };
 
-            // Make the preview full screen
-            var scale = Math.Min(this.ActualWidth / format.Width, this.ActualHeight / format.Height);
-            Preview.Width = format.Width;
-            Preview.Height = format.Height;
-            Preview.RenderTransformOrigin = new Point(.5, .5);
-            Preview.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
-            BarcodeOutline.Width = format.Width;
-            BarcodeOutline.Height = format.Height;
-            BarcodeOutline.RenderTransformOrigin = new Point(.5, .5);
-            BarcodeOutline.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
+                var capture = new MediaCapture();
+                await capture.InitializeAsync(settings);
 
-            // Enable QR code detection
-            var definition = new LumiaAnalyzerDefinition(ColorMode.Yuv420Sp, 640, AnalyzeBitmap);
-            await capture.AddEffectAsync(MediaStreamType.VideoPreview, definition.ActivatableClassId, definition.Properties);
+                // Select the capture resolution closest to screen resolution
+                var formats = capture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoPreview);
+                var format = (VideoEncodingProperties)formats.OrderBy((item) =>
+                {
+                    var props = (VideoEncodingProperties)item;
+                    return Math.Abs(props.Width - this.ActualWidth) + Math.Abs(props.Height - this.ActualHeight);
+                }).First();
+                await capture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoPreview, format);
 
-            // Start preview
-            m_time.Restart();
-            Preview.Source = capture;
-            await capture.StartPreviewAsync();
+                // Make the preview full screen
+                var scale = Math.Min(this.ActualWidth / format.Width, this.ActualHeight / format.Height);
+                Preview.Width = format.Width;
+                Preview.Height = format.Height;
+                Preview.RenderTransformOrigin = new Point(.5, .5);
+                Preview.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
+                BarcodeOutline.Width = format.Width;
+                BarcodeOutline.Height = format.Height;
+                BarcodeOutline.RenderTransformOrigin = new Point(.5, .5);
+                BarcodeOutline.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
 
-            m_capture = capture;
+                // Enable QR code detection
+                var definition = new LumiaAnalyzerDefinition(ColorMode.Yuv420Sp, 640, AnalyzeBitmap);
+                await capture.AddEffectAsync(MediaStreamType.VideoPreview, definition.ActivatableClassId, definition.Properties);
+
+                // Start preview
+                m_time.Restart();
+                Preview.Source = capture;
+                await capture.StartPreviewAsync();
+
+                capture.Failed += capture_Failed;
+
+                m_autoFocus = await ContinuousAutoFocus.StartAsync(capture.VideoDeviceController.FocusControl);
+
+                m_capture = capture;
+            }
+            catch (Exception e)
+            {
+                TextLog.Text = String.Format("Failed to start the camera: {0}", e.Message);
+            }
+
+            m_initializing = false;
         }
 
         private void AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
@@ -207,12 +262,23 @@ namespace QrCodeDetector
 
                 if (result == null)
                 {
-                    BarcodeOutline.Points.Clear();
                     TextLog.Text = String.Format("[{0,4}ms] No barcode", elapsedTimeInMS);
+
+                    if (m_autoFocus != null)
+                    {
+                        m_autoFocus.BarcodeFound = false;
+                    }
+                    
+                    BarcodeOutline.Points.Clear();
                 }
                 else
                 {
                     TextLog.Text = String.Format("[{0,4}ms] {1}", elapsedTimeInMS, result.Text);
+
+                    if (m_autoFocus != null)
+                    {
+                        m_autoFocus.BarcodeFound = true;
+                    }
 
                     BarcodeOutline.Points.Clear();
 
@@ -246,15 +312,31 @@ namespace QrCodeDetector
             return deviceId;
         }
 
-        private void DisposeCapture()
+        // Must be called on the UI thread
+        private async Task DisposeCaptureAsync()
         {
+            Preview.Source = null;
+
+            if (m_autoFocus != null)
+            {
+                m_autoFocus.Dispose();
+                m_autoFocus = null;
+            }
+
+            MediaCapture capture;
             lock (this)
             {
-                if (m_capture != null)
-                {
-                    m_capture.Dispose();
-                    m_capture = null;
-                }
+                capture = m_capture;
+                m_capture = null;
+            }
+
+            if (capture != null)
+            {
+                capture.Failed -= capture_Failed;
+
+                await capture.StopPreviewAsync();
+
+                capture.Dispose();
             }
         }
 

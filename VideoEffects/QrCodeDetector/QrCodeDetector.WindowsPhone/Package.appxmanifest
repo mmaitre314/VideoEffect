@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="5b3695a0-4402-4b10-b41d-4238ec0d3103" Publisher="CN=Matthieu" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="5b3695a0-4402-4b10-b41d-4238ec0d3103" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="5b3695a0-4402-4b10-b41d-4238ec0d3105" Publisher="CN=Matthieu" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="e088fb04-3824-4a2e-892c-7ab694221c43" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>QrCodeDetector.WindowsPhone</DisplayName>
     <PublisherDisplayName>Matthieu</PublisherDisplayName>
