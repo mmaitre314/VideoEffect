@@ -47,7 +47,7 @@ namespace QrCodeDetector
         {
             Options = new DecodingOptions
             {
-                PossibleFormats = new BarcodeFormat[] { BarcodeFormat.QR_CODE },
+                PossibleFormats = new BarcodeFormat[] { BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128 },
                 TryHarder = true
             }
         };
