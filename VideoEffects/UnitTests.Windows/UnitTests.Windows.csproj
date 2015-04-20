@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Win2D.0.0.16\build\win\Win2D.props" Condition="Exists('..\packages\Win2D.0.0.16\build\win\Win2D.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -19,7 +20,7 @@
     <PackageCertificateKeyFile>UnitTests.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>b1826bd3</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>60893101</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -173,6 +174,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Graphics.Canvas, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Win2D.0.0.16\lib\win\Microsoft.Graphics.Canvas.winmd</HintPath>
+    </Reference>
     <Reference Include="ZXing">
       <HintPath>..\packages\ZXing.Net.0.14.0.1\lib\windows8\ZXing.winmd</HintPath>
     </Reference>
@@ -187,7 +192,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.208\build\win81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.208\build\win81\LumiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\win\Win2D.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\win\Win2D.props'))" />
+    <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\win\Win2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\win\Win2D.targets'))" />
   </Target>
+  <Import Project="..\packages\Win2D.0.0.16\build\win\Win2D.targets" Condition="Exists('..\packages\Win2D.0.0.16\build\win\Win2D.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

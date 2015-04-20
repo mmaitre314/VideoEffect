@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Win2D.0.0.16\build\native\Win2D.props" Condition="Exists('..\packages\Win2D.0.0.16\build\native\Win2D.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
       <Configuration>Debug</Configuration>
@@ -302,11 +303,12 @@
   </ItemGroup>
   <PropertyGroup>
     <_DefineDefaultConvergedProjectType>False</_DefineDefaultConvergedProjectType>
-    <NuGetPackageImportStamp>123f6dd6</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>49ee02e6</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" />
+    <Import Project="..\packages\Win2D.0.0.16\build\native\Win2D.targets" Condition="Exists('..\packages\Win2D.0.0.16\build\native\Win2D.targets')" />
   </ImportGroup>
   <Import Project="$(VCInstallDir)\..\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.TestTools.Cpp.targets" Condition="Exists('$(VCInstallDir)\..\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.TestTools.Cpp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -314,5 +316,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\native\Win2D.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\native\Win2D.props'))" />
+    <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\native\Win2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\native\Win2D.targets'))" />
   </Target>
 </Project>

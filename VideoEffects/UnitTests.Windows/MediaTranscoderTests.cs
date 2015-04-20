@@ -20,6 +20,7 @@ namespace UnitTests
         [DataTestMethod]
         [DataRow(EffectType.Lumia, DisplayName="Lumia")]
         [DataRow(EffectType.LumiaBitmap, DisplayName = "LumiaBitmap")]
+        [DataRow(EffectType.CanvasBitmap, DisplayName = "CanvasBitmap")]
         [DataRow(EffectType.ShaderNv12, DisplayName = "ShaderNv12")]
         [DataRow(EffectType.ShaderBgrx8, DisplayName = "ShaderBgrx8")]
         public async Task CS_W_MT_Basic(EffectType effectType)

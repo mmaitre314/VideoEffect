@@ -13,6 +13,7 @@
 #include <robuffer.h>
 
 #include <d3d11_2.h>
+#include <Microsoft.Graphics.Canvas.DirectX.Direct3D11.interop.h>
 
 #include <mfapi.h>
 #include <mfidl.h>

@@ -7,6 +7,8 @@ using VideoEffects;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using VideoEffectExtensions;
+using Microsoft.Graphics.Canvas;
+using Windows.UI;
 
 namespace UnitTests
 {
@@ -15,7 +17,8 @@ namespace UnitTests
         Lumia,
         ShaderNv12,
         ShaderBgrx8,
-        LumiaBitmap
+        LumiaBitmap,
+        CanvasBitmap
     }
 
     /// <summary>
@@ -41,6 +44,21 @@ namespace UnitTests
                     outputData[i * outputPitch + 4 * j + 1] = 0; // G
                     outputData[i * outputPitch + 4 * j + 2] = 0; // R
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Write some text
+    /// </summary>
+    class CanvasEffect : ICanvasVideoEffect
+    {
+        public void Process(CanvasBitmap input, CanvasRenderTarget output, TimeSpan time)
+        {
+            using (CanvasDrawingSession session = output.CreateDrawingSession())
+            {
+                session.DrawImage(input);
+                session.DrawText("Canvas Effect test", 0f, 0f, Colors.Red);
             }
         }
     }
@@ -74,6 +92,12 @@ namespace UnitTests
                     return new LumiaEffectDefinition(() =>
                     {
                         return new BitmapEffect();
+                    });
+
+                case EffectType.CanvasBitmap:
+                    return new CanvasEffectDefinition(() =>
+                    {
+                        return new CanvasEffect();
                     });
 
                 default:

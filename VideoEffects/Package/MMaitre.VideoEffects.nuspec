@@ -9,13 +9,14 @@
     <licenseUrl>https://raw.githubusercontent.com/mmaitre314/VideoEffect/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/mmaitre314/VideoEffect</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Applies effects from the Lumia Imaging SDK and DirectX HLSL pixel shaders to videos.</summary>
-    <description>Provides Media Extensions applying image effects from the Lumia Imaging SDK and DirectX HLSL pixel shaders to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Enables overlays, effect animations, cropping, creating square videos, and video analysis. Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1. For documentation see https://github.com/mmaitre314/VideoEffect .</description>
-    <releaseNotes>Add LumiaAnalyzer to improve the performance of video analysis.</releaseNotes>
+    <summary>Applies effects from the Lumia Imaging SDK, Win2D, and DirectX HLSL pixel shaders to videos.</summary>
+    <description>Provides Media Extensions applying image effects from the Lumia Imaging SDK, Win2D, and DirectX HLSL pixel shaders to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Enables overlays, effect animations, cropping, creating square videos, and video analysis (barcode, QR code, etc.). Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1. For documentation see https://github.com/mmaitre314/VideoEffect .</description>
+    <releaseNotes>Leverage Win2D to create hardware-accelerated video effects.</releaseNotes>
     <copyright>Copyright © 2015, Matthieu Maitre. All rights reserved.</copyright>
-    <tags>Native WinRT Nokia DirectX HLSL shader</tags>
+    <tags>Native WinRT Lumia Win2D DirectX HLSL shader</tags>
     <dependencies>
       <dependency id="LumiaImagingSDK" version="2.0.184" />
+      <dependency id="Win2D" version="0.0.16" />
     </dependencies>
   </metadata>
   <files>

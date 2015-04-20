@@ -41,7 +41,7 @@ namespace VideoEffects
     public delegate IAnimatedFilterChain^ AnimatedFilterChainFactory();
 
     //
-    // Bitmap video effect & factory
+    // Lumia Bitmap video effect & factory
     //
 
     // Note: the effect only supports Bgra8888 to avoid MediaComposition's bug initializing
@@ -66,4 +66,31 @@ namespace VideoEffects
 
     //<summary>Bitmap video effect factory</summary>
     public delegate IBitmapVideoEffect^ BitmapVideoEffectFactory();
+
+    //
+    // Win2D Canvas video effect & factory
+    //
+
+    // Note: the effect only supports B8G8R8X8 to avoid MediaComposition's bug initializing
+    // the effect after media-type negotiation happened and because Direct2D only supports RGB well.
+
+    //<summary>A video effect processing Win2D objects</summary>
+    public interface class ICanvasVideoEffect
+    {
+        ///<summary>Process one video frame.</summary>
+        ///<param name='input'>Input bitmap.</param>
+        ///<param name='output'>Output render target.</param>
+        ///<param name='time'>Timestamp of the frame. Time typically starts at zero. 
+        /// MediaCapture is an exception: time there is tied to QueryPerformanceCounter.</param>
+        ///<remarks>
+        /// The inputs and outputs are closed when the method returns. Any
+        /// async calls in that method must be run synchronously.
+        /// Bitmaps are in B8G8R8X8 color mode with no alpha channel.
+        ///</remarks>
+        void Process(Microsoft::Graphics::Canvas::CanvasBitmap^ input, Microsoft::Graphics::Canvas::CanvasRenderTarget^ output, Windows::Foundation::TimeSpan time);
+    };
+
+    //<summary>Bitmap video effect factory</summary>
+    public delegate ICanvasVideoEffect^ CanvasVideoEffectFactory();
+
 }

@@ -14,6 +14,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CanvasEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CanvasEffectDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)D3D11DeviceLock.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)DebuggerLogger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FilterChainFactory.h" />
@@ -38,6 +40,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferView.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)CanvasEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)CanvasEffectDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)DebuggerLogger.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.cpp" />

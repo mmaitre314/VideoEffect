@@ -23,6 +23,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)VideoProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferView.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CanvasEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CanvasEffectDefinition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -44,6 +46,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)VideoProcessor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)CanvasEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)CanvasEffectDefinition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl" />
