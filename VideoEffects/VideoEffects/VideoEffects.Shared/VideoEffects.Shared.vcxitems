@@ -23,6 +23,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SurfaceProcessor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)TranscodingProfile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaAnalyzerDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LumiaEffectDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SurfaceProcessor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)TranscodingProfile.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MediaTypeFormatter.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -66,6 +68,14 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)PixelShader.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <VariableName>g_pixelShader</VariableName>
+      <ObjectFileOutput>
+      </ObjectFileOutput>
+      <HeaderFileOutput>$(IntDir)%(Filename).h</HeaderFileOutput>
+      <ShaderModel>4.0_level_9_3</ShaderModel>
+    </FxCompile>
     <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl">
       <ShaderType>Vertex</ShaderType>
       <VariableName>g_vertexShader</VariableName>

@@ -279,6 +279,12 @@ namespace VideoEffectsTestApp
                         return new BitmapEffect2();
                     });
 
+                case 9:
+                    return new CanvasEffectDefinition(() =>
+                    {
+                        return new CanvasEffect();
+                    });
+
                 default:
                     throw new ArgumentException("Invalid effect type");
             }

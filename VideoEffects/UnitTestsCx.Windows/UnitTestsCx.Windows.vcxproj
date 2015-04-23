@@ -304,7 +304,7 @@
   <PropertyGroup>
     <_DefineDefaultConvergedProjectType>False</_DefineDefaultConvergedProjectType>
     <NuGetPackageImportStamp>49ee02e6</NuGetPackageImportStamp>
-  </PropertyGroup>
+  </PropertyGroup>  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" />
@@ -319,4 +319,10 @@
     <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\native\Win2D.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\native\Win2D.props'))" />
     <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\native\Win2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\native\Win2D.targets'))" />
   </Target>
+  <ItemDefinitionGroup>
+    <!-- Workaround for Win2D 0.0.16 overwriting AdditionalLibraryDirectories -->
+    <Link>
+      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
 </Project>

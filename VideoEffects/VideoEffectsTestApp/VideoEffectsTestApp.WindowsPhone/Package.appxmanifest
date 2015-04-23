@@ -32,6 +32,7 @@
     <Extension Category="windows.activatableClass.inProcessServer">
       <InProcessServer>
         <Path>VideoEffects.WindowsPhone.dll</Path>
+        <ActivatableClass ActivatableClassId="VideoEffects.CanvasEffect" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaAnalyzer" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectBgrx8" ThreadingModel="both" />

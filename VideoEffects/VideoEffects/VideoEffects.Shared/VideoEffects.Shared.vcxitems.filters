@@ -25,6 +25,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)WinRTBufferView.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CanvasEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CanvasEffectDefinition.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SurfaceProcessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -48,8 +49,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)VideoProcessor.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CanvasEffect.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CanvasEffectDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SurfaceProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="$(MSBuildThisFileDirectory)VertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)PixelShader.hlsl" />
   </ItemGroup>
 </Project>

@@ -238,6 +238,12 @@ namespace VideoEffectsTestApp
                         return new QrCodeDetector();
                     });
 
+                case 10:
+                    return new CanvasEffectDefinition(() =>
+                    {
+                        return new CanvasEffect();
+                    });
+
                 default:
                     throw new ArgumentException("Invalid effect type");
             }

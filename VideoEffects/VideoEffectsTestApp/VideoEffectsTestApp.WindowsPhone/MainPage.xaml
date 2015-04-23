@@ -35,6 +35,7 @@
                 <ComboBoxItem>Lumia Animated effect</ComboBoxItem>
                 <ComboBoxItem>Bitmap Blue Effect</ComboBoxItem>
                 <ComboBoxItem>Bitmap Watercolor Effect</ComboBoxItem>
+                <ComboBoxItem>Win2D Effect</ComboBoxItem>
             </ComboBox>
 
             <Button Name="StartMediaElementPreview" Content="MediaElement" HorizontalAlignment="Center" Click="StartMediaElementPreview_Click" MinHeight="0"/>
