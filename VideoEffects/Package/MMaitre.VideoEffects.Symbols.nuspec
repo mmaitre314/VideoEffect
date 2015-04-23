@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/mmaitre314/VideoEffect</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Applies effects from the Lumia Imaging SDK, Win2D, and DirectX HLSL pixel shaders to videos.</summary>
-    <description>Provides Media Extensions applying image effects from the Lumia Imaging SDK, Win2D, and DirectX HLSL pixel shaders to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Enables overlays, effect animations, cropping, creating square videos, and video analysis (barcode, QR code, etc.). Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1. For documentation see https://github.com/mmaitre314/VideoEffect .</description>
+    <description>Provides Media Extensions applying image effects from the Lumia Imaging SDK, Win2D, and DirectX HLSL pixel shaders to videos via MediaTranscoder, MediaComposition, MediaCapture, or MediaElement. Enables overlays, effect animations, cropping, creating square videos, and video analysis (ZXing.Net barcode, QR code, etc.). Supports Universal Store Apps for Windows Phone 8.1 and Windows 8.1. For documentation see https://github.com/mmaitre314/VideoEffect .</description>
     <releaseNotes>Leverage Win2D to create hardware-accelerated video effects.</releaseNotes>
     <copyright>Copyright © 2015, Matthieu Maitre. All rights reserved.</copyright>
     <tags>Native WinRT Lumia Win2D DirectX HLSL shader</tags>
