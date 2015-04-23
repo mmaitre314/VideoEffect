@@ -8,13 +8,13 @@ Original|Antique + HorizontalFlip
 ----|----
 ![Original](http://mmaitre314.github.io/VideoEffect/car_original.jpg)|![Processed](http://mmaitre314.github.io/VideoEffect/car_processed.jpg)
 
-Apply image effects from the [Nokia Imaging SDK](http://developer.nokia.com/resources/library/Imaging_API_Ref/index.html) and [DirectX HLSL pixel shaders](http://msdn.microsoft.com/en-us/library/bb509635(v=VS.85).aspx) to videos in [Universal Store Apps](http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx) for Windows Phone 8.1 and Windows 8.1.
+Apply image effects from the [Lumia Imaging SDK](https://msdn.microsoft.com/en-us/library/dn859593.aspx), [Win2D](https://github.com/Microsoft/Win2D), and [DirectX HLSL pixel shaders](http://msdn.microsoft.com/en-us/library/bb509635(v=VS.85).aspx) to videos in [Universal Store Apps](http://msdn.microsoft.com/en-us/library/windows/apps/dn609832.aspx) for Windows Phone 8.1 and Windows 8.1.
 
 Effects can be applied via [MediaTranscoder](http://msdn.microsoft.com/en-us/library/windows/apps/windows.media.transcoding.mediatranscoder.aspx), [MediaComposition](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.editing.mediacomposition.aspx), [MediaCapture](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.capture.mediacapture.aspx), or [MediaElement](http://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.ui.xaml.controls.mediaelement.aspx).
 
 Binaries are available via [NuGet](https://www.nuget.org/packages/MMaitre.VideoEffects/).
 
-Nokia Imaging SDK effects
+Lumia Imaging SDK effects
 -------------------------
 
 A video effect definition is created from a chain of image effects and passed to a video-processing class like MediaTranscoder:
@@ -214,6 +214,39 @@ void AnalyzeBitmap(Bitmap bitmap, TimeSpan time)
 Note that Yuv420Sp bitmaps are made of two planes (Y grayscale + UV color) so the first plane can be passed as Gray8 to the QR code decoder.
 
 For a more complete code sample see [MainPage.xaml.cs](https://github.com/mmaitre314/VideoEffect/blob/master/VideoEffects/QrCodeDetector/QrCodeDetector.Shared/MainPage.xaml.cs) in the QrCodeDetector test app.
+
+Win2D effects
+-------------
+
+Win2D allows applying hardware-accelerated effects to videos, a much needed feature when it comes to realtime video processing on Phone. This requires implementing ICanvasVideoEffect, which has a single Process() method called with an input bitmap, an output bitmap, and the current time for each frame in the video.
+
+The bitmaps passed to the Process() call get destroyed when the call returns, so any async call in this method must be executed synchronously using '.AsTask().Wait()'.
+
+The following code snippet shows how to draw an animated disc on the video:
+
+```c#
+class CanvasEffect : ICanvasVideoEffect
+{
+    public void Process(CanvasBitmap input, CanvasRenderTarget output, TimeSpan time)
+    {
+        using (CanvasDrawingSession session = output.CreateDrawingSession())
+        {
+            session.DrawImage(input);
+            session.FillCircle(
+                (float)input.Bounds.Width / 2,
+                (float)input.Bounds.Height / 2,
+                (float)(Math.Min(input.Bounds.Width, input.Bounds.Height) / 2 * Math.Cos(2 * Math.PI * time.TotalSeconds)),
+                Colors.Aqua
+                );
+        }
+    }
+}
+
+var definition = new CanvasEffectDefinition(() =>
+{
+    return new CanvasEffect();
+});
+```
 
 DirectX HLSL Pixel Shader effects
 ---------------------------------
