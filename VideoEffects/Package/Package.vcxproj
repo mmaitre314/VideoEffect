@@ -20,6 +20,7 @@
     <None Include="Package.appxmanifest.win81.transform" />
     <None Include="Package.appxmanifest.wpa81.transform" />
     <None Include="publish.cmd" />
+    <None Include="publish.ps1" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{79958B79-9332-45A8-A4D8-1151DB3AB52E}</ProjectGuid>
