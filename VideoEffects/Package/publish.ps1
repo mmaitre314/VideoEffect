@@ -1,25 +1,54 @@
 # Script to upload the package to http://www.nuget.org/ and the symbols to http://mmaitre314.blob.core.windows.net/symbols/
 # Add-AzureAccount must be run before the script
+#
+# References about source indexing:
+#   https://github.com/Haemoglobin/GitHub-Source-Indexer/
+#   http://sourcepack.codeplex.com/
+#   https://docs.google.com/document/d/13VM59LEuNps66TK_vITqKd1TPlUtKDaOg9T2dLnFXnE/edit?hl=en_US
+#   https://msdn.microsoft.com/en-us/library/windows/hardware/ff540151(v=vs.85).aspx
 
 $version = "2.3.0"
 $outputPath = "c:\NuGet\"
 $product = "MMaitre.VideoEffects"
 $storageAccountName = "mmaitre314"
+$gitUserName = "mmaitre314"
+$gitProjectName = "VideoEffect"
 
-if (Test-Path "${env:ProgramFiles(x86)}\Windows Kits\8.1\Debuggers\x86\symstore.exe")
+function Get-ProgramPath([string]$relativePath)
 {
-    $symstorePath = "${env:ProgramFiles(x86)}\Windows Kits\8.1\Debuggers\x86\symstore.exe"
-}
-elseif (Test-Path "${env:ProgramFiles}\Windows Kits\8.1\Debuggers\x86\symstore.exe")
-{
-    $symstorePath = "${env:ProgramFiles}\Windows Kits\8.1\Debuggers\x86\symstore.exe"
-}
-else
-{
-    throw "symstore.exe not found. Please instead the Windows 8.1 SDK."
+    if (Test-Path "${env:ProgramFiles(x86)}\${relativePath}")
+    {
+        $absolutePath = "${env:ProgramFiles(x86)}\${relativePath}"
+    }
+    elseif (Test-Path "${env:ProgramFiles}\${relativePath}")
+    {
+        $absolutePath = "${env:ProgramFiles}\${relativePath}"
+    }
+    else
+    {
+        throw "${relativePath} not found"
+    }
+
+    return $absolutePath
 }
 
-function Find-PDBs($zip)
+$gitPath = Get-ProgramPath "Git\cmd\git.exe"
+$symstorePath = Get-ProgramPath "Windows Kits\8.1\Debuggers\x86\symstore.exe"
+$srctoolPath = Get-ProgramPath "Windows Kits\8.1\Debuggers\x86\srcsrv\srctool.exe"
+$pdbstrPath = Get-ProgramPath "Windows Kits\8.1\Debuggers\x86\srcsrv\pdbstr.exe"
+
+# Move to the script folder so GIT knows the repo
+cd $PSScriptRoot
+
+# Root of the GIT repo (ex: C:\Users\Matthieu\Source\Repos\MediaCaptureReader\)
+$rootPath = & $gitPath rev-parse --show-toplevel
+if ($LASTEXITCODE -ne 0)
+{
+    throw "GIT returned $LASTEXITCODE"
+}
+$rootPath = [System.IO.Path]::GetFullPath($rootPath) + "\"
+
+function Find-Pdbs($zip)
 {
     $PDBs = @()
 
@@ -41,11 +70,50 @@ function Find-PDBs($zip)
     return $PDBs
 }
 
-Write-Host "Uploading NuGet package" -ForegroundColor Cyan
-& "${outputPath}nuget.exe" push "${outputPath}Packages\${product}.${version}.nupkg"
+function Add-SourceInfoToPdb([string]$tempPath, [string]$pdbName)
+{
+    $pdbPath = "${tempPath}${pdbName}"
+    $streamPath = "${tempPath}${pdbName}.srcsrv.txt"
 
-# SymbolSource.org currently does not support native PDBs, so publishing to Azure blob instead
-# & "${outputPath}nuget.exe" push "${outputPath}Symbols\${product}.Symbols.${version}.nupkg" -Source http://nuget.gw.symbolsource.org/Public/NuGet
+    # Get the list of source files in the PDB
+    $pdbSourcePaths = @(& "$srctoolPath" "$pdbPath" -r)
+
+    # Get the list of source files checked in
+    $gitSourceRelativePaths = @(& "$gitPath" ls-tree --name-only --full-tree -r $version)
+
+    # Write the PDB source stream to file
+    "SRCSRV: ini ------------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Force
+    "VERSION=2" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    "VERCTRL=http" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    "SRCSRV: variables ------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    "HTTP_ALIAS=https://raw.githubusercontent.com/${gitUserName}/${gitProjectName}/${version}/" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    "HTTP_EXTRACT_TARGET=%HTTP_ALIAS%%var2%" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    "SRCSRVTRG=%HTTP_EXTRACT_TARGET%" | Out-File -Encoding utf8 -FilePath $streamPath -Append
+    "SRCSRV: source files ---------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    foreach ($pdbSourcePath in $pdbSourcePaths)
+    {
+        $sourcePathLower = $pdbSourcePath.ToLower()
+        if (-not $sourcePathLower.StartsWith($rootPath.ToLower()))
+        {
+            continue
+        }
+        if (-not $sourcePathLower.EndsWith(".h") -and -not $sourcePathLower.EndsWith(".cpp") -and -not $sourcePathLower.EndsWith(".cs"))
+        {
+            continue
+        }
+
+        $sourceRelativePath = $pdbSourcePath.Substring($rootPath.Length).Replace("\", "/")
+
+        # Git (and GitHub) are picky about case, so use the Git relative path
+        $sourceRelativePath = $gitSourceRelativePaths | ? { $_ -eq $sourceRelativePath }
+
+        "${pdbSourcePath}*${sourceRelativePath}" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    }
+    "SRCSRV: end ------------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
+
+    # Add stream to PDB
+    & "$pdbstrPath" -w -s:srcsrv -p:"$pdbPath" -i:"$streamPath"
+}
 
 # Create a temp folder
 $nupkgPath = "${outputPath}Symbols\${product}.Symbols.${version}.nupkg"
@@ -58,6 +126,23 @@ if (Test-Path ${tempPath} -PathType Container)
 }
 New-Item -ItemType Directory -Path $tempPath -Force | Out-Null
 
+Write-Host "Uploading NuGet package" -ForegroundColor Cyan
+& "${outputPath}nuget.exe" push "${outputPath}Packages\${product}.${version}.nupkg"
+if ($LASTEXITCODE -ne 0)
+{
+    throw "symstore returned $LASTEXITCODE"
+}
+
+# SymbolSource.org currently does not support native PDBs, so publishing to Azure blob instead
+# & "${outputPath}nuget.exe" push "${outputPath}Symbols\${product}.Symbols.${version}.nupkg" -Source http://nuget.gw.symbolsource.org/Public/NuGet
+
+Write-Host "Publishing GIT tag" -ForegroundColor Cyan
+& $gitPath push origin "v${version}"
+if ($LASTEXITCODE -ne 0)
+{
+    throw "git returned $LASTEXITCODE"
+}
+
 # Copy the NuGet symbol package to a file with a .zip extension so Shell accepts to open it
 $zipPath = "${tempPath}symbols.zip"
 Copy-Item -Path $nupkgPath -Destination $zipPath -Force
@@ -65,13 +150,20 @@ Copy-Item -Path $nupkgPath -Destination $zipPath -Force
 Write-Host "Looking for PDBs in ${nupkgPath}" -ForegroundColor Cyan
 $shell = New-Object -COM Shell.Application
 $zip = $shell.NameSpace($zipPath)
-$PDBs = Find-PDBs $zip
+$PDBs = Find-Pdbs $zip
 
 foreach ($PDB in $PDBs)
 {
-    Write-Host "Indexing $($PDB.Name)" -ForegroundColor Cyan
     $shell.Namespace($tempPath).CopyHere($PDB)
-    & $symstorePath add /f "${tempPath}$($PDB.Name)" /compress /s "$tempSymbolPath" /t ${product} /o
+    $pdbPath = "${tempPath}$($PDB.Name)"
+
+    # Add source info
+    Write-Host "Adding source info to ${pdbPath}" -ForegroundColor Cyan
+    Add-SourceInfoToPdb $tempPath $PDB.Name
+
+    # Index and compress
+    Write-Host "Indexing and compressing ${pdbPath}" -ForegroundColor Cyan
+    & $symstorePath add /f "${pdbPath}" /compress /s "$tempSymbolPath" /t ${product} /o
     if ($LASTEXITCODE -ne 0)
     {
         throw "symstore returned $LASTEXITCODE"
@@ -79,10 +171,10 @@ foreach ($PDB in $PDBs)
     Remove-Item "${tempPath}*.pdb"
 }
 
-# Upload PDBs to Azure blobs
+# Upload to Azure blobs
 $storageAccountKey = Get-AzureStorageKey $storageAccountName | %{ $_.Primary }
 $context = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
-foreach ($file in Get-ChildItem "${tempPath}Symbols\*.pd_" -Recurse)
+foreach ($file in Get-ChildItem "${$tempSymbolPath}*.pd_" -Recurse)
 {
     $blob = $file.FullName.Substring($tempSymbolPath.Length).Replace("\", "/")
 
