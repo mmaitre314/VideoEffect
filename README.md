@@ -1,5 +1,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/vkkt3t5i4av2trs0?svg=true)](https://ci.appveyor.com/project/mmaitre314/videoeffect)
 [![NuGet package](http://mmaitre314.github.io/images/nuget.png)](https://www.nuget.org/packages/MMaitre.VideoEffects/)
+[![Symbols](http://mmaitre314.github.io/images/Symbols.png)](http://mmaitre314.github.io/2015/05/24/personal-pdb-symbol-server.html)
 
 Video Effects
 =============
