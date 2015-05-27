@@ -77,19 +77,26 @@ function Add-SourceInfoToPdb([string]$tempPath, [string]$pdbName)
 
     # Get the list of source files in the PDB
     $pdbSourcePaths = @(& "$srctoolPath" "$pdbPath" -r)
+    Write-Host "Source files in PDB: $($pdbSourcePaths.Count)"
 
     # Get the list of source files checked in
-    $gitSourceRelativePaths = @(& "$gitPath" ls-tree --name-only --full-tree -r $version)
+    $gitSourceRelativePaths = @(& "$gitPath" ls-tree --name-only --full-tree -r v$version)
+    Write-Host "Source files in Git: $($gitSourceRelativePaths.Count)"
+    if ($gitSourceRelativePaths.Count -eq 0)
+    {
+        throw "Git did not return any source file"
+    }
 
     # Write the PDB source stream to file
     "SRCSRV: ini ------------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Force
     "VERSION=2" | Out-File -Encoding ascii -FilePath $streamPath -Append
     "VERCTRL=http" | Out-File -Encoding ascii -FilePath $streamPath -Append
     "SRCSRV: variables ------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
-    "HTTP_ALIAS=https://raw.githubusercontent.com/${gitUserName}/${gitProjectName}/${version}/" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    "HTTP_ALIAS=https://raw.githubusercontent.com/${gitUserName}/${gitProjectName}/v${version}/" | Out-File -Encoding ascii -FilePath $streamPath -Append
     "HTTP_EXTRACT_TARGET=%HTTP_ALIAS%%var2%" | Out-File -Encoding ascii -FilePath $streamPath -Append
     "SRCSRVTRG=%HTTP_EXTRACT_TARGET%" | Out-File -Encoding utf8 -FilePath $streamPath -Append
     "SRCSRV: source files ---------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
+    $sourceCount = 0
     foreach ($pdbSourcePath in $pdbSourcePaths)
     {
         $sourcePathLower = $pdbSourcePath.ToLower()
@@ -106,13 +113,27 @@ function Add-SourceInfoToPdb([string]$tempPath, [string]$pdbName)
 
         # Git (and GitHub) are picky about case, so use the Git relative path
         $sourceRelativePath = $gitSourceRelativePaths | ? { $_ -eq $sourceRelativePath }
+        if ($sourceRelativePath -eq $null)
+        {
+            Write-Host "WARNING: no source file in GIT matching $pdbSourcePath" -ForegroundColor Yellow
+            continue
+        }
 
         "${pdbSourcePath}*${sourceRelativePath}" | Out-File -Encoding ascii -FilePath $streamPath -Append
+        $sourceCount++
     }
     "SRCSRV: end ------------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
-
-    # Add stream to PDB
-    & "$pdbstrPath" -w -s:srcsrv -p:"$pdbPath" -i:"$streamPath"
+    Write-Host "Added $sourceCount source files to PDB"
+    
+    if ($sourceCount -gt 0)
+    {
+        # Add stream to PDB
+        & "$pdbstrPath" -w -s:srcsrv -p:"$pdbPath" -i:"$streamPath"
+    }
+    else
+    {
+        Write-Host "WARNING: no source file added to PDB" -ForegroundColor Yellow
+    }
 }
 
 # Create a temp folder
@@ -120,9 +141,9 @@ $nupkgPath = "${outputPath}Symbols\${product}.Symbols.${version}.nupkg"
 $tempPath = "${nupkgPath}.temp\"
 $tempSymbolPath = "${tempPath}Symbols\"
 Write-Host "Creating temporary folder ${tempPath}" -ForegroundColor Cyan
-if (Test-Path ${tempPath} -PathType Container)
+if (Test-Path $tempPath -PathType Container)
 {
-    Get-ChildItem ${tempPath} -File | Remove-Item -Force
+    Get-ChildItem $tempPath -File | Remove-Item -Force
 }
 New-Item -ItemType Directory -Path $tempPath -Force | Out-Null
 
@@ -174,7 +195,7 @@ foreach ($PDB in $PDBs)
 # Upload to Azure blobs
 $storageAccountKey = Get-AzureStorageKey $storageAccountName | %{ $_.Primary }
 $context = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
-foreach ($file in Get-ChildItem "${$tempSymbolPath}*.pd_" -Recurse)
+foreach ($file in Get-ChildItem "${tempSymbolPath}*.pd_" -Recurse)
 {
     $blob = $file.FullName.Substring($tempSymbolPath.Length).Replace("\", "/")
 
@@ -183,4 +204,5 @@ foreach ($file in Get-ChildItem "${$tempSymbolPath}*.pd_" -Recurse)
 }
 
 # Clean up
+Get-ChildItem $tempPath -File | Remove-Item -Force
 Remove-Item $tempPath -Recurse -Force
