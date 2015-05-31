@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+  <!-- Remove the content of the installed InProcessServer element -->
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path xdt:Locator="Condition(.='VideoEffects.Windows.dll')" xdt:Transform="Remove">VideoEffects.Windows.dll</Path>
+        <ActivatableClass ActivatableClassId="VideoEffects.CanvasEffect" ThreadingModel="both" xdt:Locator="Match(ActivatableClassId)" xdt:Transform="Remove" />
+        <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" xdt:Locator="Match(ActivatableClassId)" xdt:Transform="Remove" />
+        <ActivatableClass ActivatableClassId="VideoEffects.LumiaAnalyzer" ThreadingModel="both" xdt:Locator="Match(ActivatableClassId)" xdt:Transform="Remove" />
+        <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectBgrx8" ThreadingModel="both" xdt:Locator="Match(ActivatableClassId)" xdt:Transform="Remove" />
+        <ActivatableClass ActivatableClassId="VideoEffects.ShaderEffectNv12" ThreadingModel="both" xdt:Locator="Match(ActivatableClassId)" xdt:Transform="Remove" />
+        <ActivatableClass ActivatableClassId="VideoEffects.SquareEffect" ThreadingModel="both" xdt:Locator="Match(ActivatableClassId)" xdt:Transform="Remove" />
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+
+  <!-- Remove empty InProcessServer elements -->
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer xdt:Locator="Condition(.='')" xdt:Transform="Remove" />
+    </Extension>
+  </Extensions>
+
+  <!-- Remove empty Extension elements -->
+  <Extensions>
+    <Extension xdt:Locator="Condition(.='')" xdt:Transform="Remove" />
+  </Extensions>
+
+  <!-- Remove empty Extensions elements -->
+  <Extensions xdt:Locator="Condition(.='')" xdt:Transform="Remove" />
+
+</Package>

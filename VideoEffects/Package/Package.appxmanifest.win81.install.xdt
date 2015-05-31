@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+  <!-- Add an Extensions element if missing -->
+  <Extensions xdt:Transform="InsertIfMissing" />
+
+  <!-- Install our InProcessServer element -->
   <Extensions>
-    <Extension Category="windows.activatableClass.inProcessServer">
+    <Extension Category="windows.activatableClass.inProcessServer" xdt:Transform="Insert">
       <InProcessServer>
-        <Path>VideoEffects.WindowsPhone.dll</Path>
+        <Path>VideoEffects.Windows.dll</Path>
         <ActivatableClass ActivatableClassId="VideoEffects.CanvasEffect" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaEffect" ThreadingModel="both" />
         <ActivatableClass ActivatableClassId="VideoEffects.LumiaAnalyzer" ThreadingModel="both" />

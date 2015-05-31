@@ -9,9 +9,10 @@
     <None Include="MMaitre.VideoEffects.wpa81.targets" />
     <None Include="pack.cmd" />
     <None Include="Pack.sln" />
-    <None Include="Package.appxmanifest.win81.transform" />
-    <None Include="Package.appxmanifest.wpa81.transform" />
-    <None Include="publish.cmd" />
     <None Include="publish.ps1" />
+    <None Include="Package.appxmanifest.win81.install.xdt" />
+    <None Include="Package.appxmanifest.wpa81.install.xdt" />
+    <None Include="Package.appxmanifest.win81.uninstall.xdt" />
+    <None Include="Package.appxmanifest.wpa81.uninstall.xdt" />
   </ItemGroup>
 </Project>

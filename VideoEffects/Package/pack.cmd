@@ -1,7 +1,7 @@
 @echo off
 setlocal enableextensions
 
-set VERSION=2.3.0
+set VERSION=2.3.1
 
 set OUTPUT=c:\NuGet\
 

@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QrCodeDetector.Windows", "Q
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QrCodeDetector.WindowsPhone", "QrCodeDetector\QrCodeDetector.WindowsPhone\QrCodeDetector.WindowsPhone.csproj", "{854FC7CE-1302-4CCC-AE3D-BFCFE51DDC0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Desktop", "UnitTests.Desktop\UnitTests.Desktop.csproj", "{B70FA178-ADC0-4163-BEDA-823CD69E36D7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		QrCodeDetector\QrCodeDetector.Shared\QrCodeDetector.Shared.projitems*{92d644a1-cd63-4831-869c-dfb8d992baca}*SharedItemsImports = 13
@@ -564,6 +566,22 @@ Global
 		{854FC7CE-1302-4CCC-AE3D-BFCFE51DDC0F}.Release|x86.ActiveCfg = Release|x86
 		{854FC7CE-1302-4CCC-AE3D-BFCFE51DDC0F}.Release|x86.Build.0 = Release|x86
 		{854FC7CE-1302-4CCC-AE3D-BFCFE51DDC0F}.Release|x86.Deploy.0 = Release|x86
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|ARM.ActiveCfg = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|x64.ActiveCfg = Release|Any CPU
+		{B70FA178-ADC0-4163-BEDA-823CD69E36D7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
