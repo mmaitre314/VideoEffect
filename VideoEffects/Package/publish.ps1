@@ -99,27 +99,20 @@ function Add-SourceInfoToPdb([string]$tempPath, [string]$pdbName)
     $sourceCount = 0
     foreach ($pdbSourcePath in $pdbSourcePaths)
     {
-        $sourcePathLower = $pdbSourcePath.ToLower()
-        if (-not $sourcePathLower.StartsWith($rootPath.ToLower()))
+        if (-not $pdbSourcePath.EndsWith(".h") -and -not $pdbSourcePath.EndsWith(".cpp") -and -not $pdbSourcePath.EndsWith(".cs"))
         {
             continue
         }
-        if (-not $sourcePathLower.EndsWith(".h") -and -not $sourcePathLower.EndsWith(".cpp") -and -not $sourcePathLower.EndsWith(".cs"))
-        {
-            continue
-        }
-
-        $sourceRelativePath = $pdbSourcePath.Substring($rootPath.Length).Replace("\", "/")
+        $sourcePathLower = $pdbSourcePath.ToLower().Replace("\", "/")
 
         # Git (and GitHub) are picky about case, so use the Git relative path
-        $sourceRelativePath = $gitSourceRelativePaths | ? { $_ -eq $sourceRelativePath }
-        if ($sourceRelativePath -eq $null)
+        $gitSourceRelativePath = $gitSourceRelativePaths | ? { ($pdbSourcePath.Length -ge $_.Length) -and ($_ -eq $sourcePathLower.Substring($sourcePathLower.Length - $_.Length, $_.Length)) }
+        if ($gitSourceRelativePath -eq $null)
         {
-            Write-Host "WARNING: no source file in GIT matching $pdbSourcePath" -ForegroundColor Yellow
             continue
         }
 
-        "${pdbSourcePath}*${sourceRelativePath}" | Out-File -Encoding ascii -FilePath $streamPath -Append
+        "${pdbSourcePath}*${gitSourceRelativePath}" | Out-File -Encoding ascii -FilePath $streamPath -Append
         $sourceCount++
     }
     "SRCSRV: end ------------------------------------------------" | Out-File -Encoding ascii -FilePath $streamPath -Append
