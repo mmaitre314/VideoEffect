@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Win2D.0.0.16\build\win\Win2D.props" Condition="Exists('..\packages\Win2D.0.0.16\build\win\Win2D.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -20,7 +19,8 @@
     <PackageCertificateKeyFile>UnitTests.NuGet.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <NuGetPackageImportStamp>34aa9064</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>1343789e</NuGetPackageImportStamp>
+    <PackageCertificateThumbprint>18283ABCA8B13236AFB837B32CE9E832EC1EF1CD</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -127,9 +127,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="Help\Lumia Imaging SDK.chm" />
+    <None Include="packages.config" />
     <None Include="UnitTests.NuGet.Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -147,35 +146,35 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Graphics.Canvas">
-      <HintPath>..\packages\Win2D.0.0.16\lib\win\Microsoft.Graphics.Canvas.winmd</HintPath>
-    </Reference>
-    <Reference Include="VideoEffectExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MMaitre.VideoEffects.2.3.1\lib\portable-netcore451+wpa81\VideoEffectExtensions.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Graphics.Canvas, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Win2D.win81.1.4.0\lib\win\Microsoft.Graphics.Canvas.winmd</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="VideoEffectExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MMaitre.VideoEffects.2.3.2\lib\portable-netcore451+wpa81\VideoEffectExtensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets'))" />
-    <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\win\Win2D.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\win\Win2D.props'))" />
-    <Error Condition="!Exists('..\packages\Win2D.0.0.16\build\win\Win2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.0.0.16\build\win\Win2D.targets'))" />
-    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.2.3.1\build\win81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.2.3.1\build\win81\MMaitre.VideoEffects.targets'))" />
+    <Error Condition="!Exists('..\packages\Win2D.win81.1.4.0\build\win\Win2D.win81.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Win2D.win81.1.4.0\build\win\Win2D.win81.targets'))" />
+    <Error Condition="!Exists('..\packages\MMaitre.VideoEffects.2.3.2\build\win81\MMaitre.VideoEffects.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MMaitre.VideoEffects.2.3.2\build\win81\MMaitre.VideoEffects.targets'))" />
   </Target>
-  <Import Project="..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets" Condition="Exists('..\packages\LumiaImagingSDK.2.0.184\build\win81\LumiaImagingSDK.targets')" />
-  <Import Project="..\packages\Win2D.0.0.16\build\win\Win2D.targets" Condition="Exists('..\packages\Win2D.0.0.16\build\win\Win2D.targets')" />
-  <Import Project="..\packages\MMaitre.VideoEffects.2.3.1\build\win81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.2.3.1\build\win81\MMaitre.VideoEffects.targets')" />
+  <Import Project="..\packages\Win2D.win81.1.4.0\build\win\Win2D.win81.targets" Condition="Exists('..\packages\Win2D.win81.1.4.0\build\win\Win2D.win81.targets')" />
+  <Import Project="..\packages\MMaitre.VideoEffects.2.3.2\build\win81\MMaitre.VideoEffects.targets" Condition="Exists('..\packages\MMaitre.VideoEffects.2.3.2\build\win81\MMaitre.VideoEffects.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

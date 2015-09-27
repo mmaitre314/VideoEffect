@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Win2D.0.0.16\build\native\Win2D.props" Condition="Exists('..\..\packages\Win2D.0.0.16\build\native\Win2D.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
       <Configuration>Debug</Configuration>
@@ -100,7 +99,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>edc2ed84</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>ada30f6a</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -250,7 +249,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets" Condition="Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" />
     <Import Project="..\..\packages\MMaitre.TraceEtw.1.0.24\build\native\MMaitre.TraceEtw.targets" Condition="Exists('..\..\packages\MMaitre.TraceEtw.1.0.24\build\native\MMaitre.TraceEtw.targets')" />
-    <Import Project="..\..\packages\Win2D.0.0.16\build\native\Win2D.targets" Condition="Exists('..\..\packages\Win2D.0.0.16\build\native\Win2D.targets')" />
+    <Import Project="..\..\packages\Win2D.win81.1.4.0\build\native\Win2D.win81.targets" Condition="Exists('..\..\packages\Win2D.win81.1.4.0\build\native\Win2D.win81.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -258,7 +257,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LumiaImagingSDK.2.0.184\build\native\LumiaImagingSDK.targets'))" />
     <Error Condition="!Exists('..\..\packages\MMaitre.TraceEtw.1.0.24\build\native\MMaitre.TraceEtw.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MMaitre.TraceEtw.1.0.24\build\native\MMaitre.TraceEtw.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Win2D.0.0.16\build\native\Win2D.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Win2D.0.0.16\build\native\Win2D.props'))" />
-    <Error Condition="!Exists('..\..\packages\Win2D.0.0.16\build\native\Win2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Win2D.0.0.16\build\native\Win2D.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Win2D.win81.1.4.0\build\native\Win2D.win81.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Win2D.win81.1.4.0\build\native\Win2D.win81.targets'))" />
   </Target>
 </Project>

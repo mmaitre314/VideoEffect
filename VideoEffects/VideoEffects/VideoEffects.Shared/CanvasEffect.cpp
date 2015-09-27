@@ -61,7 +61,7 @@ void CanvasEffect::StartStreaming(_In_ unsigned long format, _In_ unsigned int w
     CHK(hr);
 
     IDirect3DDevice^ d3dDevice = CreateDirect3DDevice(As<IDXGIDevice>(device).Get());
-    _canvasDevice = CanvasDevice::CreateFromDirect3D11Device(d3dDevice, CanvasDebugLevel::None);
+    _canvasDevice = CanvasDevice::CreateFromDirect3D11Device(d3dDevice);
 
     {
         D3D11_TEXTURE2D_DESC desc = {};
@@ -137,11 +137,13 @@ bool CanvasEffect::ProcessSample(_In_ const ComPtr<IMFSample>& inputSample, _In_
     auto input = CanvasBitmap::CreateFromDirect3D11Surface(
         _canvasDevice,
         CreateDirect3DSurface(As<IDXGISurface>(_inputTexture).Get()),
+        96.f,
         CanvasAlphaMode::Ignore
         );
     auto output = CanvasRenderTarget::CreateFromDirect3D11Surface(
         _canvasDevice,
         CreateDirect3DSurface(As<IDXGISurface>(_outputTexture).Get()),
+        96.f,
         CanvasAlphaMode::Ignore
         );
 

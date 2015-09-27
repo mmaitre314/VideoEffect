@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="fffcff14-c22f-4fb3-80b3-9a3679d784f1" Publisher="CN=mmaitre" Version="1.0.0.1" />
+  <Identity Name="fffcff14-c22f-4fb3-80b3-9a3679d784f1" Publisher="CN=Matthieu" Version="1.0.0.1" />
   <Properties>
     <DisplayName>UnitTests.Windows</DisplayName>
     <PublisherDisplayName>mmaitre</PublisherDisplayName>

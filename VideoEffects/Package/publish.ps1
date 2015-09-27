@@ -7,7 +7,7 @@
 #   https://docs.google.com/document/d/13VM59LEuNps66TK_vITqKd1TPlUtKDaOg9T2dLnFXnE/edit?hl=en_US
 #   https://msdn.microsoft.com/en-us/library/windows/hardware/ff540151(v=vs.85).aspx
 
-$version = "2.3.1"
+$version = "2.3.2"
 $outputPath = "c:\NuGet\"
 $product = "MMaitre.VideoEffects"
 $storageAccountName = "mmaitre314"
