@@ -15,6 +15,8 @@ Effects can be applied via [MediaTranscoder](http://msdn.microsoft.com/en-us/lib
 
 Binaries are available via [NuGet](https://www.nuget.org/packages/MMaitre.VideoEffects/).
 
+Note for Win10+: the OS provides built-in support for video effects via [IBasicVideoEffect](https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.effects.ibasicvideoeffect.aspx), which makes the VideoEffect lib obsolete. See [Win2D Example Gallery Effects](https://github.com/Microsoft/Win2D/tree/31bf8ac397e272bdadfdac1493ae3b52680d570a/samples/ExampleGallery/Effects) for code samples.
+
 Lumia Imaging SDK effects
 -------------------------
 
